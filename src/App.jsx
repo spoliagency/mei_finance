@@ -1597,7 +1597,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
   if (isPJ) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div className="mobile-summary-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14 }}>
+        <div className="mobile-summary-grid hide-mobile" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14 }}>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
               <div style={{ fontSize: 16 }}>🎯</div>
@@ -1671,7 +1671,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               </ResponsiveContainer>
             </div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="hide-mobile" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div className="card" style={{ padding: "24px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 16 }}>Meta de Receita</div>
               <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 12 }}>
@@ -1713,7 +1713,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div className="hide-mobile" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <div className="card" style={{ padding: "24px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
               <div style={{ color: "#a855f7" }}><IconPie size={18} /></div>
@@ -1788,7 +1788,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
     // PERSONAL DASHBOARD
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+        <div className="grid-3 hide-mobile" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
               <div style={{ color: "#16a34a" }}>🛡️</div>
@@ -1856,7 +1856,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
             </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="hide-mobile" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {/* Spending Evolution */}
             <div className="card" style={{ padding: "24px", flex: 1 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 20 }}>Evolução Mensal Pessoal</div>
@@ -2924,7 +2924,7 @@ export default function App() {
                   <div key={i} className="card" style={{ padding: "18px 20px", borderTop: `3px solid ${c.accent}` }}>
                     <div style={{ fontSize: 10, color: "#999", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
                     <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.5px", color: c.accent, fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3, minHeight: 26 }}>{c.value}</div>
-                    <div style={{ fontSize: 11, color: "#aaa", marginTop: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.sub}</div>
+                    <div className="hide-mobile-soft" style={{ fontSize: 11, color: "#aaa", marginTop: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.sub}</div>
                   </div>
                 ))}
               </div>
@@ -2944,25 +2944,23 @@ export default function App() {
               </div>
 
               {/* ── Search + status filter ── */}
-              <div className="mobile-search-row" style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
+              <div className={view === "dashboard" ? "hide-mobile mobile-search-row" : "mobile-search-row"} style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
                 <input className="input" style={{ maxWidth: 240 }} placeholder={isPJ ? "Buscar descrição ou cliente..." : "Buscar descrição..."} value={search} onChange={e => setSearch(e.target.value)} />
-                {(isPJ || view !== "dashboard") && (
-                  <div className="mobile-filter-scroll" style={{ display: "flex", gap: 6 }}>
-                    {(isPJ ? ["todos", "recebido", "pendente", "cancelado"] : ["todos", ...METODOS]).map(s => {
-                      const isFilterActive = isPJ ? filterStatus === s : filterMetodo === s;
-                      return (
-                        <button key={s} className="filter-btn" onClick={() => isPJ ? setFilterStatus(s) : setFilterMetodo(s)}
-                          style={{
-                            borderColor: isFilterActive ? "var(--text)" : "var(--filter-btn-border)",
-                            background: isFilterActive ? "var(--text)" : "transparent",
-                            color: isFilterActive ? "var(--bg)" : "var(--text-muted)"
-                          }}>
-                          {s.charAt(0).toUpperCase() + s.slice(1)}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                <div className="mobile-filter-scroll" style={{ display: "flex", gap: 6 }}>
+                  {(isPJ ? ["todos", "recebido", "pendente", "cancelado"] : ["todos", ...METODOS]).map(s => {
+                    const isFilterActive = isPJ ? filterStatus === s : filterMetodo === s;
+                    return (
+                      <button key={s} className="filter-btn" onClick={() => isPJ ? setFilterStatus(s) : setFilterMetodo(s)}
+                        style={{
+                          borderColor: isFilterActive ? "var(--text)" : "var(--filter-btn-border)",
+                          background: isFilterActive ? "var(--text)" : "transparent",
+                          color: isFilterActive ? "var(--bg)" : "var(--text-muted)"
+                        }}>
+                        {s.charAt(0).toUpperCase() + s.slice(1)}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* ── Dashboard view ── */}
@@ -3305,19 +3303,19 @@ export default function App() {
                 {isPJ ? (
                   <>
                     <button className="btn btn-green" style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: 16, borderRadius: 16 }} onClick={() => { closeModal(); setTimeout(openAddVenda, 50); }}>
-                      <span style={{ fontSize: 20 }}>✨</span> <span>Nova Venda / Receita</span>
+                      <span>Nova Venda / Receita</span>
                     </button>
-                    <button className="btn btn-dark" style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: 16, borderRadius: 16 }} onClick={() => { closeModal(); setTimeout(openAddDespesa, 50); }}>
-                      <span style={{ fontSize: 20 }}>💸</span> <span>Nova Despesa (PJ)</span>
+                    <button className="btn btn-outline" style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: 16, borderRadius: 16, border: "2px solid var(--border)", color: "var(--text)", background: "var(--card)" }} onClick={() => { closeModal(); setTimeout(openAddDespesa, 50); }}>
+                      <span>Nova Despesa (PJ)</span>
                     </button>
                   </>
                 ) : (
                   <>
                     <button className="btn btn-green" style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: 16, borderRadius: 16 }} onClick={() => { closeModal(); setTimeout(openAddReserva, 50); }}>
-                      <span style={{ fontSize: 20 }}>✨</span> <span>Nova Reserva</span>
+                      <span>Nova Reserva</span>
                     </button>
-                    <button className="btn btn-dark" style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: 16, borderRadius: 16 }} onClick={() => { closeModal(); setTimeout(openAddGasto, 50); }}>
-                      <span style={{ fontSize: 20 }}>🛍️</span> <span>Novo Gasto Pessoal</span>
+                    <button className="btn btn-outline" style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: 16, borderRadius: 16, border: "2px solid var(--border)", color: "var(--text)", background: "var(--card)" }} onClick={() => { closeModal(); setTimeout(openAddGasto, 50); }}>
+                      <span>Novo Gasto Pessoal</span>
                     </button>
                   </>
                 )}
