@@ -299,18 +299,56 @@ const CSS = `
       -webkit-overflow-scrolling: touch;
       gap: 4px !important;
       padding: 0 12px 12px !important;
+      scrollbar-width: none;
     }
+    .mobile-config-sidebar nav::-webkit-scrollbar { display: none; }
     .mobile-config-sidebar nav button {
       flex-shrink: 0 !important;
       white-space: nowrap !important;
       padding: 8px 14px !important;
       font-size: 12px !important;
+      width: auto !important;
     }
     .mobile-config-content {
       padding: 20px 16px !important;
     }
     .mobile-config-footer { display: none !important; }
     .mobile-config-photo { flex-direction: column !important; gap: 12px !important; align-items: flex-start !important; text-align: left; }
+
+    /* Record table card view restored */
+    .mobile-record-card {
+      display: flex !important;
+      flex-direction: column;
+      padding: 14px 16px !important;
+      gap: 8px;
+      border-bottom: 1px solid var(--divider);
+    }
+    .mobile-record-card:last-child { border-bottom: none; }
+    .mobile-record-field {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .mobile-record-field-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .mobile-record-field-value {
+      text-align: right;
+      min-width: 0;
+    }
+    .mobile-record-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+      padding-top: 6px;
+      border-top: 1px solid var(--divider);
+    }
 
     /* Top-bar mobile PJ/PF switcher */
     .mobile-context-switch {
@@ -340,6 +378,10 @@ const CSS = `
     .mobile-stat-scroll::-webkit-scrollbar { display: none; }
     .mobile-stat-scroll > div { flex-shrink: 0 !important; }
     .mobile-chart-grid { display: grid !important; grid-template-columns: 1fr !important; }
+
+    /* Force hide-mobile absolutely overrides any grid flex column rule */
+    .hide-mobile { display: none !important; }
+    .hide-mobile-soft { display: none !important; }
   }
   
   .toast { position: fixed; bottom: 32px; right: 32px; background: #1a1a1a; color: #f5f2ed; padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 13px; z-index: 9999; animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 2s forwards; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
