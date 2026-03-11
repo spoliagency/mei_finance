@@ -2319,9 +2319,18 @@ export default function App() {
   const setOrcamento = async (cat, val) => {
     const v = unmaskCurrency(maskCurrency(val));
     setOrcamentos(o => ({ ...o, [cat]: v }));
-    // Sync with Supabase
+    // Sync with Supabase (delete + insert works around missing composite unique constraint)
     if (session) {
-      const { error } = await supabase.from('orcamentos').upsert({ categoria: cat, valor: v, user_id: session.user.id }, { onConflict: 'user_id,categoria' });
+      await supabase.from('orcamentos').delete()
+        .eq('user_id', session.user.id)
+        .eq('categoria', cat);
+        
+      const { error } = await supabase.from('orcamentos').insert({ 
+        categoria: cat, 
+        valor: v, 
+        user_id: session.user.id 
+      });
+      
       if (error) {
         console.error("Erro Orçamento:", error.message);
         showToast("Erro ao salvar orçamento: " + error.message);
