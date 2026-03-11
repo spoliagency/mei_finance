@@ -244,7 +244,15 @@ const CSS = `
     .main-container { padding: 16px 12px 80px !important; }
 
     /* Summary Cards: 2 columns forced */
-    .mobile-summary-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+    .mobile-summary-grid { 
+      display: grid !important; 
+      grid-template-columns: repeat(2, 1fr) !important; 
+      gap: 12px !important; 
+      padding-bottom: 4px;
+    }
+    .mobile-summary-grid .card {
+      padding: 16px 14px !important;
+    }
 
     /* Hiding secondary info on mobile to simplify */
     .hide-mobile-soft { display: none !important; }
@@ -252,12 +260,20 @@ const CSS = `
     /* Search & filters: full width, scrollable */
     .mobile-search-row { flex-direction: column !important; gap: 10px !important; display: flex !important; }
     .mobile-search-row input { max-width: 100% !important; width: 100% !important; }
-    .mobile-filter-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap !important; padding-bottom: 4px; }
-    .mobile-filter-scroll::-webkit-scrollbar { display: none; }
+
+    .mobile-filter-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      flex-wrap: nowrap !important;
+      padding-bottom: 4px;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none;  /* IE and Edge */
+    }
+    .mobile-filter-scroll::-webkit-scrollbar { display: none !important; }
     .mobile-filter-scroll .filter-btn { flex-shrink: 0; }
 
     /* Date filter: stack on mobile */
-    .mobile-date-row { flex-wrap: wrap !important; }
+    .mobile-date-row { flex-wrap: nowrap !important; padding-bottom: 8px; }
     .mobile-date-row input[type="date"] { width: 100% !important; flex: 1; min-width: 0; }
 
     /* CatGrid: 3 columns */
@@ -482,7 +498,7 @@ function DateFilterBar({ range, setRange }) {
   const presets = [["mes", "Este mês"], ["anterior", "Mês anterior"], ["ano", "Este ano"], ["custom", "Personalizado"]];
   const pick = (p) => { setActive(p); if (p !== "custom") setQuickRange(p, setRange); };
   return (
-    <div className="mobile-date-row mobile-filter-scroll" style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+    <div className="mobile-date-row mobile-filter-scroll" style={{ display: "flex", gap: 8, alignItems: "center" }}>
       {presets.map(([k, l]) => (
         <button key={k} className="filter-btn" onClick={() => pick(k)}
           style={{
@@ -2570,7 +2586,6 @@ export default function App() {
     const pfOrcTotal = categoriasPF.reduce((acc, c) => acc + (orcamentos[c.label] || 0), 0);
     return [
       { label: "Total Gasto", value: fmt(totals.totalGastos), sub: "contas pessoais", accent: "#6366f1" },
-      { label: "Orçamento total", value: fmt(pfOrcTotal), sub: "limite mensal", accent: "#aaa", className: "hide-mobile" },
       { label: "Disponível", value: fmt(Math.max(0, pfOrcTotal - totals.totalGastos)), sub: "até o fim do mês", accent: "#4ade80" },
       { label: "Total Reservado", value: fmt(totals.totalReservado), sub: "guardado no período", accent: "#10b981" },
       { label: "Pendentes", value: fmt(totals.pendentesGasto), sub: "a pagar", accent: "#f59e0b" },
@@ -2919,7 +2934,7 @@ export default function App() {
               </div>
 
               {/* ── Summary cards ── */}
-              <div className={`mobile-summary-grid ${isPJ ? "grid-4" : ""}`} style={{ display: "grid", gridTemplateColumns: isPJ ? "repeat(4, 1fr)" : "repeat(5, 1fr)", gap: 14, marginBottom: 24 }}>
+              <div className="mobile-summary-grid grid-4" style={{ display: "grid", gridTemplateColumns: isPJ ? "repeat(4, 1fr)" : "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
                 {summaryCards.map((c, i) => (
                   <div key={i} className={`card ${c.className || ""}`} style={{ padding: "18px 20px", borderTop: `3px solid ${c.accent}` }}>
                     <div style={{ fontSize: 10, color: "#999", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
