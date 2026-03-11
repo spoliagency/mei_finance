@@ -244,10 +244,13 @@ const CSS = `
     .main-container { padding: 16px 12px 80px !important; }
 
     /* Summary Cards: 2 columns forced */
-    .mobile-summary-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+    .mobile-summary-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+
+    /* Hiding secondary info on mobile to simplify */
+    .hide-mobile-soft { display: none !important; }
 
     /* Search & filters: full width, scrollable */
-    .mobile-search-row { flex-direction: column !important; gap: 10px !important; }
+    .mobile-search-row { flex-direction: column !important; gap: 10px !important; display: flex !important; }
     .mobile-search-row input { max-width: 100% !important; width: 100% !important; }
     .mobile-filter-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap !important; padding-bottom: 4px; }
     .mobile-filter-scroll::-webkit-scrollbar { display: none; }
@@ -355,7 +358,7 @@ const CSS = `
     }
     .mobile-stat-scroll::-webkit-scrollbar { display: none; }
     .mobile-stat-scroll > div { flex-shrink: 0 !important; }
-    .mobile-chart-grid { grid-template-columns: 1fr !important; }
+    .mobile-chart-grid { display: grid !important; grid-template-columns: 1fr !important; }
   }
   
   .toast { position: fixed; bottom: 32px; right: 32px; background: #1a1a1a; color: #f5f2ed; padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 13px; z-index: 9999; animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 2s forwards; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
@@ -1601,7 +1604,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Ticket Médio</div>
             </div>
             <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>{fmt(pjStats.ticketMedio)}</div>
-            <div style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Valor médio por venda</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Valor médio por venda</div>
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -1609,7 +1612,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Lucro Real</div>
             </div>
             <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "#16a34a" }}>{fmtPct(pjStats.margemLucro)}</div>
-            <div style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>% que sobra após taxas e despesas</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>% que sobra após taxas e despesas</div>
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -1617,7 +1620,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Melhor Dia</div>
             </div>
             <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", textTransform: "capitalize" }}>{pjStats.melhorDia}</div>
-            <div style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Com mais faturamento</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Com mais faturamento</div>
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -1625,7 +1628,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Custo Fixo</div>
             </div>
             <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>{fmt(totals.totalDesp)}</div>
-            <div style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Despesas da empresa</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Despesas da empresa</div>
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -1633,7 +1636,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Custos Totais</div>
             </div>
             <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "#ef4444" }}>{fmt(totals.totalDesp + totals.totalDeducao)}</div>
-            <div style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Fixos: {fmt(totals.totalDesp)} · Taxas: {fmt(totals.totalDeducao)}</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Fixos: {fmt(totals.totalDesp)} · Taxas: {fmt(totals.totalDeducao)}</div>
           </div>
         </div>
 
@@ -1796,7 +1799,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                 {pfStats.reservaMeses.toFixed(1)} meses
               </div>
             ) : (
-              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-dim)" }}>Configure a média mensal</div>
+              <div className="hide-mobile-soft" style={{ fontSize: 13, fontWeight: 600, color: "var(--text-dim)" }}>Configure a média mensal</div>
             )}
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
@@ -1814,7 +1817,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase" }}>Top Categoria</div>
             </div>
             <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text)" }}>{pfStats.raloSorted[0] ? pfStats.raloSorted[0][0] : "—"}</div>
-            <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>{pfStats.raloSorted[0] ? fmt(pfStats.raloSorted[0][1]) : ""}</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>{pfStats.raloSorted[0] ? fmt(pfStats.raloSorted[0][1]) : ""}</div>
           </div>
         </div>
 
@@ -3294,6 +3297,34 @@ export default function App() {
             );
           })()}
 
+          {/* ── Mobile Add Menu Modal ── */}
+          {modal?.type === "mobile-add-menu" && (
+            <div className="modal-overlay" onClick={closeModal} style={{ alignItems: "flex-end", paddingBottom: 80 }}>
+              <div className="modal" style={{ padding: "24px", width: "100%", maxWidth: 360, display: "flex", flexDirection: "column", gap: 12, borderRadius: "24px 24px 16px 16px" }} onClick={e => e.stopPropagation()}>
+                <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 8, textAlign: "center" }}>Adicionar Novo</div>
+                {isPJ ? (
+                  <>
+                    <button className="btn btn-green" style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: 16, borderRadius: 16 }} onClick={() => { closeModal(); setTimeout(openAddVenda, 50); }}>
+                      <span style={{ fontSize: 20 }}>✨</span> <span>Nova Venda / Receita</span>
+                    </button>
+                    <button className="btn btn-dark" style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: 16, borderRadius: 16 }} onClick={() => { closeModal(); setTimeout(openAddDespesa, 50); }}>
+                      <span style={{ fontSize: 20 }}>💸</span> <span>Nova Despesa (PJ)</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button className="btn btn-green" style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: 16, borderRadius: 16 }} onClick={() => { closeModal(); setTimeout(openAddReserva, 50); }}>
+                      <span style={{ fontSize: 20 }}>✨</span> <span>Nova Reserva</span>
+                    </button>
+                    <button className="btn btn-dark" style={{ width: "100%", justifyContent: "center", padding: "16px", fontSize: 16, borderRadius: 16 }} onClick={() => { closeModal(); setTimeout(openAddGasto, 50); }}>
+                      <span style={{ fontSize: 20 }}>🛍️</span> <span>Novo Gasto Pessoal</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* ── Delete confirm ── */}
           {deleteConfirm && (
             <div className="modal-overlay" onClick={() => setDeleteConfirm(null)}>
@@ -3316,7 +3347,7 @@ export default function App() {
               <IconList size={20} /> <span style={{ fontSize: 10, fontWeight: 700 }}>Lista</span>
             </button>
             {/* Floating Add Button in Nav */}
-            <button className="btn-fab" onClick={isPJ ? openAddVenda : openAddGasto}
+            <button className="btn-fab" onClick={() => setModal({ type: "mobile-add-menu" })}
               style={{ width: 44, height: 44, borderRadius: 22, background: "var(--text)", color: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", marginTop: -15, boxShadow: "0 4px 12px rgba(0,0,0,0.2)", border: "none", cursor: "pointer" }}>
               <span style={{ fontSize: 24, fontWeight: 800 }}>+</span>
             </button>
