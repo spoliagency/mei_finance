@@ -2570,7 +2570,7 @@ export default function App() {
     const pfOrcTotal = categoriasPF.reduce((acc, c) => acc + (orcamentos[c.label] || 0), 0);
     return [
       { label: "Total Gasto", value: fmt(totals.totalGastos), sub: "contas pessoais", accent: "#6366f1" },
-      { label: "Orçamento total", value: fmt(pfOrcTotal), sub: "limite mensal", accent: "#aaa" },
+      { label: "Orçamento total", value: fmt(pfOrcTotal), sub: "limite mensal", accent: "#aaa", className: "hide-mobile" },
       { label: "Disponível", value: fmt(Math.max(0, pfOrcTotal - totals.totalGastos)), sub: "até o fim do mês", accent: "#4ade80" },
       { label: "Total Reservado", value: fmt(totals.totalReservado), sub: "guardado no período", accent: "#10b981" },
       { label: "Pendentes", value: fmt(totals.pendentesGasto), sub: "a pagar", accent: "#f59e0b" },
@@ -2723,7 +2723,7 @@ export default function App() {
             {isPJ ? (
               <><span style={{ fontSize: 15 }}>+</span> Cadastrar venda</>
             ) : (
-              <><span style={{ fontSize: 15 }}>💰</span> Reservar</>
+              <><span style={{ fontSize: 15 }}>+</span> Reservar</>
             )}
           </button>
 
@@ -2921,7 +2921,7 @@ export default function App() {
               {/* ── Summary cards ── */}
               <div className={`mobile-summary-grid ${isPJ ? "grid-4" : ""}`} style={{ display: "grid", gridTemplateColumns: isPJ ? "repeat(4, 1fr)" : "repeat(5, 1fr)", gap: 14, marginBottom: 24 }}>
                 {summaryCards.map((c, i) => (
-                  <div key={i} className="card" style={{ padding: "18px 20px", borderTop: `3px solid ${c.accent}` }}>
+                  <div key={i} className={`card ${c.className || ""}`} style={{ padding: "18px 20px", borderTop: `3px solid ${c.accent}` }}>
                     <div style={{ fontSize: 10, color: "#999", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
                     <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.5px", color: c.accent, fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3, minHeight: 26 }}>{c.value}</div>
                     <div className="hide-mobile-soft" style={{ fontSize: 11, color: "#aaa", marginTop: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.sub}</div>
