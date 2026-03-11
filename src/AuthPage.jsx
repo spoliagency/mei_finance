@@ -11,6 +11,7 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
   const [pwd2, setPwd2] = useState("");
   const [nome, setNome] = useState("");
   const [showPwd, setShowPwd] = useState(false);
+  const [legalModal, setLegalModal] = useState(null); // "terms" | "privacy" | null
 
   useEffect(() => { if (initialView) setView(initialView); }, [initialView]);
 
@@ -329,8 +330,8 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
           {(view === "register" || view === "login") && (
             <div style={{ textAlign: "center", marginTop: 24, fontSize: 11, color: "#bbb", lineHeight: 1.6 }}>
               Ao continuar, você concorda com os{" "}
-              <span style={{ color: "#888", fontWeight: 600 }}>Termos de Uso</span> e{" "}
-              <span style={{ color: "#888", fontWeight: 600 }}>Política de Privacidade</span>
+              <button onClick={() => setLegalModal("terms")} className="alh" style={{ color: "#888", fontWeight: 600, cursor: "pointer", background: "none", border: "none", fontFamily: "'Syne',sans-serif", fontSize: 11, padding: 0, textDecoration: "underline" }}>Termos de Uso</button> e{" "}
+              <button onClick={() => setLegalModal("privacy")} className="alh" style={{ color: "#888", fontWeight: 600, cursor: "pointer", background: "none", border: "none", fontFamily: "'Syne',sans-serif", fontSize: 11, padding: 0, textDecoration: "underline" }}>Política de Privacidade</button>
             </div>
           )}
         </div>
@@ -347,6 +348,128 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
           border: `1px solid ${authToast.err ? "#552222" : "#166534"}`
         }}>
           {authToast.err ? "✕ " : "✓ "}{authToast.msg}
+        </div>
+      )}
+
+      {/* ── Legal Modal ── */}
+      {legalModal && (
+        <div onClick={() => setLegalModal(null)} style={{
+          position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)",
+          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10000, padding: 20
+        }}>
+          <div onClick={e => e.stopPropagation()} className="auth-fade" style={{
+            background: "#f5f2ed", borderRadius: 16, width: "100%", maxWidth: 640, maxHeight: "85vh",
+            display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.3)"
+          }}>
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 28px", borderBottom: "1px solid #e8e5e0", flexShrink: 0 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.5px" }}>
+                {legalModal === "terms" ? "Termos de Uso" : "Política de Privacidade"}
+              </div>
+              <button onClick={() => setLegalModal(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 22, color: "#888", padding: 4, lineHeight: 1 }}>✕</button>
+            </div>
+            {/* Content */}
+            <div style={{ padding: "24px 28px", overflowY: "auto", fontSize: 13, color: "#555", lineHeight: 1.8, fontFamily: "'Syne',sans-serif" }}>
+              {legalModal === "terms" ? (
+                <div>
+                  <p style={{ fontSize: 11, color: "#aaa", marginBottom: 16 }}>Última atualização: {new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 0 }}>1. Aceitação dos Termos</h3>
+                  <p>Ao acessar e utilizar o <strong>Mei Finanças</strong> ("Plataforma"), disponível em meifinancas.app, você declara que leu, compreendeu e concorda com estes Termos de Uso. Caso não concorde, não utilize a Plataforma.</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>2. Descrição do Serviço</h3>
+                  <p>O Mei Finanças é uma plataforma de gestão financeira voltada para Microempreendedores Individuais (MEI), oferecendo funcionalidades como:</p>
+                  <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
+                    <li>Separação de contas PJ (Pessoa Jurídica) e PF (Pessoa Física)</li>
+                    <li>Registro de vendas, despesas e gastos pessoais</li>
+                    <li>Controle de categorias e orçamentos</li>
+                    <li>Acompanhamento do DAS (Documento de Arrecadação do Simples Nacional)</li>
+                    <li>Relatórios financeiros e dashboards</li>
+                  </ul>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>3. Cadastro e Conta</h3>
+                  <p>Para utilizar a Plataforma, você deve criar uma conta fornecendo informações verdadeiras e atualizadas. Você é responsável por manter a confidencialidade de sua senha e por todas as atividades realizadas em sua conta.</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>4. Uso Adequado</h3>
+                  <p>Você se compromete a utilizar a Plataforma apenas para fins legais e de acordo com estes Termos. É proibido:</p>
+                  <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
+                    <li>Utilizar a Plataforma para qualquer atividade ilícita</li>
+                    <li>Tentar acessar áreas restritas ou dados de outros usuários</li>
+                    <li>Introduzir vírus, malware ou código malicioso</li>
+                    <li>Realizar engenharia reversa ou descompilar o software</li>
+                  </ul>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>5. Planos e Pagamentos</h3>
+                  <p>A Plataforma pode oferecer planos gratuitos e pagos. Os valores, funcionalidades e condições de cada plano serão informados na página de preços. Pagamentos recorrentes podem ser cancelados a qualquer momento, com efeito ao final do período vigente.</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>6. Propriedade Intelectual</h3>
+                  <p>Todo o conteúdo da Plataforma, incluindo marca, design, código-fonte, textos e funcionalidades, é de propriedade exclusiva do Mei Finanças e protegido pelas leis de propriedade intelectual brasileiras.</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>7. Limitação de Responsabilidade</h3>
+                  <p>O Mei Finanças não substitui consultoria contábil ou fiscal profissional. Os dados e cálculos fornecidos são meramente informativos. Recomendamos a consulta a um contador para decisões financeiras relevantes. Não nos responsabilizamos por perdas decorrentes do uso inadequado das informações.</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>8. Disponibilidade</h3>
+                  <p>Nos esforçamos para manter a Plataforma disponível 24/7, mas não garantimos disponibilidade ininterrupta. Manutenções programadas e imprevistos podem causar períodos de indisponibilidade.</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>9. Modificações</h3>
+                  <p>Reservamo-nos o direito de modificar estes Termos a qualquer momento. Alterações significativas serão comunicadas por e-mail ou notificação na Plataforma.</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>10. Contato</h3>
+                  <p>Em caso de dúvidas, entre em contato pelo e-mail <strong>contato@meifinancas.app</strong>.</p>
+                </div>
+              ) : (
+                <div>
+                  <p style={{ fontSize: 11, color: "#aaa", marginBottom: 16 }}>Última atualização: {new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 0 }}>1. Introdução</h3>
+                  <p>A sua privacidade é importante para nós. Esta Política de Privacidade descreve como o <strong>Mei Finanças</strong> coleta, utiliza, armazena e protege as informações pessoais dos usuários, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>2. Dados Coletados</h3>
+                  <p>Coletamos os seguintes dados pessoais:</p>
+                  <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
+                    <li><strong>Dados de cadastro:</strong> nome completo, e-mail, CNPJ (opcional), CPF (opcional)</li>
+                    <li><strong>Dados financeiros:</strong> vendas, despesas, gastos pessoais, categorias e orçamentos inseridos voluntariamente pelo usuário</li>
+                    <li><strong>Dados de uso:</strong> informações sobre como você interage com a Plataforma (páginas visitadas, funcionalidades utilizadas)</li>
+                    <li><strong>Dados técnicos:</strong> endereço IP, tipo de navegador, sistema operacional</li>
+                  </ul>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>3. Finalidade do Uso dos Dados</h3>
+                  <p>Utilizamos seus dados para:</p>
+                  <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
+                    <li>Fornecer e aprimorar os serviços da Plataforma</li>
+                    <li>Personalizar sua experiência de uso</li>
+                    <li>Enviar comunicações relevantes (confirmação de conta, alertas, novidades)</li>
+                    <li>Garantir a segurança da sua conta</li>
+                    <li>Cumprir obrigações legais e regulatórias</li>
+                  </ul>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>4. Compartilhamento de Dados</h3>
+                  <p><strong>Não vendemos</strong> seus dados pessoais. Podemos compartilhar informações apenas com:</p>
+                  <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
+                    <li><strong>Provedores de serviço:</strong> empresas que nos auxiliam na operação (hospedagem, e-mail, analytics), sob contratos de confidencialidade</li>
+                    <li><strong>Obrigações legais:</strong> quando exigido por lei ou ordem judicial</li>
+                  </ul>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>5. Armazenamento e Segurança</h3>
+                  <p>Seus dados são armazenados em servidores seguros com criptografia. Utilizamos medidas técnicas e organizacionais para proteger suas informações contra acesso não autorizado, perda ou destruição, incluindo:</p>
+                  <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
+                    <li>Criptografia de dados em trânsito (HTTPS/TLS)</li>
+                    <li>Autenticação segura com hash de senhas</li>
+                    <li>Backups periódicos</li>
+                    <li>Controle de acesso restrito</li>
+                  </ul>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>6. Seus Direitos (LGPD)</h3>
+                  <p>Conforme a LGPD, você tem direito a:</p>
+                  <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
+                    <li>Confirmar a existência de tratamento de seus dados</li>
+                    <li>Acessar seus dados pessoais</li>
+                    <li>Corrigir dados incompletos ou desatualizados</li>
+                    <li>Solicitar a eliminação de dados desnecessários</li>
+                    <li>Revogar o consentimento a qualquer momento</li>
+                    <li>Solicitar a portabilidade dos dados</li>
+                  </ul>
+                  <p>Para exercer seus direitos, entre em contato pelo e-mail <strong>contato@meifinancas.app</strong>.</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>7. Cookies</h3>
+                  <p>Utilizamos cookies essenciais para o funcionamento da Plataforma (autenticação e sessão). Não utilizamos cookies de rastreamento para fins publicitários.</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>8. Retenção de Dados</h3>
+                  <p>Seus dados são mantidos enquanto sua conta estiver ativa. Ao solicitar o encerramento da conta, seus dados serão excluídos em até 30 dias, exceto quando a retenção for necessária para cumprimento de obrigações legais.</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>9. Alterações nesta Política</h3>
+                  <p>Esta Política pode ser atualizada periodicamente. Alterações significativas serão comunicadas por e-mail ou notificação na Plataforma.</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>10. Contato</h3>
+                  <p>Para dúvidas sobre privacidade e proteção de dados, entre em contato: <strong>contato@meifinancas.app</strong>.</p>
+                </div>
+              )}
+            </div>
+            {/* Footer */}
+            <div style={{ padding: "16px 28px", borderTop: "1px solid #e8e5e0", flexShrink: 0, display: "flex", justifyContent: "flex-end" }}>
+              <button onClick={() => setLegalModal(null)} className="abh" style={{ ...btnP, width: "auto", padding: "0 32px", height: 42, fontSize: 13 }}>Entendido</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
