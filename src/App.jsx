@@ -224,8 +224,10 @@ const CSS = `
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
   /* ── Mobile Optimization ── */
+  html, body { overflow-x: hidden; }
   @media (max-width: 768px) {
     .hide-mobile { display: none !important; }
+    .show-mobile { display: flex !important; }
     .mobile-px { padding-left: 12px !important; padding-right: 12px !important; }
     .mobile-stack { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; }
     .mobile-header { height: auto !important; padding: 12px 16px !important; flex-direction: column !important; align-items: start !important; gap: 12px !important; }
@@ -238,9 +240,10 @@ const CSS = `
       z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
     }
     .modal { border-radius: 16px 16px 0 0; max-height: 92vh; height: auto; }
+    .modal-overlay { padding: 0; align-items: flex-end; }
     .main-container { padding: 16px 12px 80px !important; }
 
-    /* Summary Cards: 2 columns */
+    /* Summary Cards: 2 columns forced */
     .mobile-summary-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
 
     /* Search & filters: full width, scrollable */
@@ -250,7 +253,7 @@ const CSS = `
     .mobile-filter-scroll::-webkit-scrollbar { display: none; }
     .mobile-filter-scroll .filter-btn { flex-shrink: 0; }
 
-    /* Date filter: full width date inputs */
+    /* Date filter: stack on mobile */
     .mobile-date-row { flex-wrap: wrap !important; }
     .mobile-date-row input[type="date"] { width: 100% !important; flex: 1; min-width: 0; }
 
@@ -294,6 +297,65 @@ const CSS = `
       padding-top: 6px;
       border-top: 1px solid var(--divider);
     }
+
+    /* Config page: stack vertically */
+    .mobile-config-wrapper {
+      flex-direction: column !important;
+      min-height: auto !important;
+    }
+    .mobile-config-sidebar {
+      width: 100% !important;
+      border-right: none !important;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0 0 !important;
+    }
+    .mobile-config-sidebar nav {
+      display: flex !important;
+      flex-direction: row !important;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      gap: 4px !important;
+      padding: 0 12px 12px !important;
+    }
+    .mobile-config-sidebar nav button {
+      flex-shrink: 0 !important;
+      white-space: nowrap !important;
+      padding: 8px 14px !important;
+      font-size: 12px !important;
+    }
+    .mobile-config-content {
+      padding: 20px 16px !important;
+    }
+    .mobile-config-footer { display: none !important; }
+
+    /* Top-bar mobile PJ/PF switcher */
+    .mobile-context-switch {
+      display: flex !important;
+      background: #2a2a2a;
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .mobile-context-switch button {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    /* Dashboard stat cards scroll */
+    .mobile-stat-scroll {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch;
+      flex-wrap: nowrap !important;
+    }
+    .mobile-stat-scroll::-webkit-scrollbar { display: none; }
+    .mobile-stat-scroll > div { flex-shrink: 0 !important; }
+    .mobile-chart-grid { grid-template-columns: 1fr !important; }
   }
   
   .toast { position: fixed; bottom: 32px; right: 32px; background: #1a1a1a; color: #f5f2ed; padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 13px; z-index: 9999; animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 2s forwards; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
@@ -964,11 +1026,11 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
   ];
 
   return (
-    <div style={{ display: "flex", gap: 0, minHeight: 600, background: "var(--card)", borderRadius: 18, border: "1px solid var(--border)", overflow: "hidden" }}
+    <div className="mobile-config-wrapper" style={{ display: "flex", gap: 0, minHeight: 600, background: "var(--card)", borderRadius: 18, border: "1px solid var(--border)", overflow: "hidden" }}
       onClick={e => e.stopPropagation()}>
 
       {/* ── Sidebar ── */}
-      <div style={{ width: 220, background: "var(--sidebar-bg)", borderRight: "1px solid var(--border)", padding: "24px 0", display: "flex", flexDirection: "column", flexShrink: 0 }}>
+      <div className="mobile-config-sidebar" style={{ width: 220, background: "var(--sidebar-bg)", borderRight: "1px solid var(--border)", padding: "24px 0", display: "flex", flexDirection: "column", flexShrink: 0 }}>
         <div style={{ padding: "0 20px 20px", borderBottom: "1px solid var(--divider)", marginBottom: 8 }}>
           <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: "-0.3px" }}>Configurações</div>
           <div style={{ fontSize: 11, color: "var(--text-dim)", marginTop: 2 }}>Finanças Mei · MEI</div>
@@ -986,7 +1048,7 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
             </button>
           ))}
         </nav>
-        <div style={{ padding: "16px 16px 0", borderTop: "1px solid var(--divider)", marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
+        <div className="mobile-config-footer" style={{ padding: "16px 16px 0", borderTop: "1px solid var(--divider)", marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ width: 34, height: 34, borderRadius: 99, background: "var(--bg)", border: "1.5px solid var(--border)", overflow: "hidden", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}>
               {draftPerfil.foto ? <img src={draftPerfil.foto} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : "👤"}
@@ -1006,7 +1068,7 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
       </div>
 
       {/* ── Content ── */}
-      <div style={{ flex: 1, padding: "32px 36px", overflowY: "auto" }}>
+      <div className="mobile-config-content" style={{ flex: 1, padding: "32px 36px", overflowY: "auto" }}>
 
         {/* ── Perfil ── */}
         {section === "perfil" && (
@@ -1532,7 +1594,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
   if (isPJ) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div className="grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14 }}>
+        <div className="mobile-summary-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14 }}>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
               <div style={{ fontSize: 16 }}>🎯</div>
@@ -1575,7 +1637,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           </div>
         </div>
 
-        <div className="grid-1" style={{ display: "grid", gridTemplateColumns: "2.2fr 1fr", gap: 14 }}>
+        <div className="mobile-chart-grid" style={{ display: "grid", gridTemplateColumns: "2.2fr 1fr", gap: 14 }}>
           <div className="card" style={{ padding: "24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <div>
@@ -2622,6 +2684,17 @@ export default function App() {
             <div className="hide-mobile" style={{ fontSize: 9, color: "#666", fontWeight: 700, marginTop: -2, letterSpacing: "0.2px" }}>Controle financeiro MEI</div>
           </div>
         </div>
+
+          {/* Mobile PJ/PF switcher — visible only on mobile */}
+          <div className="mobile-context-switch" style={{ display: "none" }}>
+            {[{ key: "pj", label: "Empresa" }, { key: "pf", label: "Pessoal" }].map((item) => (
+              <button key={item.key} onClick={() => { setContext(item.key); setSearch(""); setFilterStatus("todos"); setFilterMetodo("todos"); safeNavigate("main", "dashboard"); }}
+                style={{
+                  background: context === item.key ? "#f5f2ed" : "transparent",
+                  color: context === item.key ? "#1a1a1a" : "#666"
+                }}>{item.label}</button>
+            ))}
+          </div>
 
         {/* Header actions — fixed layout, never shifts */}
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
