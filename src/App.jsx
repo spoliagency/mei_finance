@@ -262,12 +262,9 @@ const CSS = `
     .mobile-search-row input { max-width: 100% !important; width: 100% !important; }
 
     .mobile-filter-scroll {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      flex-wrap: nowrap !important;
+      flex-wrap: wrap !important;
       padding-bottom: 4px;
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none;  /* IE and Edge */
+      gap: 6px !important;
     }
     .mobile-filter-scroll::-webkit-scrollbar { display: none !important; }
     .mobile-filter-scroll .filter-btn { flex-shrink: 0; }
@@ -294,16 +291,11 @@ const CSS = `
     }
     .mobile-config-sidebar nav {
       display: flex !important;
-      flex-direction: row !important;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      gap: 4px !important;
+      flex-wrap: wrap !important;
+      gap: 6px !important;
       padding: 0 12px 12px !important;
-      scrollbar-width: none;
     }
-    .mobile-config-sidebar nav::-webkit-scrollbar { display: none; }
     .mobile-config-sidebar nav button {
-      flex-shrink: 0 !important;
       white-space: nowrap !important;
       padding: 8px 14px !important;
       font-size: 12px !important;
@@ -726,6 +718,252 @@ function RecordTable({ records, columns, onView, onEdit, onDelete, emptyMsg }) {
 }
 
 // ─── Config Page ──────────────────────────────────────────────────────────────
+function CatManager({ cats, setCats }) {
+  const [editingIdx, setEditingIdx] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ label: "", icon: "💼", color: "#6366f1" });
+
+  const openAdd = () => { setForm({ label: "", icon: "💼", color: "#6366f1" }); setEditingIdx(null); setShowForm(true); };
+  const openEdit = (i) => { const c = cats[i]; setForm({ label: c.label, icon: c.icon, color: CAT_COLORS[c.label] || "#6366f1" }); setEditingIdx(i); setShowForm(true); };
+  const saveForm = () => {
+    if (!form.label.trim()) return;
+    const newCat = { label: form.label.trim(), icon: form.icon };
+    CAT_COLORS[form.label.trim()] = form.color;
+
+    let next;
+    if (editingIdx === null) {
+      next = [...cats, newCat];
+    } else {
+      next = cats.map((c, i) => i === editingIdx ? newCat : c);
+    }
+    setCats(next);
+    setShowForm(false);
+  };
+  const deleteCat = (i) => {
+    const next = cats.filter((_, idx) => idx !== i);
+    setCats(next);
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <div style={{ fontSize: 11, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>{cats.length} categorias</div>
+        <button onClick={openAdd} style={{ background: "var(--text)", color: "var(--bg)", border: "none", borderRadius: 8, padding: "6px 13px", fontSize: 12, fontWeight: 700, fontFamily: "'Syne',sans-serif", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+          <span style={{ fontSize: 14 }}>+</span> Nova
+        </button>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+        {showForm && editingIdx === null && (
+          <div style={{ background: "var(--sidebar-bg)", border: "1px solid var(--text)", borderRadius: 12, padding: "16px", display: "flex", flexDirection: "column", gap: 11, marginBottom: 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)" }}>Nova categoria</div>
+            <input className="input" placeholder="Nome da categoria" value={form.label} onChange={e => setForm(f => ({ ...f, label: e.target.value }))} style={{ background: "var(--bg)", color: "var(--text)" }} />
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 5 }}>Ícone</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                {EMOJI_OPTIONS.map(e => (
+                  <button key={e} onClick={() => setForm(f => ({ ...f, icon: e }))}
+                    style={{
+                      width: 30, height: 30, borderRadius: 7, border: "1.5px solid", cursor: "pointer", fontSize: 15,
+                      background: form.icon === e ? "var(--text)" : "rgba(255,255,255,0.05)",
+                      borderColor: form.icon === e ? "var(--text)" : "var(--divider)",
+                      color: form.icon === e ? "var(--bg)" : "inherit"
+                    }}>
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 5 }}>Cor</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{COLOR_OPTIONS.map(c => <button key={c} onClick={() => setForm(f => ({ ...f, color: c }))} style={{ width: 24, height: 24, borderRadius: 6, border: form.color === c ? "2.5px solid #1a1a1a" : "2px solid transparent", cursor: "pointer", background: c }} />)}</div>
+            </div>
+            <div style={{ display: "flex", gap: 7 }}>
+              <button onClick={() => setShowForm(false)} style={{ flex: 1, padding: "8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "transparent", cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: "'Syne',sans-serif", color: "var(--text-muted)" }}>Cancelar</button>
+              <button onClick={saveForm} style={{ flex: 2, padding: "8px", borderRadius: 8, border: "none", background: "var(--text)", cursor: "pointer", fontSize: 12, fontWeight: 700, fontFamily: "'Syne',sans-serif", color: "var(--bg)" }}>Criar</button>
+            </div>
+          </div>
+        )}
+
+        {cats.map((c, i) => (
+          <div key={c.label}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "var(--sidebar-bg)", border: editingIdx === i ? "1.5px solid var(--text)" : "1px solid var(--divider)" }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: `${CAT_COLORS[c.label] || "#888"}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>{c.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
+              </div>
+              <div style={{ display: "flex", gap: 3 }}>
+                <button className="btn-icon" onClick={() => openEdit(i)} style={{ color: editingIdx === i ? "var(--text)" : "#6366f1" }}><IconEdit size={14} /></button>
+                <button className="btn-icon" onClick={() => deleteCat(i)}><IconTrash size={14} /></button>
+              </div>
+            </div>
+
+            {showForm && editingIdx === i && (
+              <div style={{ background: "var(--sidebar-bg)", border: "1.5px solid var(--text)", borderRadius: 12, padding: "16px", display: "flex", flexDirection: "column", gap: 11, marginTop: -2, marginBottom: 8, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+                <input className="input" placeholder="Nome da categoria" value={form.label} onChange={e => setForm(f => ({ ...f, label: e.target.value }))} style={{ background: "var(--bg)", color: "var(--text)" }} />
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 5 }}>Ícone</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                    {EMOJI_OPTIONS.map(e => (
+                      <button key={e} onClick={() => setForm(f => ({ ...f, icon: e }))}
+                        style={{
+                          width: 30, height: 30, borderRadius: 7, border: "1.5px solid", cursor: "pointer", fontSize: 15,
+                          background: form.icon === e ? "var(--text)" : "rgba(255,255,255,0.05)",
+                          borderColor: form.icon === e ? "var(--text)" : "var(--divider)",
+                          color: form.icon === e ? "var(--bg)" : "inherit"
+                        }}>
+                        {e}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{COLOR_OPTIONS.map(c => <button key={c} onClick={() => setForm(f => ({ ...f, color: c }))} style={{ width: 24, height: 24, borderRadius: 6, border: form.color === c ? "2.5px solid #1a1a1a" : "2px solid transparent", cursor: "pointer", background: c }} />)}</div>
+                </div>
+                <div style={{ display: "flex", gap: 7 }}>
+                  <button onClick={() => { setShowForm(false); setEditingIdx(null); }} style={{ flex: 1, padding: "8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "transparent", cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: "'Syne',sans-serif", color: "var(--text-muted)" }}>Cancelar</button>
+                  <button onClick={saveForm} style={{ flex: 2, padding: "8px", borderRadius: 8, border: "none", background: "var(--text)", cursor: "pointer", fontSize: 12, fontWeight: 700, fontFamily: "'Syne',sans-serif", color: "var(--bg)" }}>Salvar</button>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BudgetManager({ cats, orcamentos, setOrcamento }) {
+  const [editingOrc, setEditingOrc] = useState(null);
+  const [orcInput, setOrcInput] = useState("");
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+      {cats.map(c => {
+        const orc = orcamentos[c.label]; const hasOrc = orc != null && orc > 0; const isEditing = editingOrc === c.label;
+        return (
+          <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "var(--sidebar-bg)", border: "1px solid var(--divider)" }}>
+            <span style={{ fontSize: 16, flexShrink: 0 }}>{c.icon}</span>
+            <div style={{ fontSize: 12, fontWeight: 600, flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "var(--text)" }}>{c.label}</div>
+            {isEditing ? (
+              <input autoFocus type="text" value={maskCurrency(orcInput)} onChange={e => setOrcInput(e.target.value.replace(/\D/g, ""))}
+                onBlur={() => { setOrcamento(c.label, orcInput); setEditingOrc(null); }}
+                onKeyDown={e => { if (e.key === "Enter") { setOrcamento(c.label, orcInput); setEditingOrc(null); } if (e.key === "Escape") setEditingOrc(null); }}
+                style={{ width: 90, background: "var(--input-bg)", border: "1.5px solid var(--text)", borderRadius: 8, padding: "4px 10px", fontSize: 12, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", outline: "none", color: "var(--text)" }} placeholder="R$ 0" />
+            ) : (
+              <button onClick={() => { setEditingOrc(c.label); setOrcInput(hasOrc ? String(orc) : ""); }}
+                style={{ background: hasOrc ? "var(--bg)" : "transparent", border: hasOrc ? "1px solid var(--border)" : "1.5px dashed var(--divider)", borderRadius: 8, padding: "4px 12px", cursor: "pointer", fontFamily: "'JetBrains Mono',monospace", fontSize: 12, fontWeight: 700, color: hasOrc ? "var(--text)" : "var(--text-dim)", transition: "all 0.15s", flexShrink: 0 }}>
+                {hasOrc ? fmt(orc) : "Definir"}
+              </button>
+            )}
+            {hasOrc && !isEditing && (
+              <button onClick={() => setOrcamento(c.label, "")} className="btn-icon" style={{ color: "#ccc", flexShrink: 0 }} title="Remover">
+                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function BankManager({ bancos, setBancos, session, showToast }) {
+  const [editingIdx, setEditingIdx] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ nome: "", icon: "🏦", color: "#6366f1" });
+
+  const openAdd = () => { setForm({ nome: "", icon: "🏦", color: "#6366f1" }); setEditingIdx(null); setShowForm(true); };
+  const openEdit = (i) => { const b = bancos[i]; setForm({ nome: b.nome, icon: b.icon, color: b.color || "#6366f1" }); setEditingIdx(i); setShowForm(true); };
+
+  const saveForm = async () => {
+    if (!form.nome.trim()) return;
+    const newBank = { nome: form.nome.trim(), icon: form.icon, color: form.color, user_id: session.user.id };
+
+    if (editingIdx === null) {
+      const { data, error } = await supabase.from('bancos').insert([newBank]).select();
+      if (error) { showToast("Erro: " + error.message); return; }
+      setBancos(p => [...p, data[0]]);
+      showToast("Banco adicionado!");
+    } else {
+      const bankId = bancos[editingIdx].id;
+      if (!bankId) {
+        setBancos(p => p.map((b, i) => i === editingIdx ? { ...newBank, id: null } : b));
+      } else {
+        const { error } = await supabase.from('bancos').update(newBank).eq('id', bankId);
+        if (error) { showToast("Erro: " + error.message); return; }
+        setBancos(p => p.map((b, i) => i === editingIdx ? { ...newBank, id: bankId } : b));
+      }
+      showToast("Banco atualizado!");
+    }
+    setShowForm(false);
+  };
+
+  const deleteBank = async (i) => {
+    const b = bancos[i];
+    if (b.id) {
+      const { error } = await supabase.from('bancos').delete().eq('id', b.id);
+      if (error) { showToast("Erro: " + error.message); return; }
+    }
+    setBancos(p => p.filter((_, idx) => idx !== i));
+    showToast("Banco removido.");
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <div style={{ fontSize: 11, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>{bancos.length} bancos cadastrados</div>
+        <button onClick={openAdd} style={{ background: "var(--text)", color: "var(--bg)", border: "none", borderRadius: 8, padding: "6px 13px", fontSize: 12, fontWeight: 700, fontFamily: "'Syne',sans-serif", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+          <span style={{ fontSize: 14 }}>+</span> Novo Banco
+        </button>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {showForm && editingIdx === null && (
+          <div style={{ background: "var(--sidebar-bg)", border: "1px solid var(--text)", borderRadius: 12, padding: "16px", display: "flex", flexDirection: "column", gap: 12, marginBottom: 8 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)" }}>Novo Banco / Corretora</div>
+            <input className="input" placeholder="Nome do banco" value={form.nome} onChange={e => setForm(f => ({ ...f, nome: e.target.value }))} style={{ background: "var(--bg)", color: "var(--text)" }} />
+            <div style={{ display: "flex", gap: 10 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "#aaa", textTransform: "uppercase", marginBottom: 6 }}>Ícone/Emoji</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{["🏦", "💰", "🟢", "🟡", "🔴", "🟠", "🔵", "⚫", "⚪", "🟣"].map(e => <button key={e} onClick={() => setForm(f => ({ ...f, icon: e }))} style={{ width: 32, height: 32, borderRadius: 8, border: form.icon === e ? "2px solid var(--text)" : "1.5px solid var(--border)", background: "transparent", cursor: "pointer", fontSize: 16 }}>{e}</button>)}</div>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+              <button onClick={() => setShowForm(false)} style={{ flex: 1, padding: "8px", borderRadius: 10, border: "1.5px solid var(--border)", background: "transparent", cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: "'Syne',sans-serif", color: "var(--text-muted)" }}>Cancelar</button>
+              <button onClick={saveForm} style={{ flex: 2, padding: "8px", borderRadius: 10, border: "none", background: "var(--text)", cursor: "pointer", fontSize: 12, fontWeight: 700, fontFamily: "'Syne',sans-serif", color: "var(--bg)" }}>Adicionar</button>
+            </div>
+          </div>
+        )}
+
+        {bancos.map((b, i) => (
+          <div key={b.id || i}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 12, background: "var(--sidebar-bg)", border: editingIdx === i ? "1.5px solid var(--text)" : "1px solid var(--divider)" }}>
+              <div style={{ width: 34, height: 34, borderRadius: 8, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{b.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>{b.nome}</div>
+              </div>
+              <div style={{ display: "flex", gap: 4 }}>
+                <button className="btn-icon" onClick={() => openEdit(i)}><IconEdit size={14} /></button>
+                <button className="btn-icon" onClick={() => deleteBank(i)} style={{ color: "#ef4444" }}><IconTrash size={14} /></button>
+              </div>
+            </div>
+            {showForm && editingIdx === i && (
+              <div style={{ background: "var(--sidebar-bg)", border: "1.5px solid var(--text)", borderRadius: 12, padding: "16px", display: "flex", flexDirection: "column", gap: 12, marginTop: -2, marginBottom: 12, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+                <input className="input" placeholder="Nome do banco" value={form.nome} onChange={e => setForm(f => ({ ...f, nome: e.target.value }))} style={{ background: "var(--bg)", color: "var(--text)" }} />
+                <div style={{ fontSize: 10, fontWeight: 700, color: "#aaa", textTransform: "uppercase", marginBottom: 4 }}>Ícone/Emoji</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{["🏦", "💰", "🟢", "🟡", "🔴", "🟠", "🔵", "⚫", "⚪", "🟣"].map(e => <button key={e} onClick={() => setForm(f => ({ ...f, icon: e }))} style={{ width: 32, height: 32, borderRadius: 8, border: form.icon === e ? "2px solid var(--text)" : "1.5px solid var(--border)", background: "transparent", cursor: "pointer", fontSize: 16 }}>{e}</button>)}</div>
+                <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                  <button onClick={() => setShowForm(false)} style={{ flex: 1, padding: "8px", borderRadius: 10, border: "1.5px solid var(--border)", background: "transparent", cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: "'Syne',sans-serif", color: "var(--text-muted)" }}>Cancelar</button>
+                  <button onClick={saveForm} style={{ flex: 2, padding: "8px", borderRadius: 10, border: "none", background: "var(--text)", cursor: "pointer", fontSize: 12, fontWeight: 700, fontFamily: "'Syne',sans-serif", color: "var(--bg)" }}>Salvar Alteração</button>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCategoriasPJ, categoriasPF, setCategoriasPF, orcamentos, setOrcamento, perfil, setPerfil, isPJ, session, showToast, bancos, setBancos }) {
   const [draftPerfil, setDraftPerfil] = useState(perfil);
   const [section, setSection] = useState("perfil");
