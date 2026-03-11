@@ -226,9 +226,7 @@ const CSS = `
   /* ── Mobile Optimization ── */
   @media (max-width: 768px) {
     .hide-mobile { display: none !important; }
-    .mobile-px { padding-left: 16px !important; padding-right: 16px !important; }
-    .grid-4 { grid-template-columns: 1fr 1fr !important; }
-    .grid-1 { grid-template-columns: 1fr !important; }
+    .mobile-px { padding-left: 12px !important; padding-right: 12px !important; }
     .mobile-stack { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; }
     .mobile-header { height: auto !important; padding: 12px 16px !important; flex-direction: column !important; align-items: start !important; gap: 12px !important; }
     .mobile-header > div { width: 100%; justify-content: space-between !important; }
@@ -239,8 +237,63 @@ const CSS = `
       display: flex !important; justify-content: space-around; align-items: center; 
       z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
     }
-    .modal { border-radius: 0; max-height: 100vh; height: 100vh; }
-    .main-container { padding: 16px 16px 80px !important; }
+    .modal { border-radius: 16px 16px 0 0; max-height: 92vh; height: auto; }
+    .main-container { padding: 16px 12px 80px !important; }
+
+    /* Summary Cards: 2 columns */
+    .mobile-summary-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+
+    /* Search & filters: full width, scrollable */
+    .mobile-search-row { flex-direction: column !important; gap: 10px !important; }
+    .mobile-search-row input { max-width: 100% !important; width: 100% !important; }
+    .mobile-filter-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap !important; padding-bottom: 4px; }
+    .mobile-filter-scroll::-webkit-scrollbar { display: none; }
+    .mobile-filter-scroll .filter-btn { flex-shrink: 0; }
+
+    /* Date filter: full width date inputs */
+    .mobile-date-row { flex-wrap: wrap !important; }
+    .mobile-date-row input[type="date"] { width: 100% !important; flex: 1; min-width: 0; }
+
+    /* CatGrid: 3 columns */
+    .mobile-cat-grid { grid-template-columns: repeat(3, 1fr) !important; }
+
+    /* Welcome title smaller */
+    .mobile-welcome-title { font-size: 20px !important; }
+
+    /* Record table card view */
+    .mobile-record-card {
+      display: flex !important;
+      flex-direction: column;
+      padding: 14px 16px !important;
+      gap: 8px;
+      border-bottom: 1px solid var(--divider);
+    }
+    .mobile-record-card:last-child { border-bottom: none; }
+    .mobile-record-field {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .mobile-record-field-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .mobile-record-field-value {
+      text-align: right;
+      min-width: 0;
+    }
+    .mobile-record-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+      padding-top: 6px;
+      border-top: 1px solid var(--divider);
+    }
   }
   
   .toast { position: fixed; bottom: 32px; right: 32px; background: #1a1a1a; color: #f5f2ed; padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 13px; z-index: 9999; animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 2s forwards; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
@@ -364,7 +417,7 @@ function DateFilterBar({ range, setRange }) {
   const presets = [["mes", "Este mês"], ["anterior", "Mês anterior"], ["ano", "Este ano"], ["custom", "Personalizado"]];
   const pick = (p) => { setActive(p); if (p !== "custom") setQuickRange(p, setRange); };
   return (
-    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+    <div className="mobile-date-row mobile-filter-scroll" style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
       {presets.map(([k, l]) => (
         <button key={k} className="filter-btn" onClick={() => pick(k)}
           style={{
@@ -389,7 +442,7 @@ function DateFilterBar({ range, setRange }) {
 // ─── Category Grid (read-only, for PF) ───────────────────────────────────────
 function CatGrid({ cats, value, onChange }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 6 }}>
+    <div className="mobile-cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 6 }}>
       {cats.map(c => (
         <button key={c.label} onClick={() => onChange(c.label)}
           style={{
@@ -445,7 +498,7 @@ function CatGridEditable({ cats, value, onChange, onCatsChange }) {
 
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 6, marginBottom: 8 }}>
+      <div className="mobile-cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 6, marginBottom: 8 }}>
         {cats.map((c, i) => (
           <div key={c.label} style={{ position: "relative" }}>
             <button onClick={() => !editMode && onChange(c.label)}
@@ -529,6 +582,36 @@ function CatGridEditable({ cats, value, onChange, onCatsChange }) {
 
 // ─── CRUD Table ───────────────────────────────────────────────────────────────
 function RecordTable({ records, columns, onView, onEdit, onDelete, emptyMsg }) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  if (isMobile) {
+    return (
+      <div className="card" style={{ overflow: "hidden" }}>
+        {records.length === 0 && <div style={{ textAlign: "center", padding: "48px 0", color: "var(--text-dim)", fontSize: 13 }}>{emptyMsg}</div>}
+        {records.map((r, idx) => (
+          <div key={r.id} className="mobile-record-card row-hover">
+            {columns.map(c => (
+              <div key={c.label} className="mobile-record-field">
+                <div className="mobile-record-field-label">{c.label}</div>
+                <div className="mobile-record-field-value" style={{ minWidth: 0 }}>{c.render(r)}</div>
+              </div>
+            ))}
+            <div className="mobile-record-actions">
+              <button className="btn-icon" onClick={() => onView(r)}><IconEye /></button>
+              <button className="btn-icon" onClick={() => onEdit(r)}><IconEdit /></button>
+              <button className="btn-icon" onClick={() => onDelete(r.id)}><IconTrash /></button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div style={{ overflowX: "auto", margin: "0 -4px" }}>
       <div className="card" style={{ overflow: "hidden", minWidth: 600 }}>
@@ -2738,20 +2821,20 @@ export default function App() {
                 {isPJ ? (
                   <>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Bem-vindo(a),</div>
-                    <div style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.empresa || "Sua Empresa"} ✨</div>
+                    <div className="mobile-welcome-title" style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.empresa || "Sua Empresa"} ✨</div>
                   </>
                 ) : (
                   <>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       {(() => { const h = new Date().getHours(); return h >= 5 && h < 12 ? "Bom dia," : h >= 12 && h < 18 ? "Boa tarde," : "Boa noite,"; })()}
                     </div>
-                    <div style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.apelido || perfil.nome || "Visitante"} ✨</div>
+                    <div className="mobile-welcome-title" style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.apelido || perfil.nome || "Visitante"} ✨</div>
                   </>
                 )}
               </div>
 
               {/* ── Summary cards ── */}
-              <div className={isPJ ? "grid-4" : ""} style={{ display: "grid", gridTemplateColumns: isPJ ? "repeat(4, 1fr)" : "repeat(5, 1fr)", gap: 14, marginBottom: 24 }}>
+              <div className={`mobile-summary-grid ${isPJ ? "grid-4" : ""}`} style={{ display: "grid", gridTemplateColumns: isPJ ? "repeat(4, 1fr)" : "repeat(5, 1fr)", gap: 14, marginBottom: 24 }}>
                 {summaryCards.map((c, i) => (
                   <div key={i} className="card" style={{ padding: "18px 20px", borderTop: `3px solid ${c.accent}` }}>
                     <div style={{ fontSize: 10, color: "#999", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
@@ -2776,10 +2859,10 @@ export default function App() {
               </div>
 
               {/* ── Search + status filter ── */}
-              <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
+              <div className="mobile-search-row" style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
                 <input className="input" style={{ maxWidth: 240 }} placeholder={isPJ ? "Buscar descrição ou cliente..." : "Buscar descrição..."} value={search} onChange={e => setSearch(e.target.value)} />
                 {(isPJ || view !== "dashboard") && (
-                  <div style={{ display: "flex", gap: 6 }}>
+                  <div className="mobile-filter-scroll" style={{ display: "flex", gap: 6 }}>
                     {(isPJ ? ["todos", "recebido", "pendente", "cancelado"] : ["todos", ...METODOS]).map(s => {
                       const isFilterActive = isPJ ? filterStatus === s : filterMetodo === s;
                       return (
