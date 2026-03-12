@@ -1637,10 +1637,10 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
               <div style={{ fontSize: 16 }}>⚖️</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Custo Fixo</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Custo Fixo PJ</div>
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>{fmt(totals.totalDesp)}</div>
-            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Despesas da empresa</div>
+            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>{fmt(totals.totalDespFixo)}</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Recorrente · Variável: {fmt(totals.totalDespVariavel)}</div>
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -1648,7 +1648,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Custos Totais</div>
             </div>
             <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "#ef4444" }}>{fmt(totals.totalDesp + totals.totalDeducao)}</div>
-            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Fixos: {fmt(totals.totalDesp)} · Taxas: {fmt(totals.totalDeducao)}</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Fixos: {fmt(totals.totalDespFixo)} · Variáveis: {fmt(totals.totalDespVariavel)} · Taxas: {fmt(totals.totalDeducao)}</div>
           </div>
         </div>
 
@@ -1782,7 +1782,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                   <div style={{ fontSize: 16, marginBottom: 4 }}>📉</div>
                   <div style={{ fontSize: 9, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Custos Operacionais</div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: "#ef4444", fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap" }}>{fmt(totals.totalDesp + totals.totalDeducao)}</div>
-                  <div style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Despesas + Deduções</div>
+                  <div style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Fixos: {fmt(totals.totalDespFixo)} · Var: {fmt(totals.totalDespVariavel)}</div>
                 </div>
                 <div style={{ padding: "12px", border: "1px solid var(--divider)", borderRadius: 10, textAlign: "center" }}>
                   <div style={{ fontSize: 16, marginBottom: 4 }}>💳</div>
@@ -1825,11 +1825,11 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <div style={{ color: "#f59e0b" }}>🍴</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase" }}>Top Categoria</div>
+              <div style={{ fontSize: 16 }}>⚖️</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase" }}>Custo Fixo PF</div>
             </div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text)" }}>{pfStats.raloSorted[0] ? pfStats.raloSorted[0][0] : "—"}</div>
-            <div className="hide-mobile-soft" style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>{pfStats.raloSorted[0] ? fmt(pfStats.raloSorted[0][1]) : ""}</div>
+            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>{fmt(totals.totalGastosFixo)}</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Recorrente · Variável: {fmt(totals.totalGastosVariavel)}</div>
           </div>
         </div>
 
@@ -2541,14 +2541,24 @@ export default function App() {
     const vendasRec = vendas.filter(v => inDateRange(v.data, dateRange) && v.status === "recebido");
     const totalBruto = vendasRec.reduce((s, v) => s + v.faturamento, 0);
     const totalLiq = vendasRec.reduce((s, v) => s + calcLiquido(v.faturamento, v.taxas).liquido, 0);
-    const totalDesp = despesas.filter(d => inDateRange(d.data, dateRange) && d.status === "pago").reduce((s, d) => s + d.valor, 0);
-    const totalGastos = gastos.filter(g => inDateRange(g.data, dateRange) && g.status === "pago").reduce((s, g) => s + g.valor, 0);
-    const totalReservado = reservas.filter(r => inDateRange(r.data, dateRange)).reduce((s, r) => s + r.valor, 0);
 
+    const despPagas = despesas.filter(d => inDateRange(d.data, dateRange) && d.status === "pago");
+    const totalDesp = despPagas.reduce((s, d) => s + d.valor, 0);
+    const totalDespFixo = despPagas.filter(d => d.recorrencia !== "Único").reduce((s, d) => s + d.valor, 0);
+    const totalDespVariavel = despPagas.filter(d => d.recorrencia === "Único").reduce((s, d) => s + d.valor, 0);
+
+    const gastosPagos = gastos.filter(g => inDateRange(g.data, dateRange) && g.status === "pago");
+    const totalGastos = gastosPagos.reduce((s, g) => s + g.valor, 0);
+    const totalGastosFixo = gastosPagos.filter(g => g.recorrencia !== "Único").reduce((s, g) => s + g.valor, 0);
+    const totalGastosVariavel = gastosPagos.filter(g => g.recorrencia === "Único").reduce((s, g) => s + g.valor, 0);
+
+    const totalReservado = reservas.filter(r => inDateRange(r.data, dateRange)).reduce((s, r) => s + r.valor, 0);
     const totalDeducao = totalBruto - totalLiq;
 
     return {
-      totalBruto, totalLiq, totalDesp, totalGastos, totalDeducao, totalReservado,
+      totalBruto, totalLiq, totalDesp, totalDespFixo, totalDespVariavel,
+      totalGastos, totalGastosFixo, totalGastosVariavel,
+      totalDeducao, totalReservado,
       resultado: totalLiq - totalDesp,
       pendentesPJ: vendas.filter(v => v.status === "pendente").reduce((s, v) => s + v.faturamento, 0) + despesas.filter(d => d.status === "pendente").reduce((s, d) => s + d.valor, 0),
       pendentesGasto: gastos.filter(g => g.status === "pendente").reduce((s, g) => s + g.valor, 0)
@@ -2581,7 +2591,7 @@ export default function App() {
   ] : (() => {
     const pfOrcTotal = categoriasPF.reduce((acc, c) => acc + (orcamentos[c.label] || 0), 0);
     return [
-      { label: "Total Gasto", value: fmt(totals.totalGastos), sub: "contas pessoais", accent: "#6366f1" },
+      { label: "Total Gasto", value: fmt(totals.totalGastos), sub: `Fixo: ${fmt(totals.totalGastosFixo)} · Var: ${fmt(totals.totalGastosVariavel)}`, accent: "#6366f1" },
       { label: "Disponível", value: fmt(Math.max(0, pfOrcTotal - totals.totalGastos)), sub: "até o fim do mês", accent: "#4ade80" },
       { label: "Total Reservado", value: fmt(totals.totalReservado), sub: "guardado no período", accent: "#10b981" },
       { label: "Pendentes", value: fmt(totals.pendentesGasto), sub: "a pagar", accent: "#f59e0b" },
