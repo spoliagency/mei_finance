@@ -718,13 +718,16 @@ function RecordTable({ records, columns, onView, onEdit, onDelete, emptyMsg }) {
 }
 
 // ─── Config Page ──────────────────────────────────────────────────────────────
-function CatManager({ cats, setCats }) {
+function CatManager({ cats, setCats, orcamentos = {}, setOrcamento }) {
   const [editingIdx, setEditingIdx] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ label: "", icon: "💼", color: "#6366f1" });
+  const [editingOrc, setEditingOrc] = useState(null);
+  const [orcInput, setOrcInput] = useState("");
 
   const openAdd = () => { setForm({ label: "", icon: "💼", color: "#6366f1" }); setEditingIdx(null); setShowForm(true); };
   const openEdit = (i) => { const c = cats[i]; setForm({ label: c.label, icon: c.icon, color: CAT_COLORS[c.label] || "#6366f1" }); setEditingIdx(i); setShowForm(true); };
+
   const saveForm = () => {
     if (!form.label.trim()) return;
     const newCat = { label: form.label.trim(), icon: form.icon };
@@ -739,9 +742,12 @@ function CatManager({ cats, setCats }) {
     setCats(next);
     setShowForm(false);
   };
+
   const deleteCat = (i) => {
-    const next = cats.filter((_, idx) => idx !== i);
-    setCats(next);
+    if (window.confirm("Excluir esta categoria?")) {
+      const next = cats.filter((_, idx) => idx !== i);
+      setCats(next);
+    }
   };
 
   return (
@@ -784,50 +790,147 @@ function CatManager({ cats, setCats }) {
           </div>
         )}
 
-        {cats.map((c, i) => (
-          <div key={c.label}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "var(--sidebar-bg)", border: editingIdx === i ? "1.5px solid var(--text)" : "1px solid var(--divider)" }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: `${CAT_COLORS[c.label] || "#888"}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>{c.icon}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
-              </div>
-              <div style={{ display: "flex", gap: 3 }}>
-                <button className="btn-icon" onClick={() => openEdit(i)} style={{ color: editingIdx === i ? "var(--text)" : "#6366f1" }}><IconEdit size={14} /></button>
-                <button className="btn-icon" onClick={() => deleteCat(i)}><IconTrash size={14} /></button>
-              </div>
-            </div>
+        {cats.map((c, i) => {
+          const orc = orcamentos[c.label];
+          const hasOrc = orc != null && orc > 0;
+          const isOrcEditing = editingOrc === c.label;
 
-            {showForm && editingIdx === i && (
-              <div style={{ background: "var(--sidebar-bg)", border: "1.5px solid var(--text)", borderRadius: 12, padding: "16px", display: "flex", flexDirection: "column", gap: 11, marginTop: -2, marginBottom: 8, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
-                <input className="input" placeholder="Nome da categoria" value={form.label} onChange={e => setForm(f => ({ ...f, label: e.target.value }))} style={{ background: "var(--bg)", color: "var(--text)" }} />
-                <div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 5 }}>Ícone</div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                    {EMOJI_OPTIONS.map(e => (
-                      <button key={e} onClick={() => setForm(f => ({ ...f, icon: e }))}
+          return (
+            <div key={c.label}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "var(--sidebar-bg)", border: editingIdx === i ? "1.5px solid var(--text)" : "1px solid var(--divider)" }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: `${CAT_COLORS[c.label] || "#888"}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>{c.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
+                </div>
+
+                {setOrcamento && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    {isOrcEditing ? (
+                      <input autoFocus type="text" value={maskCurrency(orcInput)} onChange={e => setOrcInput(e.target.value.replace(/\D/g, ""))}
+                        onBlur={() => { setOrcamento(c.label, orcInput); setEditingOrc(null); }}
+                        onKeyDown={e => { if (e.key === "Enter") { setOrcamento(c.label, orcInput); setEditingOrc(null); } if (e.key === "Escape") setEditingOrc(null); }}
+                        className="input" style={{ width: 90, padding: "4px 8px", fontSize: 11, fontWeight: 700, height: 28, background: "var(--bg)" }} placeholder="R$ 0" />
+                    ) : (
+                      <button onClick={() => { setEditingOrc(c.label); setOrcInput(hasOrc ? String(orc) : ""); }}
                         style={{
-                          width: 30, height: 30, borderRadius: 7, border: "1.5px solid", cursor: "pointer", fontSize: 15,
-                          background: form.icon === e ? "var(--text)" : "rgba(255,255,255,0.05)",
-                          borderColor: form.icon === e ? "var(--text)" : "var(--divider)",
-                          color: form.icon === e ? "var(--bg)" : "inherit"
+                          background: hasOrc ? "var(--bg)" : "transparent",
+                          border: hasOrc ? "1.5px solid var(--border)" : "1.5px dashed var(--divider)",
+                          borderRadius: 8, padding: "4px 10px", cursor: "pointer", fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 700, color: hasOrc ? "var(--text)" : "var(--text-dim)", height: 28
                         }}>
-                        {e}
+                        {hasOrc ? fmt(orc) : "Meta R$"}
                       </button>
-                    ))}
+                    )}
+                  </div>
+                )}
+
+                <div style={{ display: "flex", gap: 3 }}>
+                  <button className="btn-icon" onClick={() => openEdit(i)} style={{ color: editingIdx === i ? "var(--text)" : "#6366f1" }}><IconEdit size={14} /></button>
+                  <button className="btn-icon" onClick={() => deleteCat(i)}><IconTrash size={14} /></button>
+                </div>
+              </div>
+
+              {showForm && editingIdx === i && (
+                <div style={{ background: "var(--sidebar-bg)", border: "1.5px solid var(--text)", borderRadius: 12, padding: "16px", display: "flex", flexDirection: "column", gap: 11, marginTop: -2, marginBottom: 8, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+                  <input className="input" placeholder="Nome da categoria" value={form.label} onChange={e => setForm(f => ({ ...f, label: e.target.value }))} style={{ background: "var(--bg)", color: "var(--text)" }} />
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 5 }}>Ícone</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                      {EMOJI_OPTIONS.map(e => (
+                        <button key={e} onClick={() => setForm(f => ({ ...f, icon: e }))}
+                          style={{
+                            width: 30, height: 30, borderRadius: 7, border: "1.5px solid", cursor: "pointer", fontSize: 15,
+                            background: form.icon === e ? "var(--text)" : "rgba(255,255,255,0.05)",
+                            borderColor: form.icon === e ? "var(--text)" : "var(--divider)",
+                            color: form.icon === e ? "var(--bg)" : "inherit"
+                          }}>
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{COLOR_OPTIONS.map(c => <button key={c} onClick={() => setForm(f => ({ ...f, color: c }))} style={{ width: 24, height: 24, borderRadius: 6, border: form.color === c ? "2.5px solid #1a1a1a" : "2px solid transparent", cursor: "pointer", background: c }} />)}</div>
+                  </div>
+                  <div style={{ display: "flex", gap: 7 }}>
+                    <button onClick={() => { setShowForm(false); setEditingIdx(null); }} style={{ flex: 1, padding: "8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "transparent", cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: "'Syne',sans-serif", color: "var(--text-muted)" }}>Cancelar</button>
+                    <button onClick={saveForm} style={{ flex: 2, padding: "8px", borderRadius: 8, border: "none", background: "var(--text)", cursor: "pointer", fontSize: 12, fontWeight: 700, fontFamily: "'Syne',sans-serif", color: "var(--bg)" }}>Salvar</button>
                   </div>
                 </div>
-                <div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{COLOR_OPTIONS.map(c => <button key={c} onClick={() => setForm(f => ({ ...f, color: c }))} style={{ width: 24, height: 24, borderRadius: 6, border: form.color === c ? "2.5px solid #1a1a1a" : "2px solid transparent", cursor: "pointer", background: c }} />)}</div>
-                </div>
-                <div style={{ display: "flex", gap: 7 }}>
-                  <button onClick={() => { setShowForm(false); setEditingIdx(null); }} style={{ flex: 1, padding: "8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "transparent", cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: "'Syne',sans-serif", color: "var(--text-muted)" }}>Cancelar</button>
-                  <button onClick={saveForm} style={{ flex: 2, padding: "8px", borderRadius: 8, border: "none", background: "var(--text)", cursor: "pointer", fontSize: 12, fontWeight: 700, fontFamily: "'Syne',sans-serif", color: "var(--bg)" }}>Salvar</button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          );
+        })}
       </div>
+    </div>
+  );
+}
+
+function FixedCostManager({ custos, setCustos }) {
+  const [editingIdx, setEditingIdx] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ label: "", valor: "", categoria: "" });
+
+  const [categorias] = useState(() => {
+    // Tenta encontrar as categorias disponíveis no contexto pai (simplificado)
+    return []; 
+  });
+
+  const openAdd = () => { setForm({ label: "", valor: "", categoria: "" }); setEditingIdx(null); setShowForm(true); };
+  const save = () => {
+    if (!form.label || !form.valor) return;
+    const numericValue = unmaskCurrency(maskCurrency(form.valor));
+    const newCost = { label: form.label, valor: numericValue, categoria: form.categoria };
+    if (editingIdx === null) setCustos([...custos, newCost]);
+    else setCustos(custos.map((c, i) => i === editingIdx ? newCost : c));
+    setShowForm(false);
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      {custos.map((c, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "var(--sidebar-bg)", border: "1px solid var(--divider)" }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
+              {c.categoria && <div style={{ fontSize: 9, fontWeight: 700, color: "var(--text-dim)", background: "var(--bg)", padding: "1px 6px", borderRadius: 4, border: "1px solid var(--border)" }}>{c.categoria}</div>}
+            </div>
+            <div style={{ fontSize: 12, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)" }}>{fmt(c.valor)}</div>
+          </div>
+          <div style={{ display: "flex", gap: 4 }}>
+            <button onClick={() => { setForm({ label: c.label, valor: toDigits(c.valor), categoria: c.categoria || "" }); setEditingIdx(i); setShowForm(true); }} className="btn-icon" title="Editar">
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+            </button>
+            <button onClick={() => setCustos(custos.filter((_, idx) => idx !== i))} className="btn-icon" style={{ color: "var(--text-dim)" }} title="Remover">
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
+            </button>
+          </div>
+        </div>
+      ))}
+      {!showForm ? (
+        <button onClick={openAdd} className="btn-outline" style={{ padding: "10px", width: "100%", borderStyle: "dashed", fontSize: 11, fontWeight: 700, borderRadius: 10, marginTop: 4 }}>
+          + Adicionar Custo Fixo
+        </button>
+      ) : (
+        <div className="card" style={{ padding: "16px", display: "flex", flexDirection: "column", gap: 12, border: "1.5px solid var(--text)", marginTop: 4 }}>
+          <div>
+            {lbl("Nome do Custo")}
+            <input className="input" placeholder="Ex: Aluguel" value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} autoFocus />
+          </div>
+          <div>
+            {lbl("Valor Mensal")}
+            <input className="input" placeholder="R$ 0,00" value={maskCurrency(form.valor)} onChange={e => setForm({ ...form, valor: e.target.value.replace(/\D/g, "") })} style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 700 }} />
+          </div>
+          <div>
+            {lbl("Categoria Relacionada")}
+            <input className="input" placeholder="Ex: Moradia, Alimentação..." value={form.categoria} onChange={e => setForm({ ...form, categoria: e.target.value })} list="cat-suggestions" />
+            <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 4 }}>Opcional: use para calcular gastos excedentes por categoria.</div>
+          </div>
+          <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+            <button onClick={() => setShowForm(false)} className="btn-outline" style={{ flex: 1, padding: "8px", fontSize: 12 }}>Cancelar</button>
+            <button onClick={save} className="btn-dark" style={{ flex: 2, padding: "8px", fontSize: 12 }}>{editingIdx === null ? "Adicionar" : "Salvar Alteração"}</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1015,7 +1118,11 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
       dark_mode: draftPerfil.darkMode,
       media_gasto_manual: unmaskCurrency(maskCurrency(draftPerfil.mediaGastoManual)),
       valor_das: unmaskCurrency(maskCurrency(draftPerfil.valorDAS)),
-      dia_fechamento: draftPerfil.diaFechamento
+      dia_fechamento: draftPerfil.diaFechamento,
+      das_email_alerts: draftPerfil.dasEmailAlerts,
+      das_dash_alerts: draftPerfil.dasDashAlerts,
+      custos_fixos: draftPerfil.custosFixos || [],
+      custos_fixos_pf: draftPerfil.custosFixosPF || []
     };
     const { error } = await supabase.from('perfil').upsert(toSave, { onConflict: 'user_id' });
     if (error) {
@@ -1029,15 +1136,30 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
     }
   };
 
-  const SIDEBAR_ITEMS = [
-    { key: "perfil", icon: <IconUser size={16} />, label: "Perfil" },
-    { key: "cat-vendas", icon: <IconBusiness size={16} />, label: "Categorias de Vendas" },
-    { key: "cat-pj", icon: <IconBusiness size={16} />, label: "Categorias PJ" },
-    { key: "cat-pf", icon: <IconUser size={16} />, label: "Categorias PF" },
-    { key: "orc-pj", icon: <IconChart size={16} />, label: "Orçamentos PJ" },
-    { key: "orc-pf", icon: <IconChart size={16} />, label: "Orçamentos PF" },
-    { key: "bancos", icon: <IconBank size={16} />, label: "Meus Bancos" },
-    { key: "prefs", icon: <IconSettings size={16} />, label: "Preferências" },
+  const SIDEBAR_SECTIONS = [
+    {
+      title: "Geral",
+      items: [
+        { key: "perfil", icon: <IconUser size={16} />, label: "Perfil" },
+        { key: "bancos", icon: <IconBank size={16} />, label: "Meus Bancos" },
+        { key: "prefs", icon: <IconSettings size={16} />, label: "Preferências" },
+      ]
+    },
+    {
+      title: "Negócio (PJ)",
+      items: [
+        { key: "cat-vendas", icon: <IconBusiness size={16} />, label: "Categorias de Vendas" },
+        { key: "cat-pj", icon: <IconBusiness size={16} />, label: "Categorias PJ" },
+        { key: "custos-fixos", icon: <IconBusiness size={16} />, label: "Custos Fixos PJ" },
+      ]
+    },
+    {
+      title: "Pessoal (PF)",
+      items: [
+        { key: "cat-pf", icon: <IconUser size={16} />, label: "Categorias PF" },
+        { key: "custos-fixos-pf", icon: <IconUser size={16} />, label: "Custos Fixos PF" },
+      ]
+    }
   ];
 
   return (
@@ -1051,16 +1173,23 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
           <div style={{ fontSize: 11, color: "var(--text-dim)", marginTop: 2 }}>Finanças Mei · MEI</div>
         </div>
         <nav style={{ flex: 1, padding: "0 10px" }}>
-          {SIDEBAR_ITEMS.map(item => (
-            <button key={item.key} onClick={() => setSection(item.key)}
-              style={{
-                width: "100%", padding: "10px 14px", borderRadius: 9, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, fontSize: 13, fontWeight: section === item.key ? 700 : 600, fontFamily: "'Syne',sans-serif", transition: "all 0.15s", textAlign: "left",
-                background: section === item.key ? "var(--sidebar-active)" : "transparent",
-                color: section === item.key ? "var(--sidebar-active-text)" : "var(--text-muted)",
-              }}>
-              <span style={{ fontSize: 15, lineHeight: 1 }}>{item.icon}</span>
-              {item.label}
-            </button>
+          {SIDEBAR_SECTIONS.map((sectionData, sIdx) => (
+            <div key={sIdx} style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 10, fontWeight: 800, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.8px", padding: "0 14px 8px" }}>
+                {sectionData.title}
+              </div>
+              {sectionData.items.map(item => (
+                <button key={item.key} onClick={() => setSection(item.key)}
+                  style={{
+                    width: "100%", padding: "10px 14px", borderRadius: 9, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, fontSize: 13, fontWeight: section === item.key ? 700 : 600, fontFamily: "'Syne',sans-serif", transition: "all 0.15s", textAlign: "left",
+                    background: section === item.key ? "var(--sidebar-active)" : "transparent",
+                    color: section === item.key ? "var(--sidebar-active-text)" : "var(--text-muted)",
+                  }}>
+                  <span style={{ fontSize: 15, lineHeight: 1 }}>{item.icon}</span>
+                  {item.label}
+                </button>
+              ))}
+            </div>
           ))}
         </nav>
         <div className="mobile-config-footer" style={{ padding: "16px 16px 0", borderTop: "1px solid var(--divider)", marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1196,39 +1325,19 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
         {section === "cat-pj" && (
           <div>
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Categorias — Empresa (PJ)</div>
-              <div style={{ fontSize: 12, color: "#aaa" }}>Categorias usadas ao lançar despesas do CNPJ</div>
+              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Categorias e Orçamentos — Empresa (PJ)</div>
+              <div style={{ fontSize: 12, color: "#aaa" }}>Gerencie categorias e defina metas de orçamento mensal.</div>
             </div>
-            <CatManager cats={categoriasPJ} setCats={setCategoriasPJ} />
+            <CatManager cats={categoriasPJ} setCats={setCategoriasPJ} orcamentos={orcamentos} setOrcamento={setOrcamento} />
           </div>
         )}
         {section === "cat-pf" && (
           <div>
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Categorias — Pessoal (PF)</div>
-              <div style={{ fontSize: 12, color: "#aaa" }}>Categorias usadas ao lançar gastos pessoais</div>
+              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Categorias e Orçamentos — Pessoal (PF)</div>
+              <div style={{ fontSize: 12, color: "#aaa" }}>Gerencie categorias e defina limites para seus gastos.</div>
             </div>
-            <CatManager cats={categoriasPF} setCats={setCategoriasPF} />
-          </div>
-        )}
-
-        {/* ── Orçamentos ── */}
-        {section === "orc-pj" && (
-          <div>
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Orçamentos — Empresa (PJ)</div>
-              <div style={{ fontSize: 12, color: "#aaa" }}>Limites mensais por categoria de despesa. Clique no valor para editar.</div>
-            </div>
-            <BudgetManager cats={categoriasPJ} orcamentos={orcamentos} setOrcamento={setOrcamento} />
-          </div>
-        )}
-        {section === "orc-pf" && (
-          <div>
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Orçamentos — Pessoal (PF)</div>
-              <div style={{ fontSize: 12, color: "#aaa" }}>Limites mensais por categoria de gasto pessoal. Clique no valor para editar.</div>
-            </div>
-            <BudgetManager cats={categoriasPF} orcamentos={orcamentos} setOrcamento={setOrcamento} />
+            <CatManager cats={categoriasPF} setCats={setCategoriasPF} orcamentos={orcamentos} setOrcamento={setOrcamento} />
           </div>
         )}
         {section === "bancos" && (
@@ -1240,7 +1349,48 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
             <BankManager bancos={bancos} setBancos={setBancos} session={session} showToast={showToast} />
           </div>
         )}
+        
+        {/* ── Custos Fixos PJ ── */}
+        {section === "custos-fixos" && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Custos Fixos da Empresa</div>
+              <div style={{ fontSize: 12, color: "#aaa" }}>Valores recorrentes mensais (ex: Aluguel, MEI, Luz)</div>
+            </div>
+            <FixedCostManager 
+              custos={draftPerfil.custosFixos || []} 
+              setCustos={(c) => setDraftPerfil(p => ({ ...p, custosFixos: c }))} 
+            />
+            <datalist id="cat-suggestions">
+              {categoriasPJ.map(c => <option key={c.label} value={c.label} />)}
+            </datalist>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 24, gap: 10, alignItems: "center" }}>
+              {savedFeedback && <div style={{ fontSize: 11, color: "#16a34a", fontWeight: 700 }}>✓ Custos salvos!</div>}
+              <button className="btn btn-dark" onClick={savePerfil} style={{ padding: "8px 24px" }}>Salvar alterações</button>
+            </div>
+          </div>
+        )}
 
+        {/* ── Custos Fixos PF ── */}
+        {section === "custos-fixos-pf" && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Custos Fixos Pessoais</div>
+              <div style={{ fontSize: 12, color: "#aaa" }}>Suas despesas fixas (ex: Aluguel casa, Internet, Streaming)</div>
+            </div>
+            <FixedCostManager 
+              custos={draftPerfil.custosFixosPF || []} 
+              setCustos={(c) => setDraftPerfil(p => ({ ...p, custosFixosPF: c }))} 
+            />
+            <datalist id="cat-suggestions">
+              {categoriasPF.map(c => <option key={c.label} value={c.label} />)}
+            </datalist>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 24, gap: 10, alignItems: "center" }}>
+              {savedFeedback && <div style={{ fontSize: 11, color: "#16a34a", fontWeight: 700 }}>✓ Custos salvos!</div>}
+              <button className="btn btn-dark" onClick={savePerfil} style={{ padding: "8px 24px" }}>Salvar alterações</button>
+            </div>
+          </div>
+        )}
 
         {/* ── Preferências ── */}
         {section === "prefs" && (
@@ -1323,6 +1473,36 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
 
               <div className="card" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 16 }}>
                 <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>Lembretes do DAS (Dashboard)</div>
+                  <div style={{ fontSize: 11, color: "var(--text-dim)" }}>Mostrar alerta no sino 5 dias antes do dia {perfil.diaFechamento || "20"}</div>
+                </div>
+                <div
+                  onClick={() => setDraftPerfil(p => ({ ...p, dasDashAlerts: p.dasDashAlerts === undefined ? false : !p.dasDashAlerts }))}
+                  style={{
+                    width: 44, height: 24, borderRadius: 20, background: (draftPerfil.dasDashAlerts === undefined || draftPerfil.dasDashAlerts) ? "#16a34a" : "#ccc", padding: 3, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center",
+                    justifyContent: (draftPerfil.dasDashAlerts === undefined || draftPerfil.dasDashAlerts) ? "flex-end" : "flex-start"
+                  }}>
+                  <div style={{ width: 18, height: 18, borderRadius: 99, background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+                </div>
+              </div>
+
+              <div className="card" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>Lembretes por E-mail</div>
+                  <div style={{ fontSize: 11, color: "var(--text-dim)" }}>Receber e-mail automático 5 dias antes e no dia do vencimento</div>
+                </div>
+                <div
+                  onClick={() => setDraftPerfil(p => ({ ...p, dasEmailAlerts: p.dasEmailAlerts === undefined ? false : !p.dasEmailAlerts }))}
+                  style={{
+                    width: 44, height: 24, borderRadius: 20, background: (draftPerfil.dasEmailAlerts === undefined || draftPerfil.dasEmailAlerts) ? "#16a34a" : "#ccc", padding: 3, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center",
+                    justifyContent: (draftPerfil.dasEmailAlerts === undefined || draftPerfil.dasEmailAlerts) ? "flex-end" : "flex-start"
+                  }}>
+                  <div style={{ width: 18, height: 18, borderRadius: 99, background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+                </div>
+              </div>
+
+              <div className="card" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>Modo Escuro (Dark Mode)</div>
                   <div style={{ fontSize: 11, color: "var(--text-dim)" }}>Mudar visual para tons escuros</div>
                 </div>
@@ -1350,7 +1530,7 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
 }
 
 // ─── Category Budget View ─────────────────────────────────────────────────────
-function CategoryBudgetView({ catBreakdown, orcamentos, catIcon, isPJ, totals }) {
+function CategoryBudgetView({ catBreakdown, orcamentos, catIcon, isPJ, totals, onCategoryClick }) {
   const total = isPJ ? totals.totalDesp : totals.totalGastos;
   const withBudget = catBreakdown.filter(([cat]) => orcamentos[cat] != null && orcamentos[cat] > 0);
   const withinBudget = withBudget.filter(([cat, val]) => val <= orcamentos[cat]).length;
@@ -1408,7 +1588,7 @@ function CategoryBudgetView({ catBreakdown, orcamentos, catIcon, isPJ, totals })
               const barWidth = hasOrc ? Math.min(pct, 1) * 100 : (total ? (val / total) * 100 : 0);
 
               return (
-                <div key={cat} style={{ width: "100%" }}>
+                <div key={cat} style={{ width: "100%", cursor: "pointer" }} onClick={() => onCategoryClick && onCategoryClick(cat)} className="row-hover-soft">
                   {/* Row Top Info */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 6 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1475,7 +1655,66 @@ function CategoryBudgetView({ catBreakdown, orcamentos, catIcon, isPJ, totals })
 }
 
 // ─── Dashboard ───────────────────────────────────────────────────────────────
-function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, catIcon, reservas }) {
+
+function CostDistributionCard({ data, isPJ, catIcon }) {
+  if (!data || data.total === 0) return null;
+  const fixoPct = (data.fixo / data.total) * 100;
+  const variavelPct = (data.variavel / data.total) * 100;
+
+  return (
+    <div className="card" style={{ padding: "20px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          Distribuição: Fixo vs Variável
+        </div>
+        <div className="tag" style={{ fontSize: 10, background: "rgba(99,102,241,0.1)", color: "#6366f1", borderColor: "rgba(99,102,241,0.2)" }}>
+          {isPJ ? "Empresa" : "Pessoal"}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ height: 24, background: "var(--divider)", borderRadius: 8, overflow: "hidden", display: "flex", marginBottom: 8 }}>
+          <div style={{ width: `${fixoPct}%`, background: "#6366f1", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>
+            {fixoPct > 15 && `${fixoPct.toFixed(0)}% FIXO`}
+          </div>
+          <div style={{ width: `${variavelPct}%`, background: "#f59e0b", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>
+            {variavelPct > 15 && `${variavelPct.toFixed(0)}% VARIÁVEL`}
+          </div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ width: 8, height: 8, borderRadius: 2, background: "#6366f1" }} />
+            <span style={{ color: "var(--text-dim)" }}>Fixo:</span> {fmt(data.fixo)}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ width: 8, height: 8, borderRadius: 2, background: "#f59e0b" }} />
+            <span style={{ color: "var(--text-dim)" }}>Variável:</span> {fmt(data.variavel)}
+          </div>
+        </div>
+      </div>
+
+      {data.extraByCat.length > 0 && (
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 800, color: "var(--text-dim)", textTransform: "uppercase", marginBottom: 10, letterSpacing: "0.5px" }}>Maiores gastos excedentes</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {data.extraByCat.map((item, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--divider)" }}>
+                <span style={{ fontSize: 16 }}>{catIcon(item.name)}</span>
+                <div style={{ flex: 1, fontSize: 12, fontWeight: 700, color: "var(--text)" }}>{item.name}</div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: "#f59e0b", fontFamily: "'JetBrains Mono',monospace" }}>+{fmt(item.value)}</div>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: "var(--text-dim)" }}>acima do fixo</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, catIcon, reservas, pfStats, orcamentos, pjStats }) {
 
   const chartData = useMemo(() => {
     const months = [];
@@ -1500,108 +1739,6 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
     return months;
   }, [vendas, despesas, gastos, isPJ]);
 
-  const pjStats = useMemo(() => {
-    if (!isPJ) return {};
-    const vLiq = totals?.totalLiq || 0;
-    const vBruto = (vendas || []).filter(v => v.status === "recebido" && inDateRange(v.data, dateRange))
-      .reduce((s, v) => s + (parseFloat(v.faturamento) || 0), 0);
-    const vFiltered = (vendas || []).filter(v => v.status === "recebido" && inDateRange(v.data, dateRange));
-    const ticketMedio = vFiltered.length > 0 ? vLiq / vFiltered.length : 0;
-    const margemLucro = vBruto > 0 ? ((totals?.resultado || 0) / vBruto) * 100 : 0;
-
-    const salesByDay = {};
-    vFiltered.forEach(v => {
-      const day = v.data ? new Date(v.data).getDay() : 0;
-      salesByDay[day] = (salesByDay[day] || 0) + calcLiquido(v.faturamento, v.taxas).liquido;
-    });
-    const weekDays = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-    let bestDayIdx = 0, maxSales = 0;
-    Object.entries(salesByDay).forEach(([d, s]) => { if (s > maxSales) { maxSales = s; bestDayIdx = d; } });
-    const melhorDia = maxSales > 0 ? weekDays[bestDayIdx] : "—";
-
-    const currentYear = new Date().getFullYear();
-    const vendasAno = (vendas || []).filter(v => v.status === "recebido" && v.data?.startsWith(String(currentYear)));
-    const anualComNF = vendasAno.filter(v => v.nf === true).reduce((s, v) => s + (parseFloat(v.faturamento) || 0), 0);
-    const anualTotal = vendasAno.reduce((s, v) => s + (parseFloat(v.faturamento) || 0), 0);
-    const pctLimiteMEI = (anualComNF / 81000) * 100;
-
-    const catDataMap = {};
-    (vendas || []).filter(v => v.status === "recebido" && inDateRange(v.data, dateRange)).forEach(v => {
-      const cat = v.categoria || "Outro PJ";
-      catDataMap[cat] = (catDataMap[cat] || 0) + calcLiquido(v.faturamento, v.taxas).liquido;
-    });
-    return { ticketMedio, margemLucro, melhorDia, anualComNF, anualTotal, pctLimiteMEI, catChartData: Object.entries(catDataMap).map(([name, value]) => ({ name, value })) };
-  }, [vendas, totals, dateRange, isPJ]);
-
-  const pfStats = useMemo(() => {
-    if (isPJ) return {};
-    const currentGastos = gastos.filter(g => g.status === "pago" && inDateRange(g.data, dateRange));
-    const totalGasto = currentGastos.reduce((s, g) => s + g.valor, 0);
-
-    // 50/30/20 Rule
-    const needsArr = ["Alimentação", "Moradia", "Transporte", "Saúde", "Educação"];
-    const wantsArr = ["Lazer", "Compras", "Streaming", "Outros"];
-    const savingsArr = ["Investimentos"];
-
-    const nVal = currentGastos.filter(g => needsArr.includes(g.categoria)).reduce((s, g) => s + g.valor, 0);
-    const wVal = currentGastos.filter(g => wantsArr.includes(g.categoria)).reduce((s, g) => s + g.valor, 0);
-    const sVal = currentGastos.filter(g => savingsArr.includes(g.categoria)).reduce((s, g) => s + g.valor, 0);
-
-    const rule503020 = [
-      { name: "Essenciais", value: nVal, color: "#6366f1", target: 50 },
-      { name: "Estilo Vida", value: wVal, color: "#f59e0b", target: 30 },
-      { name: "Investimento", value: sVal, color: "#10b981", target: 20 },
-    ];
-
-    // ── Reserva de Emergência Inteligente ──
-    const monthsWithSpending = new Set();
-    gastos.filter(g => g.status === "pago").forEach(g => {
-      if (g.data) monthsWithSpending.add(g.data.substring(0, 7));
-    });
-    const numMonths = monthsWithSpending.size;
-    const totalAllGastos = gastos.filter(g => g.status === "pago").reduce((s, g) => s + g.valor, 0);
-    const mediaAutoGastos = numMonths >= 3 ? totalAllGastos / numMonths : 0;
-
-    // Prioridade: manual das Preferências > automático (só após 3+ meses)
-    const mediaManual = unmaskCurrency(maskCurrency(perfil.mediaGastoManual)) || 0;
-    const useAuto = numMonths >= 3 && mediaAutoGastos > 0;
-    const mediaFinal = useAuto ? mediaAutoGastos : (mediaManual > 0 ? mediaManual : 0);
-    const hasMediaData = mediaFinal > 0;
-    const mediaSource = useAuto ? "auto" : (mediaManual > 0 ? "manual" : "none");
-
-    const manualReserva = unmaskCurrency(maskCurrency(perfil.reservaAtual)) || 0;
-    const totalReservado = (reservas || []).reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
-    const reservaAtualVal = manualReserva + totalReservado;
-    const metaReservaMeses = parseFloat(perfil.reservaEmerg) || 6;
-    const reservaMeses = mediaFinal > 0 ? reservaAtualVal / mediaFinal : 0;
-
-    // Metas de 3, 6, 12 meses
-    const metas = [3, 6, 12].map(m => ({
-      meses: m,
-      necessario: mediaFinal * m,
-      falta: Math.max(0, (mediaFinal * m) - reservaAtualVal),
-      atingido: mediaFinal > 0 && reservaAtualVal >= (mediaFinal * m)
-    }));
-
-    // Pró-labore vs Gastos
-    const pl = unmaskCurrency(maskCurrency(perfil.prolabore)) || 0;
-    const taxaEconomia = pl > 0 ? ((pl - totalGasto) / pl) * 100 : 0;
-
-    // Ralos (Categories)
-    const catMap = {};
-    currentGastos.forEach(g => catMap[g.categoria] = (catMap[g.categoria] || 0) + g.valor);
-    const raloSorted = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 3);
-
-    // Metodos
-    const metodoMap = {};
-    currentGastos.forEach(g => {
-      const m = g.metodo || "Outro";
-      metodoMap[m] = (metodoMap[m] || 0) + g.valor;
-    });
-    const metodosSorted = Object.entries(metodoMap).sort((a, b) => b[1] - a[1]);
-
-    return { totalGasto, rule503020, reservaMeses, metaReservaMeses, taxaEconomia, raloSorted, metodosSorted, reservaAtualVal, mediaFinal, metas, numMonths: numMonths || 0, hasMediaData, mediaSource };
-  }, [gastos, perfil, dateRange, isPJ, reservas]);
 
   const meta = unmaskCurrency(maskCurrency(perfil.metaReceita)) || 10000;
   const pctMeta = meta > 0 ? (totals.totalLiq / meta) * 100 : 0;
@@ -1645,7 +1782,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
               <div style={{ fontSize: 16 }}>📉</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Custos Totais</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Ponto de Equilíbrio</div>
             </div>
             <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "#ef4444" }}>{fmt(totals.totalDesp + totals.totalDeducao)}</div>
             <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Fixos: {fmt(totals.totalDespFixo)} · Variáveis: {fmt(totals.totalDespVariavel)} · Taxas: {fmt(totals.totalDeducao)}</div>
@@ -1684,6 +1821,8 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
             </div>
           </div>
           <div className="hide-mobile" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <CostDistributionCard data={pjStats.costDist} isPJ={true} catIcon={catIcon} />
+            
             <div className="card" style={{ padding: "24px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 16 }}>Meta de Receita</div>
               <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 12 }}>
@@ -1800,26 +1939,36 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
     // PERSONAL DASHBOARD
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div className="grid-3 hide-mobile" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+        <div className="mobile-summary-grid hide-mobile" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
               <div style={{ color: "#16a34a" }}>🛡️</div>
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase" }}>Meses Seguros</div>
             </div>
             {pfStats.hasMediaData ? (
-              <div style={{ fontSize: 20, fontWeight: 800, color: pfStats.reservaMeses >= pfStats.metaReservaMeses ? "#16a34a" : "#f59e0b", fontFamily: "'JetBrains Mono',monospace" }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: pfStats.reservaMeses >= pfStats.metaReservaMeses ? "#16a34a" : "#f59e0b", fontFamily: "'JetBrains Mono',monospace" }}>
                 {pfStats.reservaMeses.toFixed(1)} meses
               </div>
             ) : (
-              <div className="hide-mobile-soft" style={{ fontSize: 13, fontWeight: 600, color: "var(--text-dim)" }}>Configure a média mensal</div>
+              <div className="hide-mobile-soft" style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" }}>Configure a reserva</div>
             )}
+          </div>
+          <div className="card" style={{ padding: "16px 20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <div style={{ color: "#6366f1" }}>⚖️</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase" }}>Custo Base</div>
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>
+              {fmt(pfStats.mediaFinal)}
+            </div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Custo de vida planejado</div>
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
               <div style={{ color: "#6366f1" }}>💰</div>
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase" }}>Taxa Economia</div>
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: pfStats.taxaEconomia > 15 ? "#16a34a" : "var(--text)" }}>
+            <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: pfStats.taxaEconomia > 15 ? "#16a34a" : "var(--text)" }}>
               {fmtPct(pfStats.taxaEconomia)}
             </div>
           </div>
@@ -1906,6 +2055,9 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                 {pfStats.metodosSorted.length === 0 && <div style={{ fontSize: 12, color: "var(--text-dim)", textAlign: "center", padding: "10px" }}>Sem registros no período</div>}
               </div>
             </div>
+
+            <CostDistributionCard data={pfStats.costDist} isPJ={false} catIcon={catIcon} />
+
             {/* Emergency Fund Card — Redesenhado */}
             <div className="card" style={{ padding: "20px" }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 14 }}>Reserva de Emergência</div>
@@ -1924,7 +2076,11 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                   <div style={{ height: "100%", width: `${Math.min((pfStats.reservaMeses / pfStats.metaReservaMeses) * 100, 100)}%`, background: pfStats.reservaMeses >= pfStats.metaReservaMeses ? "#16a34a" : "#f59e0b", borderRadius: 99, transition: "width 0.4s ease" }} />
                 </div>
                 <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 600, marginBottom: 12 }}>
-                  Média mensal: {fmt(pfStats.mediaFinal)} · {pfStats.mediaSource === "auto" ? `Calculada de ${pfStats.numMonths} meses de dados` : "Definida nas Preferências"}
+                  Média mensal: {fmt(pfStats.mediaFinal)} · {
+                    pfStats.mediaSource === "prolabore" ? "Baseada no Pró-labore" :
+                    pfStats.mediaSource === "auto" ? `Calculada de ${pfStats.numMonths} meses de dados` : 
+                    "Definida nas Preferências"
+                  }
                   {pfStats.mediaSource === "manual" && pfStats.numMonths > 0 && pfStats.numMonths < 3 ? ` · ${pfStats.numMonths}/3 meses p/ média automática` : ""}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
@@ -1976,28 +2132,166 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
 }
 
 // ─── Reports View ──────────────────────────────────────────────────────────────
-function ReportsView({ vendas, despesas, gastos, dateRange, isPJ, perfil }) {
+function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, perfil }) {
+  // 1. Dados Compartilhados (Últimos 6 meses para evolução)
+  const dt = new Date();
+  const hist = [];
+  for (let i = 5; i >= 0; i--) {
+    const temp = new Date(dt.getFullYear(), dt.getMonth() - i, 1);
+    const yyyy = temp.getFullYear();
+    const mm = String(temp.getMonth() + 1).padStart(2, "0");
+    const mStr = `${yyyy}-${mm}`;
+
+    if (isPJ) {
+      let fM = 0;
+      (vendas || []).filter(v => v.data?.startsWith(mStr) && v.status === "recebido").forEach(v => {
+        fM += calcLiquido(v.faturamento, v.taxas).liquido;
+      });
+      let dM = (despesas || []).filter(d => d.data?.startsWith(mStr) && d.status === "pago").reduce((s, d) => s + (parseFloat(d.valor) || 0), 0);
+
+      hist.push({
+        name: `${mm}/${String(yyyy).slice(-2)}`,
+        Receita: fM,
+        Despesas: dM,
+        Lucro: fM - dM
+      });
+    } else {
+      let gM = (gastos || []).filter(g => g.data?.startsWith(mStr) && g.status === "pago").reduce((s, g) => s + (parseFloat(g.valor) || 0), 0);
+      hist.push({
+        name: `${mm}/${String(yyyy).slice(-2)}`,
+        Gastos: gM,
+        Investimento: (gastos || []).filter(g => g.data?.startsWith(mStr) && g.categoria === "Investimentos").reduce((s, g) => s + (parseFloat(g.valor) || 0), 0)
+      });
+    }
+  }
+
   if (!isPJ) {
+    // ─── LÓGICA PESSOA FÍSICA (PF) ───
+    const filteredGastos = gastos.filter(g => inDateRange(g.data, dateRange) && g.status === "pago");
+    const totalGasto = filteredGastos.reduce((s, g) => s + (parseFloat(g.valor) || 0), 0);
+    const reservaAtual = parseFloat(perfil.reservaAtual) || 0;
+    const metaReservaMeses = parseFloat(perfil.reservaEmerg) || 6;
+    
+    // Base de cálculo para reserva: Pro-labore > Custos Fixos PF > Média Manual > Orçamentos
+    const pl = parseFloat(perfil.prolabore) || 0;
+    const totalCustoFixoPF = (perfil.custosFixosPF || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+    const somaOrcamentos = Object.values(orcamentos).reduce((s, v) => s + (parseFloat(v) || 0), 0);
+    const mediaGastosMensal = totalCustoFixoPF > 0 ? totalCustoFixoPF : (pl > 0 ? pl : (parseFloat(perfil.mediaGastoManual) || (somaOrcamentos > 0 ? somaOrcamentos : 1)));
+    
+    const mesesCobertura = reservaAtual / mediaGastosMensal;
+    const progressoReserva = Math.min((mesesCobertura / metaReservaMeses) * 100, 100);
+
+    const catBreakdown = {};
+    filteredGastos.forEach(g => { catBreakdown[g.categoria] = (catBreakdown[g.categoria] || 0) + (parseFloat(g.valor) || 0); });
+    const catsComOrcamento = Object.keys(orcamentos).filter(cat => orcamentos[cat] > 0);
+    const dentroOrcamento = catsComOrcamento.filter(cat => (catBreakdown[cat] || 0) <= orcamentos[cat]).length;
+    const eficienciaOrc = catsComOrcamento.length > 0 ? (dentroOrcamento / catsComOrcamento.length) * 100 : 100;
+    const ticketMedioPF = filteredGastos.length > 0 ? totalGasto / filteredGastos.length : 0;
+
+    // Ponto de Equilíbrio PF: Quando o Pro-labore cobre o Custo de Vida
+    const prolabore = parseFloat(perfil.prolabore) || 0;
+    const prolaboreDiario = prolabore / 30;
+    const custoDeVida = totalCustoFixoPF || somaOrcamentos;
+    const diasParaCobrirPF = (prolaboreDiario > 0 && custoDeVida > 0) ? Math.ceil(custoDeVida / prolaboreDiario) : Infinity;
+    const progressoCustoVida = custoDeVida > 0 ? Math.min((prolabore / custoDeVida) * 100, 200) : 0; // % do custo coberto pelo pro-labore
+
     return (
-      <div style={{ padding: "60px 20px", textAlign: "center", background: "var(--card)", borderRadius: 16, border: "1px dashed var(--border)" }}>
-        <IconReport size={48} color="var(--text-dim)" style={{ marginBottom: 16 }} />
-        <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", marginBottom: 8, letterSpacing: "-0.5px" }}>Relatórios Avançados</div>
-        <div style={{ fontSize: 14, color: "var(--text-muted)", maxWidth: 360, margin: "0 auto" }}>
-          Explore o perfil "Empresa (PJ)" para ter acesso ao DRE completo, projeções de impostos e análises de rentabilidade do seu negócio.
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 24 }}>
+          {/* Reserva de Emergência */}
+          <div className="card" style={{ padding: "24px 28px", border: "1.5px solid var(--text)", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: 0, right: 0, padding: "8px 12px", background: "var(--text)", color: "var(--bg)", fontSize: 10, fontWeight: 800, borderBottomLeftRadius: 12 }}>SAÚDE PF</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 16 }}>Reserva</div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Meses de Cobertura</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: "var(--text)", letterSpacing: "-1.5px" }}>{mesesCobertura.toFixed(1)} <span style={{ fontSize: 16 }}>meses</span></div>
+              <div style={{ fontSize: 11, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Custo base: {fmt(mediaGastosMensal)}</div>
+            </div>
+            <div style={{ background: "var(--bg)", borderRadius: 12, padding: "12px", border: "1px solid var(--border)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                <span style={{ fontSize: 11, fontWeight: 700 }}>Meta: {metaReservaMeses} meses</span>
+                <span style={{ fontSize: 11, fontWeight: 800 }}>{fmtPct(progressoReserva)}</span>
+              </div>
+              <div style={{ height: 6, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ width: `${progressoReserva}%`, height: "100%", background: progressoReserva >= 100 ? "#10b981" : "#6366f1", transition: "width 0.8s ease" }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Ponto de Equilíbrio PF */}
+          <div className="card" style={{ padding: "24px 28px" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 16 }}>Estilo de Vida</div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Dias para cobrir o custo</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: "var(--text)", letterSpacing: "-1.5px" }}>{diasParaCobrirPF === Infinity ? "---" : `${diasParaCobrirPF} dias`}</div>
+              <div style={{ fontSize: 11, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Ref: Pro-labore {fmt(prolabore)}</div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ flex: 1, padding: "1px 8px", borderRadius: 6, background: "rgba(22,163,74,0.1)", color: "#16a34a", fontSize: 10, fontWeight: 800, textAlign: "center" }}>
+                {progressoCustoVida >= 100 ? "LUCRO PF" : "DÉFICIT PF"}
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: "var(--text-muted)" }}>{fmtPct(progressoCustoVida)}</div>
+            </div>
+          </div>
+
+          {/* Eficiência Orçamentária Visual */}
+          <div className="card" style={{ padding: "24px 28px", display: "flex", flexDirection: "column", justifyContent: "center", border: "1px solid var(--divider)" }}>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", marginBottom: 12 }}>Eficiência do Plano</div>
+              <div style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", width: 100, height: 100, marginBottom: 12 }}>
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="44" stroke="var(--divider)" strokeWidth="6" fill="none" />
+                  <circle cx="50" cy="50" r="44" stroke="#16a34a" strokeWidth="8" fill="none" strokeDasharray="276" strokeDashoffset={276 - (276 * eficienciaOrc / 100)} strokeLinecap="round" transform="rotate(-90 50 50)" style={{ transition: "stroke-dashoffset 1s ease" }} />
+                </svg>
+                <div style={{ position: "absolute", fontSize: 18, fontWeight: 800, color: "var(--text)" }}>{Math.round(eficienciaOrc)}%</div>
+              </div>
+              <div style={{ fontSize: 11, color: "var(--text-dim)", fontWeight: 700 }}>{dentroOrcamento} de {catsComOrcamento.length} no limite</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 24 }}>
+          <div className="card" style={{ padding: "24px 28px" }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 24 }}>Evolução de Gastos (Últimos 6 meses)</div>
+            <div style={{ width: "100%", height: 300 }}>
+              <ResponsiveContainer>
+                <AreaChart data={hist}>
+                  <defs><linearGradient id="colorGastos" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/><stop offset="95%" stopColor="#6366f1" stopOpacity={0}/></linearGradient></defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--divider)" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "var(--text-muted)" }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "var(--text-muted)" }} tickFormatter={v => `R$ ${v}`} />
+                  <Tooltip contentStyle={{ background: "var(--card)", borderRadius: 12, border: "1px solid var(--border)" }} />
+                  <Area type="monotone" dataKey="Gastos" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorGastos)" />
+                  <Area type="monotone" dataKey="Investimento" stroke="#10b981" strokeWidth={2} fillOpacity={0} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="card" style={{ padding: "24px 28px" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", marginBottom: 16 }}>Hábitos de Consumo</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div style={{ padding: "16px", background: "var(--bg)", borderRadius: 12, border: "1px solid var(--divider)" }}>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Ticket Médio / Gasto</div>
+                <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace" }}>{fmt(ticketMedioPF)}</div>
+              </div>
+              <div style={{ padding: "16px", background: "var(--bg)", borderRadius: 12, border: "1px solid var(--divider)" }}>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Total do Período</div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: "#ef4444" }}>{fmt(totalGasto)}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
-  // 1. DRE Data (filtrado por dateRange)
+  // ─── LÓGICA EMPRESA (PJ) ───
   const vRecebido = vendas.filter(v => v.status === "recebido" && inDateRange(v.data, dateRange));
   const dPago = despesas.filter(d => d.status === "pago" && inDateRange(d.data, dateRange));
-
-  // Consideramos gastos PF como Retiradas/Pró-labore para o DRE.
   const gPago = gastos.filter(g => g.status === "pago" && inDateRange(g.data, dateRange));
 
-  let dreBruto = 0;
-  let dreDeducoes = 0;
+  let dreBruto = 0, dreDeducoes = 0;
   vRecebido.forEach(v => {
     dreBruto += (parseFloat(v.faturamento) || 0);
     dreDeducoes += calcLiquido(v.faturamento, v.taxas).totalDeducao;
@@ -2009,59 +2303,80 @@ function ReportsView({ vendas, despesas, gastos, dateRange, isPJ, perfil }) {
   const dreRetiradas = gPago.reduce((s, g) => s + (parseFloat(g.valor) || 0), 0);
   const dreLucroLiq = dreLucroOp - dreRetiradas;
 
-  // 2. DAS/Teto Projection
   const isMei = perfil.isMei !== undefined ? perfil.isMei : true;
   const limitFiscal = isMei ? 81000 : (parseFloat(perfil.limiteAnual) || 360000);
-
-  // Faturamento do ano atual independente do filtro
-  const totalFaturadoAno = vendas.filter(v => v.status === "recebido" && v.data.startsWith(new Date().getFullYear().toString())).reduce((s, v) => s + (parseFloat(v.faturamento) || 0), 0);
+  const totalFaturadoAno = vendas.filter(v => v.status === "recebido" && v.data.startsWith(dt.getFullYear().toString())).reduce((s, v) => s + (parseFloat(v.faturamento) || 0), 0);
   const restanteLimite = limitFiscal - totalFaturadoAno;
-  const currMonth = new Date().getMonth() + 1;
-  const remMonthsAno = 12 - currMonth + 1; // +1 includes current 
+  const currMonth = dt.getMonth() + 1;
+  const remMonthsAno = 12 - currMonth + 1;
   const medParaNaoEstourar = restanteLimite > 0 ? (restanteLimite / remMonthsAno) : 0;
   const pctTeto = (totalFaturadoAno / limitFiscal) * 100;
 
-  // 3. Chart Data (Ultimos 6 meses independente de filtro para sempre ver evolução)
-  const dt = new Date();
-  const hist = [];
-  for (let i = 5; i >= 0; i--) {
-    const temp = new Date(dt.getFullYear(), dt.getMonth() - i, 1);
-    const yyyy = temp.getFullYear();
-    const mm = String(temp.getMonth() + 1).padStart(2, "0");
-    const mStr = `${yyyy}-${mm}`;
+  const totalCustoFixo = (perfil.custosFixos || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+  const currentMonthStr = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
+  const faturamentoMesAtual = vendas.filter(v => v.status === "recebido" && v.data.startsWith(currentMonthStr)).reduce((s, v) => s + calcLiquido(v.faturamento, v.taxas).liquido, 0);
+  const dayOfMonth = dt.getDate();
+  const faturamentoMedioDiario = dayOfMonth > 0 ? faturamentoMesAtual / dayOfMonth : 0;
+  const diasParaCobrir = faturamentoMedioDiario > 0 ? Math.ceil(totalCustoFixo / faturamentoMedioDiario) : Infinity;
+  const progressoCobertura = totalCustoFixo > 0 ? Math.min((faturamentoMesAtual / totalCustoFixo) * 100, 100) : 0;
 
-    let fM = 0;
-    (vendas || []).filter(v => v.data?.startsWith(mStr) && v.status === "recebido").forEach(v => {
-      fM += calcLiquido(v.faturamento, v.taxas).liquido;
-    });
-    let dM = (despesas || []).filter(d => d.data?.startsWith(mStr) && d.status === "pago").reduce((s, d) => s + (parseFloat(d.valor) || 0), 0);
-
-    hist.push({
-      name: `${mm}/${String(yyyy).slice(-2)}`,
-      Receita: fM,
-      Despesas: dM,
-      Lucro: fM - dM
-    });
-  }
+  const ticketMedio = vRecebido.length > 0 ? dreBruto / vRecebido.length : 0;
+  const margemOp = dreBruto > 0 ? (dreLucroOp / dreBruto) * 100 : 0;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      {/* Chart Section */}
+      <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 24 }}>
+        <div className="card" style={{ padding: "24px 28px", border: "1.5px solid var(--text)", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: 0, right: 0, padding: "8px 12px", background: "var(--text)", color: "var(--bg)", fontSize: 10, fontWeight: 800, borderBottomLeftRadius: 12 }}>INSIGHT</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 16 }}>Ponto de Equilíbrio</div>
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Dias médios para cobrir custos</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: "var(--text)", letterSpacing: "-1px" }}>{diasParaCobrir === Infinity ? "---" : `${diasParaCobrir} dias`}</div>
+            <div style={{ fontSize: 12, color: "var(--text-dim)", marginTop: 4 }}>{diasParaCobrir <= 15 ? "🚀 Operação saudável e rápida!" : diasParaCobrir <= 25 ? "⚖️ Atenção ao fluxo." : "⚠️ Alerta: Custos altos."}</div>
+          </div>
+          <div style={{ background: "var(--bg)", borderRadius: 12, padding: "12px", border: "1px solid var(--border)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span style={{ fontSize: 11, fontWeight: 700 }}>Meta: {fmt(totalCustoFixo)}</span><span style={{ fontSize: 11, fontWeight: 800 }}>{fmtPct(progressoCobertura)}</span></div>
+            <div style={{ height: 6, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}><div style={{ width: `${progressoCobertura}%`, height: "100%", background: "#10b981", transition: "width 0.8s ease" }} /></div>
+          </div>
+        </div>
+        <div className="card" style={{ padding: "24px 28px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+          <div style={{ borderRight: "1px solid var(--divider)", paddingRight: 20 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", marginBottom: 12 }}>Visão Geral</div>
+            <div>
+              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>Ticket Médio</div>
+              <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace" }}>{fmt(ticketMedio)}</div>
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>Margem Operacional</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: margemOp > 30 ? "#10b981" : "#6366f1" }}>{fmtPct(margemOp)}</div>
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", marginBottom: 12 }}>Produtividade</div>
+            <div>
+              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>Faturamento Médio Diário</div>
+              <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace" }}>{fmt(faturamentoMedioDiario)}</div>
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>Vendas no Período</div>
+              <div style={{ fontSize: 18, fontWeight: 800 }}>{vRecebido.length} <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)" }}>vendas</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="card" style={{ padding: "24px 28px" }}>
-        <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", marginBottom: 4 }}>Evolução Operacional</div>
-        <div style={{ fontSize: 12, color: "var(--text-dim)", marginBottom: 24 }}>Comparativo: Receita Líquida vs Despesas PJ (últimos 6 meses)</div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 24 }}>Evolução Mensal (Receita vs Despesa)</div>
         <div style={{ width: "100%", height: 300 }}>
           <ResponsiveContainer>
-            <LineChart data={hist} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <BarChart data={hist}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--divider)" />
-              <XAxis dataKey="name" tick={{ fill: 'var(--text-dim)', fontSize: 11 }} tickLine={false} axisLine={false} />
-              <YAxis tickFormatter={v => 'R$ ' + v.toLocaleString('pt-BR')} tick={{ fill: 'var(--text-dim)', fontSize: 11 }} tickLine={false} axisLine={false} width={80} />
-              <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', background: 'var(--card)', color: 'var(--text)' }} formatter={(v) => fmt(v)} />
-              <Legend iconType="circle" wrapperStyle={{ fontSize: 12, paddingTop: 10 }} />
-              <Line type="monotone" dataKey="Receita" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-              <Line type="monotone" dataKey="Despesas" stroke="#ef4444" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-              <Line type="monotone" dataKey="Lucro" stroke="#6366f1" strokeWidth={2} dot={false} />
-            </LineChart>
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "var(--text-muted)" }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "var(--text-muted)" }} tickFormatter={v => `R$ ${v}`} />
+              <Tooltip cursor={{ fill: 'var(--row-hover)' }} contentStyle={{ background: "var(--card)", borderRadius: 12, border: "1px solid var(--border)" }} />
+              <Legend verticalAlign="top" height={36}/>
+              <Bar dataKey="Receita" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Despesas" fill="#f87171" radius={[4, 4, 0, 0]} />
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
@@ -2169,6 +2484,7 @@ export default function App() {
   const [view, setView] = useState("dashboard"); // "dashboard" | "lista" | "categorias"
   const [modal, setModal] = useState(null);     // {type, mode, record ? }
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [catDetailModal, setCatDetailModal] = useState(null); // { cat, type: 'pj' | 'pf' }
 
   const safeNavigate = async (newPage, newView) => {
     // Removed native window.confirm alert for better UX
@@ -2195,14 +2511,18 @@ export default function App() {
           ...p,
           darkMode: p.dark_mode ?? prev.darkMode,
           reservaEmerg: p.reserva_emerg ?? prev.reservaEmerg,
-          reservaAtual: toDigits(p.reserva_atual ?? prev.reservaAtual),
-          metaReceita: toDigits(p.meta_receita ?? prev.metaReceita),
-          prolabore: toDigits(p.prolabore ?? prev.prolabore),
+          reservaAtual: p.reserva_atual ?? prev.reservaAtual,
+          metaReceita: p.meta_receita ?? prev.metaReceita,
+          prolabore: p.prolabore ?? prev.prolabore,
           isMei: p.is_mei !== undefined ? p.is_mei : true,
-          limiteAnual: toDigits(p.limite_anual ?? (p.is_mei === false ? 360000 : 81000)),
-          mediaGastoManual: toDigits(p.media_gasto_manual ?? prev.mediaGastoManual),
-          valorDAS: toDigits(p.valor_das ?? prev.valorDAS),
-          diaFechamento: p.dia_fechamento ?? prev.diaFechamento
+          limiteAnual: p.limite_anual ?? (p.is_mei === false ? 360000 : 81000),
+          mediaGastoManual: p.media_gasto_manual ?? prev.mediaGastoManual,
+          valorDAS: p.valor_das ?? prev.valorDAS,
+          diaFechamento: p.dia_fechamento ?? prev.diaFechamento,
+          dasEmailAlerts: p.das_email_alerts !== undefined ? p.das_email_alerts : true,
+          dasDashAlerts: p.das_dash_alerts !== undefined ? p.das_dash_alerts : true,
+          custosFixos: p.custos_fixos || [],
+          custosFixosPF: p.custos_fixos_pf || []
         };
         localStorage.setItem('mei_finance_dark_mode', newPerfil.darkMode);
         return newPerfil;
@@ -2359,6 +2679,8 @@ export default function App() {
     return {
       nome: "", apelido: "", tipo: "Serviços", profissao: "", cnpj: "", cpf: "", email: "", tel: "", empresa: "", foto: null,
       diaFechamento: "20", prolabore: "", metaReceita: "", reservaEmerg: "6", reservaAtual: "", mediaGastoManual: "", valorDAS: "",
+      dasEmailAlerts: true, dasDashAlerts: true,
+      custosFixos: [], custosFixosPF: [],
       darkMode: saved === 'true'
     };
   });
@@ -2374,7 +2696,35 @@ export default function App() {
 
   const notifications = useMemo(() => {
     const list = [];
-    // DAS notification removed per user request
+    
+    // DAS Alert Logic
+    if (perfil.dasDashAlerts !== false) {
+      const today = new Date();
+      const day = today.getDate();
+      const month = today.getMonth() + 1;
+      const year = today.getFullYear();
+      
+      // Vencimento padrão dia 20
+      const vencimentoDia = parseInt(perfil.diaFechamento) || 20;
+      
+      // Alerta 5 dias antes (ex: dia 15 se vencimento for 20)
+      if (day >= (vencimentoDia - 5) && day < vencimentoDia) {
+        list.push({
+          id: 'das-pre',
+          icon: '🧾',
+          title: 'DAS Próximo do Vencimento',
+          desc: `O vencimento do seu DAS é dia ${vencimentoDia}. Não esqueça de pagar!`
+        });
+      } else if (day === vencimentoDia) {
+        list.push({
+          id: 'das-today',
+          icon: '⚠️',
+          title: 'Vencimento do DAS Hoje!',
+          desc: `Hoje é o dia de pagar seu DAS. Evite multas e juros!`
+        });
+      }
+    }
+
     return list;
   }, [despesas, perfil]);
   const [filterStatus, setFilterStatus] = useState("todos");
@@ -2383,6 +2733,195 @@ export default function App() {
 
   const closeModal = () => setModal(null);
   const isPJ = context === "pj";
+
+  const pjStats = useMemo(() => {
+    if (!isPJ) return { ticketMedio: 0, margemLucro: 0, melhorDia: "—", anualComNF: 0, anualTotal: 0, pctLimiteMEI: 0, catChartData: [] };
+    const vLiq = totals?.totalLiq || 0;
+    const vBruto = (vendas || []).filter(v => v.status === "recebido" && inDateRange(v.data, dateRange))
+      .reduce((s, v) => s + (parseFloat(v.faturamento) || 0), 0);
+    const vFiltered = (vendas || []).filter(v => v.status === "recebido" && inDateRange(v.data, dateRange));
+    const ticketMedio = vFiltered.length > 0 ? vLiq / vFiltered.length : 0;
+    const margemLucro = vBruto > 0 ? ((totals?.resultado || 0) / vBruto) * 100 : 0;
+
+    const salesByDay = {};
+    vFiltered.forEach(v => {
+      const day = v.data ? new Date(v.data).getDay() : 0;
+      salesByDay[day] = (salesByDay[day] || 0) + calcLiquido(v.faturamento, v.taxas).liquido;
+    });
+    const weekDays = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+    let bestDayIdx = 0, maxSales = 0;
+    Object.entries(salesByDay).forEach(([d, s]) => { if (s > maxSales) { maxSales = s; bestDayIdx = d; } });
+    const melhorDia = maxSales > 0 ? weekDays[bestDayIdx] : "—";
+    const currentYear = new Date().getFullYear();
+    const vendasAno = (vendas || []).filter(v => v.status === "recebido" && v.data?.startsWith(String(currentYear)));
+    const anualComNF = vendasAno.filter(v => v.nf === true).reduce((s, v) => s + (parseFloat(v.faturamento) || 0), 0);
+    const anualTotal = vendasAno.reduce((s, v) => s + (parseFloat(v.faturamento) || 0), 0);
+    const pctLimiteMEI = (anualComNF / 81000) * 100;
+    const catDataMap = {};
+    (vendas || []).filter(v => v.status === "recebido" && inDateRange(v.data, dateRange)).forEach(v => {
+      const cat = v.categoria || "Outro PJ";
+      catDataMap[cat] = (catDataMap[cat] || 0) + calcLiquido(v.faturamento, v.taxas).liquido;
+    });
+
+    // ── Fixed vs Variable (PJ) ──
+    const fixedMap = {};
+    (perfil.custosFixos || []).forEach(c => {
+      const cat = c.categoria || "Geral";
+      fixedMap[cat] = (fixedMap[cat] || 0) + (parseFloat(c.valor) || 0);
+    });
+
+    const categories = Array.from(new Set([...Object.keys(fixedMap), ...despesas.filter(d => d.status === "pago" && inDateRange(d.data, dateRange)).map(d => d.categoria)]));
+    let totalFixoReal = 0;
+    let totalVariavelReal = 0;
+    const extraByCat = [];
+
+    categories.forEach(cat => {
+      const planned = fixedMap[cat] || 0;
+      const spent = despesas.filter(d => d.status === "pago" && inDateRange(d.data, dateRange) && d.categoria === cat).reduce((s, d) => s + d.valor, 0);
+      
+      const fixedPart = Math.min(planned, spent);
+      const variablePart = Math.max(0, spent - planned);
+      
+      totalFixoReal += fixedPart;
+      totalVariavelReal += variablePart;
+      
+      if (variablePart > 0) extraByCat.push({ name: cat, value: variablePart });
+    });
+
+    return { 
+      ticketMedio, margemLucro, melhorDia, anualComNF, anualTotal, pctLimiteMEI, 
+      catChartData: Object.entries(catDataMap).map(([name, value]) => ({ name, value })),
+      costDist: {
+        fixo: totalFixoReal,
+        variavel: totalVariavelReal,
+        total: totalFixoReal + totalVariavelReal,
+        extraByCat: extraByCat.sort((a, b) => b.value - a.value).slice(0, 3)
+      }
+    };
+  }, [vendas, totals, dateRange, isPJ]);
+
+  const pfStats = useMemo(() => {
+    if (isPJ) return { raloSorted: [], metodosSorted: [], rule503020: [], metas: [], totalGasto: 0, taxaEconomia: 0, reservaMeses: 0, mediaFinal: 0 };
+    const currentGastos = gastos.filter(g => g.status === "pago" && inDateRange(g.data, dateRange));
+    const totalGasto = currentGastos.reduce((s, g) => s + g.valor, 0);
+
+    // 50/30/20 Rule
+    const needsArr = ["Alimentação", "Moradia", "Transporte", "Saúde", "Educação"];
+    const wantsArr = ["Lazer", "Compras", "Streaming", "Outros"];
+    const savingsArr = ["Investimentos"];
+
+    const nVal = currentGastos.filter(g => needsArr.includes(g.categoria)).reduce((s, g) => s + g.valor, 0);
+    const wVal = currentGastos.filter(g => wantsArr.includes(g.categoria)).reduce((s, g) => s + g.valor, 0);
+    const sVal = currentGastos.filter(g => savingsArr.includes(g.categoria)).reduce((s, g) => s + g.valor, 0);
+
+    const rule503020 = [
+      { name: "Essenciais", value: nVal, color: "#6366f1", target: 50 },
+      { name: "Estilo Vida", value: wVal, color: "#f59e0b", target: 30 },
+      { name: "Investimento", value: sVal, color: "#10b981", target: 20 },
+    ];
+
+    // ── Reserva de Emergência Inteligente ──
+    // Prioridade de Custo Base: Custos Fixos PF > Orçamentos > Média Mensal
+    const totalCustoFixoPF = (perfil.custosFixosPF || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+    const somaOrcamentos = Object.values(orcamentos).reduce((s, v) => s + (parseFloat(v) || 0), 0);
+    const mediaManual = unmaskCurrency(maskCurrency(perfil.mediaGastoManual)) || 0;
+
+    const monthsWithSpending = new Set();
+    gastos.filter(g => g.status === "pago").forEach(g => {
+      if (g.data) monthsWithSpending.add(g.data.substring(0, 7));
+    });
+    const numMonths = monthsWithSpending.size;
+    const totalAllGastos = gastos.filter(g => g.status === "pago").reduce((s, g) => s + g.valor, 0);
+    const mediaAutoGastos = numMonths >= 3 ? totalAllGastos / numMonths : 0;
+
+    const pl = unmaskCurrency(maskCurrency(perfil.prolabore)) || 0;
+
+    let mediaFinal = 0;
+    let mediaSource = "none";
+
+    if (totalCustoFixoPF > 0) {
+      mediaFinal = totalCustoFixoPF;
+      mediaSource = "custos_fixos";
+    } else if (pl > 0) {
+      mediaFinal = pl;
+      mediaSource = "prolabore";
+    } else if (somaOrcamentos > 0) {
+      mediaFinal = somaOrcamentos;
+      mediaSource = "orcamentos";
+    } else if (numMonths >= 3 && mediaAutoGastos > 0) {
+      mediaFinal = mediaAutoGastos;
+      mediaSource = "auto";
+    } else {
+      mediaFinal = mediaManual > 0 ? mediaManual : 1;
+      mediaSource = mediaManual > 0 ? "manual" : "default";
+    }
+    const hasMediaData = mediaFinal > 1 || mediaSource !== "default";
+
+    const manualReserva = unmaskCurrency(maskCurrency(perfil.reservaAtual)) || 0;
+    const totalReservado = (reservas || []).reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
+    const reservaAtualVal = manualReserva + totalReservado;
+    const metaReservaMeses = parseFloat(perfil.reservaEmerg) || 6;
+    const reservaMeses = mediaFinal > 0 ? reservaAtualVal / mediaFinal : 0;
+
+    // Metas de 3, 6, 12 meses
+    const metas = [3, 6, 12].map(m => ({
+      meses: m,
+      necessario: mediaFinal * m,
+      falta: Math.max(0, (mediaFinal * m) - reservaAtualVal),
+      atingido: mediaFinal > 0 && reservaAtualVal >= (mediaFinal * m)
+    }));
+
+    // Pró-labore vs Gastos
+    const taxaEconomia = pl > 0 ? ((pl - totalGasto) / pl) * 100 : 0;
+
+    // Ralos (Categories)
+    const catMap = {};
+    currentGastos.forEach(g => catMap[g.categoria] = (catMap[g.categoria] || 0) + g.valor);
+    const raloSorted = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+    // Metodos
+    const metodoMap = {};
+    currentGastos.forEach(g => {
+      const m = g.metodo || "Outro";
+      metodoMap[m] = (metodoMap[m] || 0) + g.valor;
+    });
+    const metodosSorted = Object.entries(metodoMap).sort((a, b) => b[1] - a[1]);
+
+    // ── Fixed vs Variable (PF) ──
+    const fixedMap = {};
+    (perfil.custosFixosPF || []).forEach(c => {
+      const cat = c.categoria || "Geral";
+      fixedMap[cat] = (fixedMap[cat] || 0) + (parseFloat(c.valor) || 0);
+    });
+
+    const pfCategories = Array.from(new Set([...Object.keys(fixedMap), ...currentGastos.map(g => g.categoria)]));
+    let totalFixoReal = 0;
+    let totalVariavelReal = 0;
+    const extraByCat = [];
+
+    pfCategories.forEach(cat => {
+      const planned = fixedMap[cat] || 0;
+      const spent = currentGastos.filter(g => g.categoria === cat).reduce((s, g) => s + g.valor, 0);
+      
+      const fixedPart = Math.min(planned, spent);
+      const variablePart = Math.max(0, spent - planned);
+      
+      totalFixoReal += fixedPart;
+      totalVariavelReal += variablePart;
+      
+      if (variablePart > 0) extraByCat.push({ name: cat, value: variablePart });
+    });
+
+    return { 
+      totalGasto, rule503020, reservaMeses, metaReservaMeses, taxaEconomia, raloSorted, metodosSorted, reservaAtualVal, mediaFinal, metas, numMonths: numMonths || 0, hasMediaData, mediaSource,
+      costDist: {
+        fixo: totalFixoReal,
+        variavel: totalVariavelReal,
+        total: totalFixoReal + totalVariavelReal,
+        extraByCat: extraByCat.sort((a, b) => b.value - a.value).slice(0, 3)
+      }
+    };
+  }, [gastos, perfil, dateRange, isPJ, reservas, orcamentos]);
 
   // ── Modal openers ──
   const openAddVenda = () => { setFormVenda(EMPTY_VENDA); setModal({ type: "venda", mode: "add" }); };
@@ -2589,7 +3128,11 @@ export default function App() {
     { label: "Despesas PJ", value: fmt(totals.totalDesp), sub: "contas da empresa", accent: "#ef4444" },
     { label: "Pendentes", value: fmt(totals.pendentesPJ), sub: "a receber/pagar", accent: "#f59e0b" },
   ] : (() => {
-    const pfOrcTotal = categoriasPF.reduce((acc, c) => acc + (orcamentos[c.label] || 0), 0);
+    const pfOrcTotal = (categoriasPF || []).reduce((acc, c) => acc + (orcamentos?.[c.label] || 0), 0);
+    const totalCustoFixoPF = (perfil.custosFixosPF || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+    const pl = parseFloat(perfil.prolabore) || 0;
+    const custoBase = totalCustoFixoPF > 0 ? totalCustoFixoPF : (pl > 0 ? pl : (pfOrcTotal > 0 ? pfOrcTotal : (parseFloat(perfil.mediaGastoManual) || 0)));
+
     return [
       { label: "Total Gasto", value: fmt(totals.totalGastos), sub: `Fixo: ${fmt(totals.totalGastosFixo)} · Var: ${fmt(totals.totalGastosVariavel)}`, accent: "#6366f1" },
       { label: "Disponível", value: fmt(Math.max(0, pfOrcTotal - totals.totalGastos)), sub: "até o fim do mês", accent: "#4ade80" },
@@ -2601,7 +3144,7 @@ export default function App() {
   // ── Column configs ──
   const vendasCols = [
     {
-      label: "Descrição / Cliente", w: "3fr", render: r => (
+      label: "Descrição", w: "3fr", render: r => (
         <div>
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>{r.descricao}</div>
           <div style={{ fontSize: 11, color: "var(--text-dim)" }}>{r.cliente} · {fmtDate(r.data)}</div>
@@ -2985,7 +3528,7 @@ export default function App() {
               </div>
 
               {/* ── Dashboard view ── */}
-              {view === "dashboard" && <Dashboard vendas={vendas} despesas={despesas} gastos={gastos} perfil={perfil} totals={totals} dateRange={dateRange} isPJ={isPJ} catIcon={catIcon} reservas={reservas} />}
+              {view === "dashboard" && <Dashboard vendas={vendas} despesas={despesas} gastos={gastos} perfil={perfil} totals={totals} dateRange={dateRange} isPJ={isPJ} catIcon={catIcon} reservas={reservas} pfStats={pfStats} orcamentos={orcamentos} pjStats={pjStats} />}
 
               {/* ── Category view ── */}
               {view === "categorias" && (
@@ -2996,6 +3539,7 @@ export default function App() {
                   catIcon={catIcon}
                   isPJ={isPJ}
                   totals={totals}
+                  onCategoryClick={(cat) => setCatDetailModal({ cat, type: isPJ ? 'pj' : 'pf' })}
                 />
               )}
 
@@ -3034,6 +3578,7 @@ export default function App() {
                   vendas={vendas}
                   despesas={despesas}
                   gastos={gastos}
+                  orcamentos={orcamentos}
                   dateRange={dateRange}
                   isPJ={isPJ}
                   perfil={perfil}
@@ -3092,7 +3637,7 @@ export default function App() {
                     <div>{lbl("Cliente")}<input className="input" placeholder="Nome do cliente" value={formVenda.cliente} onChange={e => setFormVenda(f => ({ ...f, cliente: e.target.value }))} /></div>
                     <div>{lbl("Data")}<input className="input" type="date" value={formVenda.data} onChange={e => setFormVenda(f => ({ ...f, data: e.target.value }))} /></div>
                   </div>
-                  <div>{lbl("Descrição *")}<input className="input" placeholder="Ex: Proteção Veicular Premium" value={formVenda.descricao} onChange={e => setFormVenda(f => ({ ...f, descricao: e.target.value }))} /></div>
+                  <div>{lbl("Descrição *")}<input className="input" placeholder="Ex: Venda de produto ou serviço" value={formVenda.descricao} onChange={e => setFormVenda(f => ({ ...f, descricao: e.target.value }))} /></div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     <div>{lbl("Faturamento bruto *")}<input className="input" type="text" placeholder="R$ 0,00" value={maskCurrency(formVenda.faturamento)} onChange={e => setFormVenda(f => ({ ...f, faturamento: e.target.value.replace(/\D/g, "") }))} /></div>
                     <div>{lbl("Método")}<select className="input" value={formVenda.metodo} onChange={e => setFormVenda(f => ({ ...f, metodo: e.target.value }))}>{METODOS.map(m => <option key={m}>{m}</option>)}</select></div>
@@ -3340,6 +3885,46 @@ export default function App() {
                     </button>
                   </>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* ── Detalhamento por Categoria ── */}
+          {catDetailModal && (
+            <div className="modal-overlay" onClick={() => setCatDetailModal(null)}>
+              <div className="modal" style={{ maxWidth: 800, width: '95%', padding: 0 }} onClick={e => e.stopPropagation()}>
+                <div style={{ padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--divider)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+                      {catIcon(catDetailModal.cat)}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text)" }}>{catDetailModal.cat}</div>
+                      <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                        {catDetailModal.type === 'pj' ? 'Despesas da Empresa' : 'Gastos Pessoais'}
+                      </div>
+                    </div>
+                  </div>
+                  <button className="btn-icon" onClick={() => setCatDetailModal(null)}><IconClose size={20} /></button>
+                </div>
+                <div className="divider" />
+                <div style={{ padding: "20px", maxHeight: '70vh', overflowY: 'auto' }}>
+                  {(() => {
+                    const filteredRecords = (catDetailModal.type === 'pj' ? filteredDespesas : filteredGastos)
+                      .filter(r => r.categoria === catDetailModal.cat);
+                    
+                    return (
+                      <RecordTable 
+                        records={filteredRecords} 
+                        columns={catDetailModal.type === 'pj' ? despesasCols : gastosCols}
+                        onView={catDetailModal.type === 'pj' ? openViewDespesa : openViewGasto}
+                        onEdit={catDetailModal.type === 'pj' ? openEditDespesa : openEditGasto}
+                        onDelete={id => { setCatDetailModal(null); setDeleteConfirm({ id, type: catDetailModal.type === 'pj' ? "despesa" : "gasto" }); }}
+                        emptyMsg="Nenhum registro encontrado nesta categoria."
+                      />
+                    );
+                  })()}
+                </div>
               </div>
             </div>
           )}
