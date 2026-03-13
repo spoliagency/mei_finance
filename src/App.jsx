@@ -65,8 +65,8 @@ const STATUS_STYLE = {
 
 window.meiConfig = { isDirty: false, save: null };
 
-const EMPTY_DESPESA = { descricao: "", categoria: "Ferramentas / SaaS", metodo: "PIX", valor: "", data: today(), recorrencia: "Único", status: "pago", obs: "" };
-const EMPTY_GASTO = { descricao: "", categoria: "Alimentação", metodo: "PIX", valor: "", data: today(), recorrencia: "Único", status: "pago", obs: "" };
+const EMPTY_DESPESA = { descricao: "", categoria: "Ferramentas / SaaS", metodo: "PIX", valor: "", data: today(), recorrencia: "Único", vencimento: "", status: "pago", obs: "" };
+const EMPTY_GASTO = { descricao: "", categoria: "Alimentação", metodo: "PIX", valor: "", data: today(), recorrencia: "Único", vencimento: "", status: "pago", obs: "" };
 const EMPTY_VENDA = { descricao: "", cliente: "", categoria: "Serviço prestado", metodo: "PIX", faturamento: "", taxas: [{ label: "Taxa plataforma", value: "", type: "pct" }], data: today(), status: "recebido", nf: false, obs: "" };
 const EMPTY_RESERVA = { valor: "", banco: "", data: today(), obs: "" };
 
@@ -413,6 +413,7 @@ const CSS = `
     bottom: 0;
     z-index: 40;
     transition: background 0.2s, border 0.2s;
+    overflow-y: auto;
   }
   .sidebar-nav-item {
     display: flex;
@@ -865,69 +866,61 @@ function CatManager({ cats, setCats, orcamentos = {}, setOrcamento }) {
   );
 }
 
-function FixedCostManager({ custos, setCustos }) {
+function FixedCostManager({ costs, setCosts, cats }) {
   const [editingIdx, setEditingIdx] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ label: "", valor: "", categoria: "" });
+  const [form, setForm] = useState({ label: "", valor: "", categoria: "", vencimento: "" });
 
-  const [categorias] = useState(() => {
-    // Tenta encontrar as categorias disponíveis no contexto pai (simplificado)
-    return []; 
-  });
-
-  const openAdd = () => { setForm({ label: "", valor: "", categoria: "" }); setEditingIdx(null); setShowForm(true); };
+  const openAdd = () => { setForm({ label: "", valor: "", categoria: (cats && cats.length > 0 ? cats[0].label : ""), vencimento: "" }); setEditingIdx(null); setShowForm(true); };
   const save = () => {
     if (!form.label || !form.valor) return;
     const numericValue = unmaskCurrency(maskCurrency(form.valor));
-    const newCost = { label: form.label, valor: numericValue, categoria: form.categoria };
-    if (editingIdx === null) setCustos([...custos, newCost]);
-    else setCustos(custos.map((c, i) => i === editingIdx ? newCost : c));
+    const newCost = { label: form.label, valor: numericValue, categoria: form.categoria, vencimento: form.vencimento };
+    if (editingIdx === null) setCosts([...costs, newCost]);
+    else setCosts(costs.map((c, i) => i === editingIdx ? newCost : c));
     setShowForm(false);
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      {custos.map((c, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "var(--sidebar-bg)", border: "1px solid var(--divider)" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {(costs || []).map((c, i) => (
+        <div key={i} className="card" style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "var(--card)", border: "1px solid var(--border)" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
-              {c.categoria && <div style={{ fontSize: 9, fontWeight: 700, color: "var(--text-dim)", background: "var(--bg)", padding: "1px 6px", borderRadius: 4, border: "1px solid var(--border)" }}>{c.categoria}</div>}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
+              {c.categoria && <div style={{ fontSize: 10, fontWeight: 800, color: "var(--text-accent)", background: "var(--tag-bg)", padding: "2px 8px", borderRadius: 6, border: "1px solid var(--border)" }}>{c.categoria}</div>}
             </div>
-            <div style={{ fontSize: 12, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)" }}>{fmt(c.valor)}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)" }}>{fmt(c.valor)} {c.vencimento && <span style={{fontSize: 10, fontWeight: 600, color: "var(--text-dim)", marginLeft: 6}}>• Vence dia {c.vencimento}</span>}</div>
           </div>
-          <div style={{ display: "flex", gap: 4 }}>
-            <button onClick={() => { setForm({ label: c.label, valor: toDigits(c.valor), categoria: c.categoria || "" }); setEditingIdx(i); setShowForm(true); }} className="btn-icon" title="Editar">
-              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={() => { setForm({ label: c.label, valor: toDigits(c.valor), categoria: c.categoria || "", vencimento: c.vencimento || "" }); setEditingIdx(i); setShowForm(true); }} className="btn-icon" title="Editar">
+              <IconEdit />
             </button>
-            <button onClick={() => setCustos(custos.filter((_, idx) => idx !== i))} className="btn-icon" style={{ color: "var(--text-dim)" }} title="Remover">
-              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
+            <button onClick={() => setCosts(costs.filter((_, idx) => idx !== i))} className="btn-icon" style={{ color: "#ef4444" }} title="Remover">
+              <IconTrash />
             </button>
           </div>
         </div>
       ))}
       {!showForm ? (
-        <button onClick={openAdd} className="btn-outline" style={{ padding: "10px", width: "100%", borderStyle: "dashed", fontSize: 11, fontWeight: 700, borderRadius: 10, marginTop: 4 }}>
+        <button onClick={openAdd} className="btn-outline" style={{ padding: "12px", width: "100%", borderStyle: "dashed", fontSize: 12, fontWeight: 700, borderRadius: 12, marginTop: 4 }}>
           + Adicionar Custo Fixo
         </button>
       ) : (
-        <div className="card" style={{ padding: "16px", display: "flex", flexDirection: "column", gap: 12, border: "1.5px solid var(--text)", marginTop: 4 }}>
+        <div className="card" style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 14, border: "2px solid var(--text)", marginTop: 4 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{editingIdx === null ? "Novo Custo Fixo" : "Editar Custo Fixo"}</div>
+          <div>{lbl("Nome do Custo")}<input className="input" placeholder="Ex: Aluguel" value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} autoFocus /></div>
+          <div>{lbl("Valor Mensal")}<input className="input" placeholder="R$ 0,00" value={maskCurrency(form.valor)} onChange={e => setForm({ ...form, valor: e.target.value.replace(/\D/g, "") })} style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 700 }} /></div>
           <div>
-            {lbl("Nome do Custo")}
-            <input className="input" placeholder="Ex: Aluguel" value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} autoFocus />
+            {lbl("Categoria")}
+            <select className="input" value={form.categoria} onChange={e => setForm({ ...form, categoria: e.target.value })}>
+              {cats.map(c => <option key={c.label} value={c.label}>{c.label}</option>)}
+            </select>
           </div>
-          <div>
-            {lbl("Valor Mensal")}
-            <input className="input" placeholder="R$ 0,00" value={maskCurrency(form.valor)} onChange={e => setForm({ ...form, valor: e.target.value.replace(/\D/g, "") })} style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 700 }} />
-          </div>
-          <div>
-            {lbl("Categoria Relacionada")}
-            <input className="input" placeholder="Ex: Moradia, Alimentação..." value={form.categoria} onChange={e => setForm({ ...form, categoria: e.target.value })} list="cat-suggestions" />
-            <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 4 }}>Opcional: use para calcular gastos excedentes por categoria.</div>
-          </div>
-          <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-            <button onClick={() => setShowForm(false)} className="btn-outline" style={{ flex: 1, padding: "8px", fontSize: 12 }}>Cancelar</button>
-            <button onClick={save} className="btn-dark" style={{ flex: 2, padding: "8px", fontSize: 12 }}>{editingIdx === null ? "Adicionar" : "Salvar Alteração"}</button>
+          <div>{lbl("Dia de Vencimento")}<input className="input" type="number" min="1" max="31" placeholder="Ex: 15" value={form.vencimento} onChange={e => setForm({ ...form, vencimento: e.target.value })} /></div>
+          <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
+            <button onClick={() => setShowForm(false)} className="btn-outline" style={{ flex: 1, height: 42 }}>Cancelar</button>
+            <button onClick={save} className="btn-dark" style={{ flex: 2, height: 42 }}>{editingIdx === null ? "Adicionar" : "Salvar Alteração"}</button>
           </div>
         </div>
       )}
@@ -1067,10 +1060,14 @@ function BankManager({ bancos, setBancos, session, showToast }) {
   );
 }
 
-function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCategoriasPJ, categoriasPF, setCategoriasPF, orcamentos, setOrcamento, perfil, setPerfil, isPJ, session, showToast, bancos, setBancos }) {
+function ConfigPage({ activeSection = "perfil", categoriasVendas, setCategoriasVendas, categoriasPJ, setCategoriasPJ, categoriasPF, setCategoriasPF, orcamentos, setOrcamento, perfil, setPerfil, isPJ, session, showToast, bancos, setBancos }) {
   const [draftPerfil, setDraftPerfil] = useState(perfil);
-  const [section, setSection] = useState("perfil");
+  const [section, setSection] = useState(activeSection);
   const [savedFeedback, setSavedFeedback] = useState(false);
+
+  useEffect(() => {
+    setSection(activeSection);
+  }, [activeSection]);
 
   const isDirty = useMemo(() => {
     return Object.keys(draftPerfil).some(k => String(draftPerfil[k]) !== String(perfil[k]));
@@ -1103,7 +1100,7 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
       apelido: draftPerfil.apelido,
       is_mei: draftPerfil.isMei !== undefined ? draftPerfil.isMei : true,
       limite_anual: unmaskCurrency(maskCurrency(draftPerfil.limiteAnual)),
-      tipo_mei: draftPerfil.tipoMei,
+      tipo_mei: draftPerfil.tipo,
       profissao: draftPerfil.profissao,
       cnpj: draftPerfil.cnpj,
       cpf: draftPerfil.cpf,
@@ -1148,16 +1145,17 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
     {
       title: "Negócio (PJ)",
       items: [
-        { key: "cat-vendas", icon: <IconBusiness size={16} />, label: "Categorias de Vendas" },
-        { key: "cat-pj", icon: <IconBusiness size={16} />, label: "Categorias PJ" },
-        { key: "custos-fixos", icon: <IconBusiness size={16} />, label: "Custos Fixos PJ" },
+        { key: "cat-pj", icon: <IconList size={16} />, label: "Categorias PJ" },
+        { key: "orc-pj", icon: <IconTarget size={16} />, label: "Orçamentos PJ" },
+        { key: "fix-pj", icon: <IconClock size={16} />, label: "Custos Fixos PJ" },
       ]
     },
     {
       title: "Pessoal (PF)",
       items: [
-        { key: "cat-pf", icon: <IconUser size={16} />, label: "Categorias PF" },
-        { key: "custos-fixos-pf", icon: <IconUser size={16} />, label: "Custos Fixos PF" },
+        { key: "cat-pf", icon: <IconList size={16} />, label: "Categorias PF" },
+        { key: "orc-pf", icon: <IconTarget size={16} />, label: "Orçamentos PF" },
+        { key: "fix-pf", icon: <IconClock size={16} />, label: "Gastos Fixos PF" },
       ]
     }
   ];
@@ -1312,34 +1310,7 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
           </div>
         )}
 
-        {/* ── Categorias ── */}
-        {section === "cat-vendas" && (
-          <div>
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Categorias — Vendas & Serviços</div>
-              <div style={{ fontSize: 12, color: "#aaa" }}>Categorias usadas ao cadastrar uma venda (serviços ou produtos)</div>
-            </div>
-            <CatManager cats={categoriasVendas} setCats={setCategoriasVendas} />
-          </div>
-        )}
-        {section === "cat-pj" && (
-          <div>
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Categorias e Orçamentos — Empresa (PJ)</div>
-              <div style={{ fontSize: 12, color: "#aaa" }}>Gerencie categorias e defina metas de orçamento mensal.</div>
-            </div>
-            <CatManager cats={categoriasPJ} setCats={setCategoriasPJ} orcamentos={orcamentos} setOrcamento={setOrcamento} />
-          </div>
-        )}
-        {section === "cat-pf" && (
-          <div>
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Categorias e Orçamentos — Pessoal (PF)</div>
-              <div style={{ fontSize: 12, color: "#aaa" }}>Gerencie categorias e defina limites para seus gastos.</div>
-            </div>
-            <CatManager cats={categoriasPF} setCats={setCategoriasPF} orcamentos={orcamentos} setOrcamento={setOrcamento} />
-          </div>
-        )}
+        {/* ── Meus Bancos ── */}
         {section === "bancos" && (
           <div>
             <div style={{ marginBottom: 20 }}>
@@ -1347,48 +1318,6 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
               <div style={{ fontSize: 12, color: "#aaa" }}>Gerencie os bancos e corretoras onde você deixa seu dinheiro</div>
             </div>
             <BankManager bancos={bancos} setBancos={setBancos} session={session} showToast={showToast} />
-          </div>
-        )}
-        
-        {/* ── Custos Fixos PJ ── */}
-        {section === "custos-fixos" && (
-          <div>
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Custos Fixos da Empresa</div>
-              <div style={{ fontSize: 12, color: "#aaa" }}>Valores recorrentes mensais (ex: Aluguel, MEI, Luz)</div>
-            </div>
-            <FixedCostManager 
-              custos={draftPerfil.custosFixos || []} 
-              setCustos={(c) => setDraftPerfil(p => ({ ...p, custosFixos: c }))} 
-            />
-            <datalist id="cat-suggestions">
-              {categoriasPJ.map(c => <option key={c.label} value={c.label} />)}
-            </datalist>
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 24, gap: 10, alignItems: "center" }}>
-              {savedFeedback && <div style={{ fontSize: 11, color: "#16a34a", fontWeight: 700 }}>✓ Custos salvos!</div>}
-              <button className="btn btn-dark" onClick={savePerfil} style={{ padding: "8px 24px" }}>Salvar alterações</button>
-            </div>
-          </div>
-        )}
-
-        {/* ── Custos Fixos PF ── */}
-        {section === "custos-fixos-pf" && (
-          <div>
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Custos Fixos Pessoais</div>
-              <div style={{ fontSize: 12, color: "#aaa" }}>Suas despesas fixas (ex: Aluguel casa, Internet, Streaming)</div>
-            </div>
-            <FixedCostManager 
-              custos={draftPerfil.custosFixosPF || []} 
-              setCustos={(c) => setDraftPerfil(p => ({ ...p, custosFixosPF: c }))} 
-            />
-            <datalist id="cat-suggestions">
-              {categoriasPF.map(c => <option key={c.label} value={c.label} />)}
-            </datalist>
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 24, gap: 10, alignItems: "center" }}>
-              {savedFeedback && <div style={{ fontSize: 11, color: "#16a34a", fontWeight: 700 }}>✓ Custos salvos!</div>}
-              <button className="btn btn-dark" onClick={savePerfil} style={{ padding: "8px 24px" }}>Salvar alterações</button>
-            </div>
           </div>
         )}
 
@@ -1402,6 +1331,8 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {[
                 { key: "diaFechamento", label: "Dia de fechamento do mês", sub: "Padrão: 20 (vencimento do DAS)", placeholder: "20", type: "text" },
+                { key: "ccFechamento", label: "Dia de fechamento do cartão", sub: "Dia que a fatura fecha", placeholder: "5", type: "text" },
+                { key: "ccVencimento", label: "Dia de vencimento do cartão", sub: "Dia que a fatura vence", placeholder: "15", type: "text" },
                 { key: "prolabore", label: "Meta de pró-labore mensal", sub: "Valor que deseja se pagar todo mês", placeholder: "R$ 0", isMoney: true },
                 { key: "metaReceita", label: "Meta de receita mensal (PJ)", sub: "Usado para calcular % de atingimento", placeholder: "R$ 0", isMoney: true },
                 { key: "mediaGastoManual", label: "Média de gastos mensal (PF)", sub: "Valor estimado inicial · usado na reserva até ter dados reais", placeholder: "R$ 0", isMoney: true },
@@ -1523,6 +1454,79 @@ function ConfigPage({ categoriasVendas, setCategoriasVendas, categoriasPJ, setCa
             </div>
           </div>
         )}
+        {/* ── Categorias PJ ── */}
+        {section === "cat-pj" && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Categorias do Negócio</div>
+              <div style={{ fontSize: 12, color: "#aaa" }}>Personalize as categorias das suas despesas PJ</div>
+            </div>
+            <CatManager cats={categoriasPJ} setCats={setCategoriasPJ} orcamentos={orcamentos} setOrcamento={setOrcamento} />
+          </div>
+        )}
+
+        {/* ── Orçamentos PJ ── */}
+        {section === "orc-pj" && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Orçamentos Mensais PJ</div>
+              <div style={{ fontSize: 12, color: "#aaa" }}>Quanto você planeja gastar em cada categoria do negócio</div>
+            </div>
+            <BudgetManager cats={categoriasPJ} orcamentos={orcamentos} setOrcamento={setOrcamento} />
+          </div>
+        )}
+
+        {/* ── Custos Fixos PJ ── */}
+        {section === "fix-pj" && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Custos Fixos do Negócio</div>
+              <div style={{ fontSize: 12, color: "#aaa" }}>Despesas que ocorrem todo mês (Ex: Aluguel, SaaS, DAS...)</div>
+            </div>
+            <FixedCostManager 
+              costs={draftPerfil.custosFixos || []} 
+              setCosts={c => setDraftPerfil(p => ({ ...p, custosFixos: c }))} 
+              cats={categoriasPJ} 
+            />
+          </div>
+        )}
+
+        {/* ── Categorias PF ── */}
+        {section === "cat-pf" && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Categorias Pessoais</div>
+              <div style={{ fontSize: 12, color: "#aaa" }}>Categorias usadas nos seus gastos do dia a dia</div>
+            </div>
+            <CatManager cats={categoriasPF} setCats={setCategoriasPF} orcamentos={orcamentos} setOrcamento={setOrcamento} />
+          </div>
+        )}
+
+        {/* ── Orçamentos PF ── */}
+        {section === "orc-pf" && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Orçamentos Pessoais</div>
+              <div style={{ fontSize: 12, color: "#aaa" }}>Planejamento mensal para seus gastos pessoais</div>
+            </div>
+            <BudgetManager cats={categoriasPF} orcamentos={orcamentos} setOrcamento={setOrcamento} />
+          </div>
+        )}
+
+        {/* ── Gastos Fixos PF ── */}
+        {section === "fix-pf" && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 4 }}>Gastos Fixos Pessoais</div>
+              <div style={{ fontSize: 12, color: "#aaa" }}>Compromissos fixos mensais (Ex: Aluguel casa, Internet, Streaming)</div>
+            </div>
+            <FixedCostManager 
+              costs={draftPerfil.custosFixosPF || []} 
+              setCosts={c => setDraftPerfil(p => ({ ...p, custosFixosPF: c }))} 
+              cats={categoriasPF} 
+            />
+          </div>
+        )}
 
       </div>
     </div>
@@ -1576,7 +1580,8 @@ function CategoryBudgetView({ catBreakdown, orcamentos, catIcon, isPJ, totals, o
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {catBreakdown.map(([cat, val]) => {
+            {catBreakdown.map(([cat, info]) => {
+              const val = info.total;
               const orc = orcamentos[cat];
               const hasOrc = orc != null && orc > 0;
               const pct = hasOrc ? val / orc : 0;
@@ -1608,35 +1613,16 @@ function CategoryBudgetView({ catBreakdown, orcamentos, catIcon, isPJ, totals, o
 
                   {/* Progress Bar Container */}
                   <div style={{ height: 6, background: "var(--divider)", borderRadius: 3, position: "relative", marginBottom: 4 }}>
-                    {/* The Bar */}
-                    <div style={{
-                      height: "100%",
-                      width: `${barWidth}%`,
-                      background: barColor,
-                      borderRadius: 3,
-                      transition: "width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                      boxShadow: overBudget ? "0 0 10px rgba(239,68,68,0.3)" : "none"
-                    }} />
-
-                    {/* Budget Target Marker (the visual limit) */}
-                    {hasOrc && (
-                      <div style={{
-                        position: "absolute",
-                        right: 0,
-                        top: 0,
-                        bottom: 0,
-                        width: 1.5,
-                        background: overBudget ? "#ef4444" : "var(--text-muted)",
-                        opacity: 0.5,
-                        zIndex: 2
-                      }} />
-                    )}
+                    <div style={{ height: "100%", width: `${barWidth}%`, background: barColor, borderRadius: 3, transition: "width 0.8s", boxShadow: overBudget ? "0 0 10px rgba(239,68,68,0.3)" : "none" }} />
+                    {hasOrc && <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 1.5, background: overBudget ? "#ef4444" : "var(--text-muted)", opacity: 0.5 }} />}
                   </div>
 
                   {/* Footer Label */}
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, fontWeight: 600 }}>
-                    <div style={{ color: "var(--text-dim)" }}>
-                      {total ? `${((val / total) * 100).toFixed(1)}% do total` : ""}
+                    <div style={{ color: "var(--text-dim)", display: "flex", gap: 8 }}>
+                      <span>{total ? `${((val / total) * 100).toFixed(1)}% do total` : ""}</span>
+                      {info.fixo > 0 && <span style={{ color: "#6366f1" }}>Fixo: {fmt(info.fixo)}</span>}
+                      {info.variavel > 0 && <span style={{ color: "#f59e0b" }}>Var: {fmt(info.variavel)}</span>}
                     </div>
                     {hasOrc && (
                       <div style={{ color: overBudget ? "#ef4444" : "#10b981" }}>
@@ -1714,7 +1700,139 @@ function CostDistributionCard({ data, isPJ, catIcon }) {
   );
 }
 
-function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, catIcon, reservas, pfStats, orcamentos, pjStats }) {
+function SuggestedEntriesWidget({ perfil, records, isPJ, onLaunch, catIcon, fatura }) {
+  const [editingDates, setEditingDates] = useState({});
+
+  const suggested = useMemo(() => {
+    const now = new Date();
+    const currentMonthKey = now.toISOString().substring(0, 7);
+    const fixos = isPJ ? (perfil.custosFixos || []) : (perfil.custosFixosPF || []);
+
+    const pending = fixos.filter(f => {
+      const alreadyPosted = records.some(r =>
+        r.data?.startsWith(currentMonthKey) &&
+        r.descricao?.toLowerCase() === f.descricao?.toLowerCase() &&
+        r.categoria === f.categoria
+      );
+      return !alreadyPosted;
+    });
+
+    const list = pending.map(f => {
+      const key = `fixed-${f.descricao}-${f.categoria}`;
+      const day = editingDates[key] || f.vencimento || 1;
+      return {
+        ...f,
+        idSug: key,
+        vencimento: day,
+        dateSuggestion: `${currentMonthKey}-${String(day).padStart(2, '0')}`,
+        type: 'fixed'
+      };
+    });
+
+    if (fatura > 0) {
+      const key = `cc-${isPJ ? 'PJ' : 'PF'}`;
+      const day = editingDates[key] || perfil.ccVencimento || 10;
+      list.push({
+        descricao: `Fatura Cartão ${isPJ ? 'PJ' : 'PF'}`,
+        valor: fatura,
+        categoria: "Cartão de Crédito",
+        vencimento: day,
+        dateSuggestion: `${currentMonthKey}-${String(day).padStart(2, '0')}`,
+        type: 'cc',
+        idSug: key
+      });
+    }
+
+    // DAS Alert Suggestion
+    if (isPJ && perfil.isMei !== false) {
+      const vencimentoDia = parseInt(perfil.diaFechamento) || 20;
+      const valorDas = unmaskCurrency(maskCurrency(perfil.valorDAS)) || 72; // Valor médio MEI 2024
+      const key = `das-${currentMonthKey}`;
+      
+      const alreadyPaid = records.some(r => 
+        r.status === "pago" && 
+        (r.descricao?.toLowerCase().includes("das") || r.categoria === "Impostos / DAS") &&
+        r.data?.startsWith(currentMonthKey)
+      );
+
+      if (!alreadyPaid) {
+        list.push({
+          descricao: `DAS MEI - Venc. ${vencimentoDia}/${now.getMonth() + 1}`,
+          valor: valorDas,
+          categoria: "Impostos / DAS",
+          vencimento: vencimentoDia,
+          dateSuggestion: `${currentMonthKey}-${String(vencimentoDia).padStart(2, '0')}`,
+          type: 'das',
+          idSug: key
+        });
+      }
+    }
+
+    return list;
+  }, [perfil, records, isPJ, fatura, editingDates]);
+
+  if (suggested.length === 0) return null;
+
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div className="sidebar-section-label" style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+        <span style={{ fontSize: 14 }}>💡</span> Sugestões do Mês
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "0 4px" }}>
+        {suggested.map((s, i) => (
+          <div key={i} className="card" style={{ padding: "10px 12px", background: "var(--card)", border: "1px solid var(--border)", position: "relative" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <div style={{ fontSize: 14 }}>{s.type === 'cc' ? '💳' : catIcon(s.categoria)}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "var(--text)" }}>{s.descricao}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-accent)", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(s.valor)}</div>
+              </div>
+            </div>
+            
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 4 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ fontSize: 9, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase" }}>Dia</span>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="31"
+                  value={s.vencimento}
+                  onChange={(e) => {
+                    const val = Math.max(1, Math.min(31, parseInt(e.target.value) || 1));
+                    setEditingDates(prev => ({ ...prev, [s.idSug]: val }));
+                  }}
+                  style={{ 
+                    width: 32, 
+                    height: 20, 
+                    padding: "0 2px", 
+                    fontSize: 10, 
+                    fontWeight: 800, 
+                    background: "var(--input-bg)", 
+                    border: "1px solid var(--border)", 
+                    borderRadius: 4, 
+                    color: "var(--text)",
+                    textAlign: "center",
+                    fontFamily: "'JetBrains Mono', monospace"
+                  }}
+                />
+              </div>
+              <button 
+                onClick={() => onLaunch(s)}
+                className="btn-dark"
+                style={{ padding: "4px 8px", fontSize: 9, fontWeight: 800, borderRadius: 6, cursor: "pointer", border: "none" }}
+              >
+                {s.type === 'cc' ? 'QUITAR' : 'LANÇAR'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, catIcon, reservas, pfStats, orcamentos, pjStats, onLaunchSuggested }) {
 
   const chartData = useMemo(() => {
     const months = [];
@@ -1746,30 +1864,22 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
   if (isPJ) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div className="mobile-summary-grid hide-mobile" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14 }}>
-          <div className="card" style={{ padding: "16px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-              <div style={{ fontSize: 16 }}>🎯</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Ticket Médio</div>
-            </div>
-            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>{fmt(pjStats.ticketMedio)}</div>
-            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Valor médio por venda</div>
-          </div>
+        <div className="mobile-summary-grid hide-mobile" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
               <div style={{ fontSize: 16 }}>💰</div>
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Lucro Real</div>
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "#16a34a" }}>{fmtPct(pjStats.margemLucro)}</div>
-            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>% que sobra após taxas e despesas</div>
+            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "#16a34a" }}>{fmt(totals.resultado)}</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Margem: {fmtPct(pjStats.margemLucro)}</div>
           </div>
-          <div className="card" style={{ padding: "16px 20px" }}>
+          <div className="card" style={{ padding: "16px 20px", borderTop: "3px solid #16a34a" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-              <div style={{ fontSize: 16 }}>📅</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Melhor Dia</div>
+              <div style={{ fontSize: 16 }}>🏃‍♂️</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Pró-labore Sugerido</div>
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", textTransform: "capitalize" }}>{pjStats.melhorDia}</div>
-            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Com mais faturamento</div>
+            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "#16a34a" }}>{fmt(pjStats.prolaboreSugerido)}</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Disponível p/ retirada pessoal</div>
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -1781,11 +1891,11 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-              <div style={{ fontSize: 16 }}>📉</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Ponto de Equilíbrio</div>
+              <div style={{ fontSize: 16 }}>🎯</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Ticket Médio</div>
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "#ef4444" }}>{fmt(totals.totalDesp + totals.totalDeducao)}</div>
-            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Fixos: {fmt(totals.totalDespFixo)} · Variáveis: {fmt(totals.totalDespVariavel)} · Taxas: {fmt(totals.totalDeducao)}</div>
+            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>{fmt(pjStats.ticketMedio)}</div>
+            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Valor médio por venda</div>
           </div>
         </div>
 
@@ -1939,6 +2049,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
     // PERSONAL DASHBOARD
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        {/* SuggestedEntriesWidget removido daqui (agora fixo no sidebar) */}
         <div className="mobile-summary-grid hide-mobile" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -2305,7 +2416,7 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
 
   const isMei = perfil.isMei !== undefined ? perfil.isMei : true;
   const limitFiscal = isMei ? 81000 : (parseFloat(perfil.limiteAnual) || 360000);
-  const totalFaturadoAno = vendas.filter(v => v.status === "recebido" && v.data.startsWith(dt.getFullYear().toString())).reduce((s, v) => s + (parseFloat(v.faturamento) || 0), 0);
+  const totalFaturadoAno = vendas.filter(v => v.status === "recebido" && v.data?.startsWith(dt.getFullYear().toString())).reduce((s, v) => s + (parseFloat(v.faturamento) || 0), 0);
   const restanteLimite = limitFiscal - totalFaturadoAno;
   const currMonth = dt.getMonth() + 1;
   const remMonthsAno = 12 - currMonth + 1;
@@ -2314,7 +2425,7 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
 
   const totalCustoFixo = (perfil.custosFixos || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
   const currentMonthStr = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
-  const faturamentoMesAtual = vendas.filter(v => v.status === "recebido" && v.data.startsWith(currentMonthStr)).reduce((s, v) => s + calcLiquido(v.faturamento, v.taxas).liquido, 0);
+  const faturamentoMesAtual = vendas.filter(v => v.status === "recebido" && v.data?.startsWith(currentMonthStr)).reduce((s, v) => s + calcLiquido(v.faturamento, v.taxas).liquido, 0);
   const dayOfMonth = dt.getDate();
   const faturamentoMedioDiario = dayOfMonth > 0 ? faturamentoMesAtual / dayOfMonth : 0;
   const diasParaCobrir = faturamentoMedioDiario > 0 ? Math.ceil(totalCustoFixo / faturamentoMedioDiario) : Infinity;
@@ -2470,6 +2581,10 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const [vendas, setVendas] = useState([]);
+  const [despesas, setDespesas] = useState([]);
+  const [gastos, setGastos] = useState([]);
+
   const [reservas, setReservas] = useState([]);
   const [bancos, setBancos] = useState(BANCOS_DEFAULT);
   const [formReserva, setFormReserva] = useState(EMPTY_RESERVA);
@@ -2487,7 +2602,6 @@ export default function App() {
   const [catDetailModal, setCatDetailModal] = useState(null); // { cat, type: 'pj' | 'pf' }
 
   const safeNavigate = async (newPage, newView) => {
-    // Removed native window.confirm alert for better UX
     setPage(newPage);
     if (newView) setView(newView);
   };
@@ -2522,29 +2636,26 @@ export default function App() {
           dasEmailAlerts: p.das_email_alerts !== undefined ? p.das_email_alerts : true,
           dasDashAlerts: p.das_dash_alerts !== undefined ? p.das_dash_alerts : true,
           custosFixos: p.custos_fixos || [],
-          custosFixosPF: p.custos_fixos_pf || []
+          custosFixosPF: p.custos_fixos_pf || [],
+          ccFechamento: p.cc_fechamento || "5",
+          ccVencimento: p.cc_vencimento || "15"
         };
         localStorage.setItem('mei_finance_dark_mode', newPerfil.darkMode);
         return newPerfil;
       });
     } else if (pErr && pErr.code === 'PGRST116') {
-      // Create initial profile for new user
       await supabase.from('perfil').insert([{ user_id: session.user.id, nome: session.user.user_metadata.full_name || "" }]);
     }
 
-    // Vendas
     const { data: v, error: vErr } = await supabase.from('vendas').select('*').eq('user_id', session.user.id).order('data', { ascending: false });
     if (v) setVendas(v); else if (vErr) console.error("Erro Vendas:", vErr.message);
 
-    // Despesas
     const { data: d, error: dErr } = await supabase.from('despesas').select('*').eq('user_id', session.user.id).order('data', { ascending: false });
     if (d) setDespesas(d); else if (dErr) console.error("Erro Despesas:", dErr.message);
 
-    // Gastos
     const { data: g, error: gErr } = await supabase.from('gastos').select('*').eq('user_id', session.user.id).order('data', { ascending: false });
     if (g) setGastos(g); else if (gErr) console.error("Erro Gastos:", gErr.message);
 
-    // Orçamentos - Merge with defaults instead of overwriting
     const { data: o, error: oErr } = await supabase.from('orcamentos').select('*').eq('user_id', session.user.id);
     if (o && o.length > 0) {
       setOrcamentos(prev => {
@@ -2554,67 +2665,23 @@ export default function App() {
       });
     } else if (oErr) console.error("Erro Orçamentos:", oErr.message);
 
-    // Categorias
     const { data: cat, error: cErr } = await supabase.from('categorias_config').select('*').eq('user_id', session.user.id);
     if (cat && cat.length > 0) {
       const dbVendas = cat.filter(c => c.tipo === 'venda');
       if (dbVendas.length > 0) setCategoriasVendas(dbVendas);
-
       const dbPJ = cat.filter(c => c.tipo === 'pj');
       if (dbPJ.length > 0) setCategoriasPJ(dbPJ);
-
       const dbPF = cat.filter(c => c.tipo === 'pf');
       if (dbPF.length > 0) setCategoriasPF(dbPF);
-
       cat.forEach(c => { if (c.color) CAT_COLORS[c.label] = c.color; });
     } else if (cErr) console.error("Erro Categorias:", cErr.message);
 
-    // Bancos
     const { data: bn, error: bErr } = await supabase.from('bancos').select('*').eq('user_id', session.user.id).order('nome');
     if (bn && bn.length > 0) setBancos(bn); else if (bErr) console.error("Erro Bancos:", bErr.message);
 
-    // Reservas
     const { data: res, error: rErr } = await supabase.from('reservas').select('*').eq('user_id', session.user.id).order('data', { ascending: false });
     if (res) setReservas(res); else if (rErr) console.error("Erro Reservas:", rErr.message);
   };
-
-  const exportToCSV = () => {
-    const activeData = isPJ ? [...filteredVendas, ...filteredDespesas] : filteredGastos;
-    if (activeData.length === 0) return showToast("Nada para exportar no período filtrado.");
-
-    let header = "";
-    let rows = "";
-
-    if (isPJ) {
-      // Exporta vendas + despesas PJ
-      const vendasCSV = filteredVendas.map(r => {
-        const liq = calcLiquido(r.faturamento, r.taxas).liquido;
-        return `${r.data};"${r.descricao}";"${r.categoria || ""}";"${r.cliente || ""}";${r.metodo};${r.faturamento};;${liq};${r.status};"${r.obs || ""}"`;
-      });
-      const despCSV = filteredDespesas.map(r => {
-        return `${r.data};"${r.descricao}";"${r.categoria}";"";${r.metodo};${r.valor};;${r.valor};${r.status};"${r.obs || ""}"`;
-      });
-      header = "Data;Descrição;Categoria;Cliente;Método;Valor Bruto;Taxas;Líquido;Status;Obs\n";
-      rows = [...vendasCSV, ...despCSV].join("\n");
-    } else {
-      header = "Data;Descrição;Categoria;Valor;Status;Recorrência;Obs\n";
-      rows = activeData.map(r => `${r.data};"${r.descricao}";${r.categoria};${r.valor};${r.status};${r.recorrencia};"${r.obs || ""}"`).join("\n");
-    }
-
-    const blob = new Blob(["\ufeff" + header + rows], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Export_${isPJ ? "PJ" : "PF"}_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-
-  const [vendas, setVendas] = useState([]);
-  const [despesas, setDespesas] = useState([]);
-  const [gastos, setGastos] = useState([]);
 
   // Categories (both editable)
   const [categoriasVendas, setCategoriasVendas] = useState(CATEGORIAS_VENDAS_DEFAULT);
@@ -2681,6 +2748,7 @@ export default function App() {
       diaFechamento: "20", prolabore: "", metaReceita: "", reservaEmerg: "6", reservaAtual: "", mediaGastoManual: "", valorDAS: "",
       dasEmailAlerts: true, dasDashAlerts: true,
       custosFixos: [], custosFixosPF: [],
+      ccFechamento: "5", ccVencimento: "15",
       darkMode: saved === 'true'
     };
   });
@@ -2696,43 +2764,129 @@ export default function App() {
 
   const notifications = useMemo(() => {
     const list = [];
+    const now = new Date();
+    const day = now.getDate();
     
     // DAS Alert Logic
-    if (perfil.dasDashAlerts !== false) {
-      const today = new Date();
-      const day = today.getDate();
-      const month = today.getMonth() + 1;
-      const year = today.getFullYear();
-      
-      // Vencimento padrão dia 20
+    if (perfil.dasDashAlerts !== false && isPJ) {
       const vencimentoDia = parseInt(perfil.diaFechamento) || 20;
       
-      // Alerta 5 dias antes (ex: dia 15 se vencimento for 20)
-      if (day >= (vencimentoDia - 5) && day < vencimentoDia) {
+      if (day >= 1 && day < vencimentoDia) {
         list.push({
           id: 'das-pre',
           icon: '🧾',
-          title: 'DAS Próximo do Vencimento',
-          desc: `O vencimento do seu DAS é dia ${vencimentoDia}. Não esqueça de pagar!`
+          title: 'DAS Pendente',
+          desc: `Vencimento dia ${vencimentoDia}. Valor: ${fmt(unmaskCurrency(maskCurrency(perfil.valorDAS)) || 72)}`
         });
       } else if (day === vencimentoDia) {
         list.push({
           id: 'das-today',
           icon: '⚠️',
           title: 'Vencimento do DAS Hoje!',
-          desc: `Hoje é o dia de pagar seu DAS. Evite multas e juros!`
+          desc: `Hoje vence seu DAS. Valor: ${fmt(unmaskCurrency(maskCurrency(perfil.valorDAS)) || 72)}. Evite multas!`
+        });
+      } else if (day > vencimentoDia) {
+        list.push({
+          id: 'das-late',
+          icon: '🚩',
+          title: 'DAS Atrasado?',
+          desc: `O vencimento foi dia ${vencimentoDia}. Já realizou o pagamento?`
         });
       }
     }
 
     return list;
-  }, [despesas, perfil]);
+  }, [perfil, isPJ]);
   const [filterStatus, setFilterStatus] = useState("todos");
   const [filterMetodo, setFilterMetodo] = useState("todos");
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
 
+  const exportToCSV = () => {
+    const records = isPJ ? (view === "lista" ? [...filteredVendas, ...filteredDespesas] : [...vendas, ...despesas]) : (view === "lista" ? filteredGastos : gastos);
+    const dataFiltered = records.filter(r => inDateRange(r.data, dateRange));
+    if (dataFiltered.length === 0) { showToast("Nenhum dado para exportar no período."); return; }
+    
+    const header = isPJ ? "Tipo;Data;Descricao;Categoria;Metodo;Valor;Status\n" : "Data;Descricao;Categoria;Metodo;Valor;Status\n";
+    const csv = dataFiltered.map(r => {
+      const tipo = r.faturamento !== undefined ? "Venda" : "Despesa";
+      const val = (r.faturamento || r.valor || 0).toString().replace(".", ",");
+      if (isPJ) return `${tipo};${r.data};"${r.descricao}";"${r.categoria}";"${r.metodo}";${val};${r.status}`;
+      return `${r.data};"${r.descricao}";"${r.categoria}";"${r.metodo}";${val};${r.status}`;
+    }).join("\n");
+
+    const blob = new Blob(["\ufeff" + header + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `mei_finance_${context}_${today()}.csv`;
+    link.click();
+    showToast("CSV exportado com sucesso!");
+  };
+
   const closeModal = () => setModal(null);
   const isPJ = context === "pj";
+
+  // ── Totals ──
+  const totals = useMemo(() => {
+    const vendasRec = vendas.filter(v => inDateRange(v.data, dateRange) && v.status === "recebido");
+    const totalBruto = vendasRec.reduce((s, v) => s + v.faturamento, 0);
+    const totalLiq = vendasRec.reduce((s, v) => s + calcLiquido(v.faturamento, v.taxas).liquido, 0);
+
+    const despPagas = despesas.filter(d => inDateRange(d.data, dateRange) && d.status === "pago");
+    const totalDesp = despPagas.reduce((s, d) => s + d.valor, 0);
+
+    const gastosPagos = gastos.filter(g => inDateRange(g.data, dateRange) && g.status === "pago");
+    const totalGastos = gastosPagos.reduce((s, g) => s + g.valor, 0);
+
+    const totalReservado = reservas.filter(r => inDateRange(r.data, dateRange)).reduce((s, r) => s + r.valor, 0);
+    const totalDeducao = totalBruto - totalLiq;
+
+    // ── Lógica de Fatura de Cartão ──
+    const ccFechamento = parseInt(perfil.ccFechamento) || 5;
+    const now = new Date();
+    const currentMonthKey = now.toISOString().substring(0, 7);
+    const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const prevMonthKey = prevMonth.toISOString().substring(0, 7);
+
+    const filterFatura = (item) => {
+      if (item.metodo !== "Cartão de Crédito" || !item.data) return false;
+      const d = new Date(item.data);
+      const day = d.getDate();
+      const itemMonthKey = d.toISOString().substring(0, 7);
+      if (itemMonthKey === currentMonthKey) return day <= ccFechamento;
+      if (itemMonthKey === prevMonthKey) return day > ccFechamento;
+      return false;
+    };
+
+    const faturaPJ = despesas.filter(filterFatura).reduce((s, d) => s + d.valor, 0);
+    const faturaPF = gastos.filter(filterFatura).reduce((s, g) => s + g.valor, 0);
+
+    // ── Unificação de Custos Fixos ──
+    const fixosPJ = perfil.custosFixos || [];
+    const fixosPF = perfil.custosFixosPF || [];
+
+    const totalDespFixo = despPagas.reduce((s, d) => {
+      const eFixo = d.recorrencia !== "Único" || fixosPJ.some(f => f.descricao?.toLowerCase() === d.descricao?.toLowerCase() || f.categoria === d.categoria);
+      return eFixo ? s + d.valor : s;
+    }, 0);
+    const totalDespVariavel = totalDesp - totalDespFixo;
+
+    const totalGastosFixo = gastosPagos.reduce((s, g) => {
+      const eFixo = g.recorrencia !== "Único" || fixosPF.some(f => f.descricao?.toLowerCase() === g.descricao?.toLowerCase() || f.categoria === g.categoria);
+      return eFixo ? s + g.valor : s;
+    }, 0);
+    const totalGastosVariavel = totalGastos - totalGastosFixo;
+
+    return {
+      totalBruto, totalLiq, totalDesp, totalDespFixo, totalDespVariavel,
+      totalGastos, totalGastosFixo, totalGastosVariavel,
+      totalDeducao, totalReservado,
+      faturaPJ, faturaPF,
+      resultado: totalLiq - totalDesp,
+      pendentesPJ: vendas.filter(v => v.status === "pendente").reduce((s, v) => s + v.faturamento, 0) + despesas.filter(d => d.status === "pendente").reduce((s, d) => s + d.valor, 0),
+      pendentesGasto: gastos.filter(g => g.status === "pendente").reduce((s, g) => s + g.valor, 0)
+    };
+  }, [vendas, despesas, gastos, reservas, dateRange, perfil.ccFechamento]);
 
   const pjStats = useMemo(() => {
     if (!isPJ) return { ticketMedio: 0, margemLucro: 0, melhorDia: "—", anualComNF: 0, anualTotal: 0, pctLimiteMEI: 0, catChartData: [] };
@@ -2764,41 +2918,30 @@ export default function App() {
     });
 
     // ── Fixed vs Variable (PJ) ──
-    const fixedMap = {};
-    (perfil.custosFixos || []).forEach(c => {
-      const cat = c.categoria || "Geral";
-      fixedMap[cat] = (fixedMap[cat] || 0) + (parseFloat(c.valor) || 0);
+    const catRecMap = {};
+    despesas.filter(d => d.status === "pago" && inDateRange(d.data, dateRange)).forEach(d => {
+      if (!catRecMap[d.categoria]) catRecMap[d.categoria] = 0;
+      if (d.recorrencia === "Único") catRecMap[d.categoria] += d.valor;
     });
+    const extraByCat = Object.entries(catRecMap)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 3);
 
-    const categories = Array.from(new Set([...Object.keys(fixedMap), ...despesas.filter(d => d.status === "pago" && inDateRange(d.data, dateRange)).map(d => d.categoria)]));
-    let totalFixoReal = 0;
-    let totalVariavelReal = 0;
-    const extraByCat = [];
-
-    categories.forEach(cat => {
-      const planned = fixedMap[cat] || 0;
-      const spent = despesas.filter(d => d.status === "pago" && inDateRange(d.data, dateRange) && d.categoria === cat).reduce((s, d) => s + d.valor, 0);
-      
-      const fixedPart = Math.min(planned, spent);
-      const variablePart = Math.max(0, spent - planned);
-      
-      totalFixoReal += fixedPart;
-      totalVariavelReal += variablePart;
-      
-      if (variablePart > 0) extraByCat.push({ name: cat, value: variablePart });
-    });
+    const prolaboreMeta = unmaskCurrency(maskCurrency(perfil.prolabore)) || 0;
+    const prolaboreSugerido = totals.resultado > 0 ? Math.min(totals.resultado, prolaboreMeta || totals.resultado * 0.3) : 0;
 
     return { 
-      ticketMedio, margemLucro, melhorDia, anualComNF, anualTotal, pctLimiteMEI, 
+      ticketMedio, margemLucro, melhorDia, anualComNF, anualTotal, pctLimiteMEI, prolaboreSugerido,
       catChartData: Object.entries(catDataMap).map(([name, value]) => ({ name, value })),
       costDist: {
-        fixo: totalFixoReal,
-        variavel: totalVariavelReal,
-        total: totalFixoReal + totalVariavelReal,
-        extraByCat: extraByCat.sort((a, b) => b.value - a.value).slice(0, 3)
+        fixo: totals?.totalDespFixo || 0,
+        variavel: totals?.totalDespVariavel || 0,
+        total: totals?.totalDesp || 0,
+        extraByCat
       }
     };
-  }, [vendas, totals, dateRange, isPJ]);
+  }, [vendas, despesas, totals, dateRange, isPJ, perfil.prolabore]);
 
   const pfStats = useMemo(() => {
     if (isPJ) return { raloSorted: [], metodosSorted: [], rule503020: [], metas: [], totalGasto: 0, taxaEconomia: 0, reservaMeses: 0, mediaFinal: 0 };
@@ -2888,45 +3031,57 @@ export default function App() {
     const metodosSorted = Object.entries(metodoMap).sort((a, b) => b[1] - a[1]);
 
     // ── Fixed vs Variable (PF) ──
-    const fixedMap = {};
-    (perfil.custosFixosPF || []).forEach(c => {
-      const cat = c.categoria || "Geral";
-      fixedMap[cat] = (fixedMap[cat] || 0) + (parseFloat(c.valor) || 0);
+    const catRecMap = {};
+    currentGastos.forEach(g => {
+      if (!catRecMap[g.categoria]) catRecMap[g.categoria] = 0;
+      if (g.recorrencia === "Único") catRecMap[g.categoria] += g.valor;
     });
-
-    const pfCategories = Array.from(new Set([...Object.keys(fixedMap), ...currentGastos.map(g => g.categoria)]));
-    let totalFixoReal = 0;
-    let totalVariavelReal = 0;
-    const extraByCat = [];
-
-    pfCategories.forEach(cat => {
-      const planned = fixedMap[cat] || 0;
-      const spent = currentGastos.filter(g => g.categoria === cat).reduce((s, g) => s + g.valor, 0);
-      
-      const fixedPart = Math.min(planned, spent);
-      const variablePart = Math.max(0, spent - planned);
-      
-      totalFixoReal += fixedPart;
-      totalVariavelReal += variablePart;
-      
-      if (variablePart > 0) extraByCat.push({ name: cat, value: variablePart });
-    });
+    const extraByCat = Object.entries(catRecMap)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 3);
 
     return { 
       totalGasto, rule503020, reservaMeses, metaReservaMeses, taxaEconomia, raloSorted, metodosSorted, reservaAtualVal, mediaFinal, metas, numMonths: numMonths || 0, hasMediaData, mediaSource,
       costDist: {
-        fixo: totalFixoReal,
-        variavel: totalVariavelReal,
-        total: totalFixoReal + totalVariavelReal,
-        extraByCat: extraByCat.sort((a, b) => b.value - a.value).slice(0, 3)
+        fixo: totals?.totalGastosFixo || 0,
+        variavel: totals?.totalGastosVariavel || 0,
+        total: totals?.totalGastos || 0,
+        extraByCat
       }
     };
-  }, [gastos, perfil, dateRange, isPJ, reservas, orcamentos]);
+  }, [gastos, perfil, totals, dateRange, isPJ, reservas, orcamentos]);
 
   // ── Modal openers ──
   const openAddVenda = () => { setFormVenda(EMPTY_VENDA); setModal({ type: "venda", mode: "add" }); };
   const openEditVenda = (r) => { setFormVenda({ ...r, faturamento: toDigits(r.faturamento), taxas: r.taxas.map(t => ({ ...t, value: t.type === "fixed" ? toDigits(t.value) : String(t.value || t.pct || ""), type: t.type || "pct" })) }); setModal({ type: "venda", mode: "edit", record: r }); };
   const openViewVenda = (r) => setModal({ type: "venda", mode: "view", record: r });
+
+  const launchSuggested = (s) => {
+    if (isPJ) {
+      setFormDespesa({
+        ...EMPTY_DESPESA,
+        descricao: s.descricao,
+        valor: s.valor,
+        categoria: s.categoria,
+        data: s.dateSuggestion,
+        recorrencia: "Mensal",
+        status: "pago"
+      });
+      setModal({ type: "despesa", mode: "add" });
+    } else {
+      setFormGasto({
+        ...EMPTY_GASTO,
+        descricao: s.descricao,
+        valor: s.valor,
+        categoria: s.categoria,
+        data: s.dateSuggestion,
+        recorrencia: "Mensal",
+        status: "pago"
+      });
+      setModal({ type: "gasto", mode: "add" });
+    }
+  };
 
   const openAddDespesa = () => { setFormDespesa(EMPTY_DESPESA); setModal({ type: "despesa", mode: "add" }); };
   const openEditDespesa = (r) => { setFormDespesa({ ...r, valor: toDigits(r.valor) }); setModal({ type: "despesa", mode: "edit", record: r }); };
@@ -3047,6 +3202,41 @@ export default function App() {
     closeModal();
   };
 
+  const savePerfilInApp = async (p) => {
+    if (!session) return;
+    const toSave = {
+      user_id: session.user.id,
+      nome: p.nome,
+      apelido: p.apelido,
+      tipo: p.tipo,
+      profissao: p.profissao,
+      cnpj: p.cnpj,
+      cpf: p.cpf,
+      email: p.email,
+      tel: p.tel,
+      empresa: p.empresa,
+      foto: p.foto,
+      reserva_emerg: p.reservaEmerg,
+      reserva_atual: unmaskCurrency(maskCurrency(p.reservaAtual)),
+      meta_receita: unmaskCurrency(maskCurrency(p.metaReceita)),
+      prolabore: unmaskCurrency(maskCurrency(p.prolabore)),
+      dark_mode: p.darkMode,
+      media_gasto_manual: unmaskCurrency(maskCurrency(p.mediaGastoManual)),
+      valor_das: unmaskCurrency(maskCurrency(p.valorDAS)),
+      dia_fechamento: p.diaFechamento,
+      das_email_alerts: p.dasEmailAlerts,
+      das_dash_alerts: p.dasDashAlerts,
+      custos_fixos: p.custosFixos || [],
+      custos_fixos_pf: p.custosFixosPF || []
+    };
+    const { error } = await supabase.from('perfil').upsert(toSave, { onConflict: 'user_id' });
+    if (error) {
+      showToast("Erro ao salvar: " + error.message);
+    } else {
+      showToast("Alterações salvas com sucesso!");
+    }
+  };
+
   const doDelete = async (id) => {
     const tableMap = { venda: "vendas", despesa: "despesas", gasto: "gastos", reserva: "reservas" };
     const table = tableMap[deleteConfirm.type] || "gastos";
@@ -3075,44 +3265,20 @@ export default function App() {
   const filteredDespesas = applyFilters(despesas);
   const filteredGastos = applyFilters(gastos, true);
 
-  // ── Totals ──
-  const totals = useMemo(() => {
-    const vendasRec = vendas.filter(v => inDateRange(v.data, dateRange) && v.status === "recebido");
-    const totalBruto = vendasRec.reduce((s, v) => s + v.faturamento, 0);
-    const totalLiq = vendasRec.reduce((s, v) => s + calcLiquido(v.faturamento, v.taxas).liquido, 0);
-
-    const despPagas = despesas.filter(d => inDateRange(d.data, dateRange) && d.status === "pago");
-    const totalDesp = despPagas.reduce((s, d) => s + d.valor, 0);
-    const totalDespFixo = despPagas.filter(d => d.recorrencia !== "Único").reduce((s, d) => s + d.valor, 0);
-    const totalDespVariavel = despPagas.filter(d => d.recorrencia === "Único").reduce((s, d) => s + d.valor, 0);
-
-    const gastosPagos = gastos.filter(g => inDateRange(g.data, dateRange) && g.status === "pago");
-    const totalGastos = gastosPagos.reduce((s, g) => s + g.valor, 0);
-    const totalGastosFixo = gastosPagos.filter(g => g.recorrencia !== "Único").reduce((s, g) => s + g.valor, 0);
-    const totalGastosVariavel = gastosPagos.filter(g => g.recorrencia === "Único").reduce((s, g) => s + g.valor, 0);
-
-    const totalReservado = reservas.filter(r => inDateRange(r.data, dateRange)).reduce((s, r) => s + r.valor, 0);
-    const totalDeducao = totalBruto - totalLiq;
-
-    return {
-      totalBruto, totalLiq, totalDesp, totalDespFixo, totalDespVariavel,
-      totalGastos, totalGastosFixo, totalGastosVariavel,
-      totalDeducao, totalReservado,
-      resultado: totalLiq - totalDesp,
-      pendentesPJ: vendas.filter(v => v.status === "pendente").reduce((s, v) => s + v.faturamento, 0) + despesas.filter(d => d.status === "pendente").reduce((s, d) => s + d.valor, 0),
-      pendentesGasto: gastos.filter(g => g.status === "pendente").reduce((s, g) => s + g.valor, 0)
-    };
-  }, [vendas, despesas, gastos, reservas, dateRange]);
-
   // ── Category breakdown ──
   const catBreakdown = useMemo(() => {
     const src = isPJ ? despesas.filter(d => d.status === "pago" && inDateRange(d.data, dateRange)) : gastos.filter(g => g.status === "pago" && inDateRange(g.data, dateRange));
     const map = {};
-    src.forEach(r => { map[r.categoria] = (map[r.categoria] || 0) + r.valor; });
-    return Object.entries(map).sort((a, b) => b[1] - a[1]);
+    src.forEach(r => { 
+      if (!map[r.categoria]) map[r.categoria] = { total: 0, fixo: 0, variavel: 0 };
+      map[r.categoria].total += r.valor;
+      if (r.recorrencia !== "Único") map[r.categoria].fixo += r.valor;
+      else map[r.categoria].variavel += r.valor;
+    });
+    return Object.entries(map).sort((a, b) => b[1].total - a[1].total);
   }, [isPJ, despesas, gastos, dateRange]);
 
-  const maxCat = catBreakdown[0]?.[1] || 1;
+  const maxCat = catBreakdown[0]?.[1]?.total || 1;
   const catIcon = (cat) => [...categoriasPJ, ...categoriasPF].find(c => c.label === cat)?.icon || "📦";
 
   // ── Venda taxa helpers ──
@@ -3123,10 +3289,10 @@ export default function App() {
 
   // ── Summary cards config ──
   const summaryCards = isPJ ? [
-    { label: "Faturamento Bruto", value: fmt(totals.totalBruto), sub: "total recebido antes das taxas", accent: "#6366f1" },
-    { label: "Receita Líquida", value: fmt(totals.totalLiq), sub: "já descontando taxas", accent: "#16a34a" },
-    { label: "Despesas PJ", value: fmt(totals.totalDesp), sub: "contas da empresa", accent: "#ef4444" },
-    { label: "Pendentes", value: fmt(totals.pendentesPJ), sub: "a receber/pagar", accent: "#f59e0b" },
+    { label: "Lucro Real", value: fmt(totals.resultado), sub: `Margem: ${fmtPct(pjStats.margemLucro)}`, accent: "#16a34a" },
+    { label: "Pró-labore Sugerido", value: fmt(pjStats.prolaboreSugerido), sub: `Meta: ${fmt(unmaskCurrency(maskCurrency(perfil.prolabore)))}`, accent: "#6366f1" },
+    { label: "Custo Fixo PJ", value: fmt(totals.totalDesp), sub: "despesas recorrentes", accent: "#ef4444" },
+    { label: "Ticket Médio", value: fmt(pjStats.ticketMedio), sub: "valor por venda", accent: "#f59e0b" },
   ] : (() => {
     const pfOrcTotal = (categoriasPF || []).reduce((acc, c) => acc + (orcamentos?.[c.label] || 0), 0);
     const totalCustoFixoPF = (perfil.custosFixosPF || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
@@ -3135,7 +3301,7 @@ export default function App() {
 
     return [
       { label: "Total Gasto", value: fmt(totals.totalGastos), sub: `Fixo: ${fmt(totals.totalGastosFixo)} · Var: ${fmt(totals.totalGastosVariavel)}`, accent: "#6366f1" },
-      { label: "Disponível", value: fmt(Math.max(0, pfOrcTotal - totals.totalGastos)), sub: "até o fim do mês", accent: "#4ade80" },
+      { label: "Disponível", value: fmt(Math.max(0, custoBase - totals.totalGastos)), sub: "até o fim do mês", accent: "#4ade80" },
       { label: "Total Reservado", value: fmt(totals.totalReservado), sub: "guardado no período", accent: "#10b981" },
       { label: "Pendentes", value: fmt(totals.pendentesGasto), sub: "a pagar", accent: "#f59e0b" },
     ];
@@ -3342,7 +3508,7 @@ export default function App() {
           </div>
 
           {/* Slot 4: profile button — opens config */}
-          <button onClick={() => { safeNavigate(page === "config" ? "main" : "config", "dashboard"); setShowNotifications(false); }}
+          <button onClick={() => { safeNavigate(page === "config" ? "main" : "config", page === "config" ? "dashboard" : "perfil"); setShowNotifications(false); }}
             title="Configurações"
             style={{
               width: 38, height: 38, borderRadius: 10, border: page === "config" ? "2px solid #f5f2ed" : "2px solid #2a2a2a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s", flexShrink: 0,
@@ -3393,6 +3559,49 @@ export default function App() {
               </button>
             ))}
 
+
+            {isPJ ? (
+              <>
+                <div className="sidebar-section-label" style={{ marginTop: 16 }}>NEGÓCIO (PJ)</div>
+                <button className={`sidebar-nav-item ${page === "main" && view === "cat-vendas" ? "active" : ""}`}
+                  onClick={() => safeNavigate("main", "cat-vendas")}>
+                  <IconBusiness size={18} /> Categorias de Vendas
+                </button>
+                <button className={`sidebar-nav-item ${page === "main" && view === "cat-pj" ? "active" : ""}`}
+                  onClick={() => safeNavigate("main", "cat-pj")}>
+                  <IconBusiness size={18} /> Categorias PJ
+                </button>
+                <button className={`sidebar-nav-item ${page === "main" && view === "custos-fixos" ? "active" : ""}`}
+                  onClick={() => safeNavigate("main", "custos-fixos")}>
+                  <IconBusiness size={18} /> Custos Fixos PJ
+                </button>
+              </>
+            ) : (
+              <>
+
+                <div className="sidebar-section-label" style={{ marginTop: 16 }}>PESSOAL (PF)</div>
+                <button className={`sidebar-nav-item ${page === "main" && view === "cat-pf" ? "active" : ""}`}
+                  onClick={() => safeNavigate("main", "cat-pf")}>
+                  <IconUser size={18} /> Categorias PF
+                </button>
+                <button className={`sidebar-nav-item ${page === "main" && view === "custos-fixos-pf" ? "active" : ""}`}
+                  onClick={() => safeNavigate("main", "custos-fixos-pf")}>
+                  <IconUser size={18} /> Custos Fixos PF
+                </button>
+              </>
+            )}
+
+            <div className="divider" style={{ margin: "14px 0" }} />
+
+            <SuggestedEntriesWidget 
+              perfil={perfil} 
+              records={isPJ ? despesas : gastos} 
+              isPJ={isPJ} 
+              onLaunch={onLaunchSuggested} 
+              catIcon={catIcon} 
+              fatura={isPJ ? totals.faturaPJ : totals.faturaPF} 
+            />
+
             <div style={{ marginTop: 12 }}>
               <div className="sidebar-section-label">Ações</div>
               <button className="sidebar-nav-item" onClick={exportToCSV}>
@@ -3405,8 +3614,8 @@ export default function App() {
 
             {/* Settings */}
             <div className="sidebar-section-label">Sistema</div>
-            <button className={`sidebar-nav-item ${page === "config" ? "active" : ""}`}
-              onClick={() => safeNavigate("config")}>
+            <button className={`sidebar-nav-item ${page === "config" && (view === "perfil" || view === "bancos" || view === "prefs") ? "active" : ""}`}
+              onClick={() => safeNavigate("config", "perfil")}>
               <IconSettings size={18} /> Configurações
             </button>
             <button className="sidebar-nav-item"
@@ -3452,6 +3661,7 @@ export default function App() {
             {/* ── Config page ── */}
             {page === "config" && (
               <ConfigPage
+                activeSection={view}
                 categoriasVendas={categoriasVendas} setCategoriasVendas={updateCategoriasVendas}
                 categoriasPJ={categoriasPJ} setCategoriasPJ={updateCategoriasPJ}
                 categoriasPF={categoriasPF} setCategoriasPF={updateCategoriasPF}
@@ -3465,125 +3675,202 @@ export default function App() {
             {/* ── Main page ── */}
             {page === "main" && <>
 
-              {/* ── Greeting ── */}
-              <div style={{ marginBottom: 10 }}>
-                {isPJ ? (
+              {(() => {
+                const isManagementView = ["cat-vendas", "cat-pj", "custos-fixos", "cat-pf", "custos-fixos-pf"].includes(view);
+                return (
                   <>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Bem-vindo(a),</div>
-                    <div className="mobile-welcome-title" style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.empresa || "Sua Empresa"} ✨</div>
+                    {!isManagementView && (
+                      <>
+                        {/* ── Greeting ── */}
+                        <div style={{ marginBottom: 10 }}>
+                          {isPJ ? (
+                            <>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Bem-vindo(a),</div>
+                              <div className="mobile-welcome-title" style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.empresa || "Sua Empresa"} ✨</div>
+                            </>
+                          ) : (
+                            <>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                                {(() => { const h = new Date().getHours(); return h >= 5 && h < 12 ? "Bom dia," : h >= 12 && h < 18 ? "Boa tarde," : "Boa noite,"; })()}
+                              </div>
+                              <div className="mobile-welcome-title" style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.apelido || perfil.nome || "Visitante"} ✨</div>
+                            </>
+                          )}
+                        </div>
+
+                        {/* ── Summary cards ── */}
+                        <div className="mobile-summary-grid grid-4" style={{ display: "grid", gridTemplateColumns: isPJ ? "repeat(4, 1fr)" : "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
+                          {summaryCards.map((c, i) => (
+                            <div key={i} className={`card ${c.className || ""}`} style={{ padding: "18px 20px", borderTop: `3px solid ${c.accent}` }}>
+                              <div style={{ fontSize: 10, color: "#999", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
+                              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.5px", color: c.accent, fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3, minHeight: 26 }}>{c.value}</div>
+                              <div className="hide-mobile-soft" style={{ fontSize: 11, color: "#aaa", marginTop: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.sub}</div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* ── List actions & stats ── */}
+                        <div className="hide-mobile" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
+                          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                            <div style={{ fontSize: 12, color: "var(--text-dim)" }}>
+                              {isPJ ? `${filteredVendas.length} venda${filteredVendas.length !== 1 ? "s" : ""} · ${filteredDespesas.length} despesa${filteredDespesas.length !== 1 ? "s" : ""}` : `${filteredGastos.length} gasto${filteredGastos.length !== 1 ? "s" : ""}`}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* ── Date filter ── */}
+                        <div style={{ marginBottom: 16 }}>
+                          <DateFilterBar range={dateRange} setRange={setDateRange} />
+                        </div>
+
+                        {/* ── Search + status filter ── */}
+                        <div className={view === "dashboard" ? "hide-mobile mobile-search-row" : "mobile-search-row"} style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
+                          <input className="input" style={{ maxWidth: 240 }} placeholder={isPJ ? "Buscar descrição ou cliente..." : "Buscar descrição..."} value={search} onChange={e => setSearch(e.target.value)} />
+                          <div className="mobile-filter-scroll" style={{ display: "flex", gap: 6 }}>
+                            {(isPJ ? ["todos", "recebido", "pendente", "cancelado"] : ["todos", ...METODOS]).map(s => {
+                              const isFilterActive = isPJ ? filterStatus === s : filterMetodo === s;
+                              return (
+                                <button key={s} className="filter-btn" onClick={() => isPJ ? setFilterStatus(s) : setFilterMetodo(s)}
+                                  style={{
+                                    borderColor: isFilterActive ? "var(--text)" : "var(--filter-btn-border)",
+                                    background: isFilterActive ? "var(--text)" : "transparent",
+                                    color: isFilterActive ? "var(--text)" : "var(--text-muted)"
+                                  }}>
+                                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* ── Management Views ── */}
+                    {view === "cat-vendas" && (
+                      <div className="card" style={{ padding: "28px 32px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+                          <div>
+                            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)" }}>Categorias de Vendas</div>
+                            <div style={{ fontSize: 12, color: "var(--text-dim)" }}>Gerencie os tipos de serviços e produtos que você oferece.</div>
+                          </div>
+                          <button className="btn btn-dark" onClick={() => savePerfilInApp(perfil)}>Salvar Alterações</button>
+                        </div>
+                        <CatManager cats={categoriasVendas} setCats={updateCategoriasVendas} />
+                      </div>
+                    )}
+
+                    {view === "cat-pj" && (
+                      <div className="card" style={{ padding: "28px 32px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+                          <div>
+                            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)" }}>Categorias PJ</div>
+                            <div style={{ fontSize: 12, color: "var(--text-dim)" }}>Organize suas despesas empresariais por categoria.</div>
+                          </div>
+                          <button className="btn btn-dark" onClick={() => savePerfilInApp(perfil)}>Salvar Alterações</button>
+                        </div>
+                        <CatManager cats={categoriasPJ} setCats={updateCategoriasPJ} />
+                      </div>
+                    )}
+
+                    {view === "custos-fixos" && (
+                      <div className="card" style={{ padding: "28px 32px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+                          <div>
+                            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)" }}>Custos Fixos PJ</div>
+                            <div style={{ fontSize: 12, color: "var(--text-dim)" }}>Serviços recorrentes e despesas fixas da sua empresa.</div>
+                          </div>
+                          <button className="btn btn-dark" onClick={() => savePerfilInApp(perfil)}>Salvar Alterações</button>
+                        </div>
+                        <FixedCostManager costs={perfil.custosFixos || []} setCosts={c => setPerfil({ ...perfil, custosFixos: c })} cats={categoriasPJ} />
+                      </div>
+                    )}
+
+                    {view === "cat-pf" && (
+                      <div className="card" style={{ padding: "28px 32px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+                          <div>
+                            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)" }}>Categorias PF</div>
+                            <div style={{ fontSize: 12, color: "var(--text-dim)" }}>Configure suas categorias de gastos pessoais.</div>
+                          </div>
+                          <button className="btn btn-dark" onClick={() => savePerfilInApp(perfil)}>Salvar Alterações</button>
+                        </div>
+                        <CatManager cats={categoriasPF} setCats={updateCategoriasPF} />
+                      </div>
+                    )}
+
+                    {view === "custos-fixos-pf" && (
+                      <div className="card" style={{ padding: "28px 32px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+                          <div>
+                            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)" }}>Custos Fixos PF</div>
+                            <div style={{ fontSize: 12, color: "var(--text-dim)" }}>Suas contas e compromissos fixos pessoais.</div>
+                          </div>
+                          <button className="btn btn-dark" onClick={() => savePerfilInApp(perfil)}>Salvar Alterações</button>
+                        </div>
+                        <FixedCostManager costs={perfil.custosFixosPF || []} setCosts={c => setPerfil({ ...perfil, custosFixosPF: c })} cats={categoriasPF} />
+                      </div>
+                    )}
+
+                    {/* ── Dashboard view ── */}
+                    {view === "dashboard" && <Dashboard vendas={vendas} despesas={despesas} gastos={gastos} perfil={perfil} totals={totals} dateRange={dateRange} isPJ={isPJ} catIcon={catIcon} reservas={reservas} pfStats={pfStats} orcamentos={orcamentos} pjStats={pjStats} onLaunchSuggested={launchSuggested} />}
+
+                    {/* ── Category view ── */}
+                    {view === "categorias" && (
+                      <CategoryBudgetView
+                        catBreakdown={catBreakdown}
+                        orcamentos={orcamentos}
+                        setOrcamento={setOrcamento}
+                        catIcon={catIcon}
+                        isPJ={isPJ}
+                        totals={totals}
+                        onCategoryClick={(cat) => setCatDetailModal({ cat, type: isPJ ? 'pj' : 'pf' })}
+                      />
+                    )}
+
+                    {/* ── List view ── */}
+                    {view === "lista" && isPJ && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                        {/* Vendas */}
+                        <div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 10 }}>Vendas / Receitas</div>
+                          <RecordTable records={filteredVendas} columns={vendasCols}
+                            onView={openViewVenda} onEdit={openEditVenda} onDelete={id => setDeleteConfirm({ id, type: "venda" })}
+                            emptyMsg="Nenhuma venda no período" />
+                        </div>
+                        {/* Despesas */}
+                        <div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 10 }}>Despesas da empresa</div>
+                          <RecordTable records={filteredDespesas} columns={despesasCols}
+                            onView={openViewDespesa} onEdit={openEditDespesa} onDelete={id => setDeleteConfirm({ id, type: "despesa" })}
+                            emptyMsg="Nenhuma despesa no período" />
+                        </div>
+                      </div>
+                    )}
+
+                    {view === "lista" && !isPJ && (
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 10 }}>Gastos pessoais</div>
+                        <RecordTable records={filteredGastos} columns={gastosCols}
+                          onView={openViewGasto} onEdit={openEditGasto} onDelete={id => setDeleteConfirm({ id, type: "gasto" })}
+                          emptyMsg="Nenhum gasto no período" />
+                      </div>
+                    )}
+
+                    {/* ── Relatórios view ── */}
+                    {view === "relatorios" && (
+                      <ReportsView
+                        vendas={vendas}
+                        despesas={despesas}
+                        gastos={gastos}
+                        orcamentos={orcamentos}
+                        dateRange={dateRange}
+                        isPJ={isPJ}
+                        perfil={perfil}
+                      />
+                    )}
                   </>
-                ) : (
-                  <>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                      {(() => { const h = new Date().getHours(); return h >= 5 && h < 12 ? "Bom dia," : h >= 12 && h < 18 ? "Boa tarde," : "Boa noite,"; })()}
-                    </div>
-                    <div className="mobile-welcome-title" style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.apelido || perfil.nome || "Visitante"} ✨</div>
-                  </>
-                )}
-              </div>
-
-              {/* ── Summary cards ── */}
-              <div className="mobile-summary-grid grid-4" style={{ display: "grid", gridTemplateColumns: isPJ ? "repeat(4, 1fr)" : "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
-                {summaryCards.map((c, i) => (
-                  <div key={i} className={`card ${c.className || ""}`} style={{ padding: "18px 20px", borderTop: `3px solid ${c.accent}` }}>
-                    <div style={{ fontSize: 10, color: "#999", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
-                    <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.5px", color: c.accent, fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3, minHeight: 26 }}>{c.value}</div>
-                    <div className="hide-mobile-soft" style={{ fontSize: 11, color: "#aaa", marginTop: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.sub}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* ── List actions & stats ── */}
-              <div className="hide-mobile" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <div style={{ fontSize: 12, color: "var(--text-dim)" }}>
-                    {isPJ ? `${filteredVendas.length} venda${filteredVendas.length !== 1 ? "s" : ""} · ${filteredDespesas.length} despesa${filteredDespesas.length !== 1 ? "s" : ""}` : `${filteredGastos.length} gasto${filteredGastos.length !== 1 ? "s" : ""}`}
-                  </div>
-                </div>
-              </div>
-
-              {/* ── Date filter ── */}
-              <div style={{ marginBottom: 16 }}>
-                <DateFilterBar range={dateRange} setRange={setDateRange} />
-              </div>
-
-              {/* ── Search + status filter ── */}
-              <div className={view === "dashboard" ? "hide-mobile mobile-search-row" : "mobile-search-row"} style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
-                <input className="input" style={{ maxWidth: 240 }} placeholder={isPJ ? "Buscar descrição ou cliente..." : "Buscar descrição..."} value={search} onChange={e => setSearch(e.target.value)} />
-                <div className="mobile-filter-scroll" style={{ display: "flex", gap: 6 }}>
-                  {(isPJ ? ["todos", "recebido", "pendente", "cancelado"] : ["todos", ...METODOS]).map(s => {
-                    const isFilterActive = isPJ ? filterStatus === s : filterMetodo === s;
-                    return (
-                      <button key={s} className="filter-btn" onClick={() => isPJ ? setFilterStatus(s) : setFilterMetodo(s)}
-                        style={{
-                          borderColor: isFilterActive ? "var(--text)" : "var(--filter-btn-border)",
-                          background: isFilterActive ? "var(--text)" : "transparent",
-                          color: isFilterActive ? "var(--bg)" : "var(--text-muted)"
-                        }}>
-                        {s.charAt(0).toUpperCase() + s.slice(1)}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* ── Dashboard view ── */}
-              {view === "dashboard" && <Dashboard vendas={vendas} despesas={despesas} gastos={gastos} perfil={perfil} totals={totals} dateRange={dateRange} isPJ={isPJ} catIcon={catIcon} reservas={reservas} pfStats={pfStats} orcamentos={orcamentos} pjStats={pjStats} />}
-
-              {/* ── Category view ── */}
-              {view === "categorias" && (
-                <CategoryBudgetView
-                  catBreakdown={catBreakdown}
-                  orcamentos={orcamentos}
-                  setOrcamento={setOrcamento}
-                  catIcon={catIcon}
-                  isPJ={isPJ}
-                  totals={totals}
-                  onCategoryClick={(cat) => setCatDetailModal({ cat, type: isPJ ? 'pj' : 'pf' })}
-                />
-              )}
-
-              {/* ── List view ── */}
-              {view === "lista" && isPJ && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-                  {/* Vendas */}
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 10 }}>Vendas / Receitas</div>
-                    <RecordTable records={filteredVendas} columns={vendasCols}
-                      onView={openViewVenda} onEdit={openEditVenda} onDelete={id => setDeleteConfirm({ id, type: "venda" })}
-                      emptyMsg="Nenhuma venda no período" />
-                  </div>
-                  {/* Despesas */}
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 10 }}>Despesas da empresa</div>
-                    <RecordTable records={filteredDespesas} columns={despesasCols}
-                      onView={openViewDespesa} onEdit={openEditDespesa} onDelete={id => setDeleteConfirm({ id, type: "despesa" })}
-                      emptyMsg="Nenhuma despesa no período" />
-                  </div>
-                </div>
-              )}
-
-              {view === "lista" && !isPJ && (
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 10 }}>Gastos pessoais</div>
-                  <RecordTable records={filteredGastos} columns={gastosCols}
-                    onView={openViewGasto} onEdit={openEditGasto} onDelete={id => setDeleteConfirm({ id, type: "gasto" })}
-                    emptyMsg="Nenhum gasto no período" />
-                </div>
-              )}
-
-              {/* ── Relatórios view ── */}
-              {view === "relatorios" && (
-                <ReportsView
-                  vendas={vendas}
-                  despesas={despesas}
-                  gastos={gastos}
-                  orcamentos={orcamentos}
-                  dateRange={dateRange}
-                  isPJ={isPJ}
-                  perfil={perfil}
-                />
-              )}
+                );
+              })()}
 
             </>}
           </div>
@@ -3714,9 +4001,10 @@ export default function App() {
                     <div>{lbl("Data")}<input className="input" type="date" value={formDespesa.data} onChange={e => setFormDespesa(f => ({ ...f, data: e.target.value }))} /></div>
                   </div>
                   <div>{lbl("Categoria")}<CatGridEditable cats={categoriasPJ} value={formDespesa.categoria} onChange={v => setFormDespesa(f => ({ ...f, categoria: v }))} onCatsChange={updateCategoriasPJ} /></div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr 0.8fr", gap: 12 }}>
                     <div>{lbl("Método")}<select className="input" value={formDespesa.metodo} onChange={e => setFormDespesa(f => ({ ...f, metodo: e.target.value }))}>{METODOS.map(m => <option key={m}>{m}</option>)}</select></div>
                     <div>{lbl("Recorrência")}<select className="input" value={formDespesa.recorrencia} onChange={e => setFormDespesa(f => ({ ...f, recorrencia: e.target.value }))}>{RECORRENCIAS.map(r => <option key={r}>{r}</option>)}</select></div>
+                    <div>{lbl("Vencimento")}<input className="input" type="number" min="1" max="31" placeholder="Dia" value={formDespesa.vencimento} onChange={e => setFormDespesa(f => ({ ...f, vencimento: e.target.value }))} disabled={formDespesa.recorrencia === "Único"} /></div>
                     <div>{lbl("Status")}<select className="input" value={formDespesa.status} onChange={e => setFormDespesa(f => ({ ...f, status: e.target.value }))}><option value="pago">Pago</option><option value="pendente">Pendente</option><option value="cancelado">Cancelado</option></select></div>
                   </div>
                   <div>{lbl("Observação")}<input className="input" placeholder="Opcional" value={formDespesa.obs} onChange={e => setFormDespesa(f => ({ ...f, obs: e.target.value }))} /></div>
@@ -3746,9 +4034,10 @@ export default function App() {
                     <div>{lbl("Data")}<input className="input" type="date" value={formGasto.data} onChange={e => setFormGasto(f => ({ ...f, data: e.target.value }))} /></div>
                   </div>
                   <div>{lbl("Categoria")}<CatGridEditable cats={categoriasPF} value={formGasto.categoria} onChange={v => setFormGasto(f => ({ ...f, categoria: v }))} onCatsChange={updateCategoriasPF} /></div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr 0.8fr", gap: 12 }}>
                     <div>{lbl("Método")}<select className="input" value={formGasto.metodo} onChange={e => setFormGasto(f => ({ ...f, metodo: e.target.value }))}>{METODOS.map(m => <option key={m}>{m}</option>)}</select></div>
                     <div>{lbl("Recorrência")}<select className="input" value={formGasto.recorrencia} onChange={e => setFormGasto(f => ({ ...f, recorrencia: e.target.value }))}>{RECORRENCIAS.map(r => <option key={r}>{r}</option>)}</select></div>
+                    <div>{lbl("Vencimento")}<input className="input" type="number" min="1" max="31" placeholder="Dia" value={formGasto.vencimento} onChange={e => setFormGasto(f => ({ ...f, vencimento: e.target.value }))} disabled={formGasto.recorrencia === "Único"} /></div>
                     <div>{lbl("Status")}<select className="input" value={formGasto.status} onChange={e => setFormGasto(f => ({ ...f, status: e.target.value }))}><option value="pago">Pago</option><option value="pendente">Pendente</option><option value="cancelado">Cancelado</option></select></div>
                   </div>
                   <div>{lbl("Observação")}<input className="input" placeholder="Opcional" value={formGasto.obs} onChange={e => setFormGasto(f => ({ ...f, obs: e.target.value }))} /></div>
@@ -3958,7 +4247,7 @@ export default function App() {
             <button onClick={() => { setPage("main"); setView("categorias"); }} style={{ background: "none", border: "none", color: (page === "main" && view === "categorias") ? "var(--text)" : "var(--text-dim)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
               <IconPie size={20} /> <span style={{ fontSize: 10, fontWeight: 700 }}>Filtro</span>
             </button>
-            <button onClick={() => setPage("config")} style={{ background: "none", border: "none", color: page === "config" ? "var(--text)" : "var(--text-dim)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+            <button onClick={() => safeNavigate("config", "perfil")} style={{ background: "none", border: "none", color: page === "config" ? "var(--text)" : "var(--text-dim)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
               {perfil.foto ? <img src={perfil.foto} style={{ width: 22, height: 22, borderRadius: 6, objectFit: "cover" }} /> : <IconUser size={20} />}
               <span style={{ fontSize: 10, fontWeight: 700 }}>Ajustes</span>
             </button>
@@ -3966,6 +4255,6 @@ export default function App() {
         </div>{/* close app-content */}
       </div>{/* close app-layout */}
       {toast && <div className="toast">{toast}</div>}
-    </div >
+    </div>
   );
 }
