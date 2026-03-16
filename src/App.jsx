@@ -142,6 +142,14 @@ const IconSafe = ({ size = 20 }) => <svg width={size} height={size} fill="none" 
 const IconSun = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>;
 const IconMoon = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>;
 
+const safeNavigate = (p, v) => {
+  // Simple navigation helper as page/view are handled at the top level
+  const setPage = window.setAppPage;
+  const setView = window.setAppView;
+  if (setPage) setPage(p);
+  if (setView) setView(v);
+};
+
 // ─── Shared CSS ───────────────────────────────────────────────────────────────
 const CSS = `
   :root {
@@ -315,6 +323,20 @@ const CSS = `
       gap: 8px;
       border-bottom: 1px solid var(--divider);
     }
+    .mobile-record-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+      padding-top: 6px;
+      border-top: 1px solid var(--divider);
+    }
+
+    .filter-btn.active {
+      background: var(--text) !important;
+      color: var(--bg) !important;
+      border-color: var(--text) !important;
+    }
+
     .mobile-record-card:last-child { border-bottom: none; }
     .mobile-record-field {
       display: flex;
@@ -1864,40 +1886,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
   if (isPJ) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div className="mobile-summary-grid hide-mobile" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
-          <div className="card" style={{ padding: "16px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-              <div style={{ fontSize: 16 }}>💰</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Lucro Real</div>
-            </div>
-            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "#16a34a" }}>{fmt(totals.resultado)}</div>
-            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Margem: {fmtPct(pjStats.margemLucro)}</div>
-          </div>
-          <div className="card" style={{ padding: "16px 20px", borderTop: "3px solid #16a34a" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-              <div style={{ fontSize: 16 }}>🏃‍♂️</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Pró-labore Sugerido</div>
-            </div>
-            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "#16a34a" }}>{fmt(pjStats.prolaboreSugerido)}</div>
-            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Disponível p/ retirada pessoal</div>
-          </div>
-          <div className="card" style={{ padding: "16px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-              <div style={{ fontSize: 16 }}>⚖️</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Custo Fixo PJ</div>
-            </div>
-            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>{fmt(totals.totalDespFixo)}</div>
-            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Recorrente · Variável: {fmt(totals.totalDespVariavel)}</div>
-          </div>
-          <div className="card" style={{ padding: "16px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-              <div style={{ fontSize: 16 }}>🎯</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Ticket Médio</div>
-            </div>
-            <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>{fmt(pjStats.ticketMedio)}</div>
-            <div className="hide-mobile-soft" style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Valor médio por venda</div>
-          </div>
-        </div>
+
 
         <div className="mobile-chart-grid" style={{ display: "grid", gridTemplateColumns: "2.2fr 1fr", gap: 14 }}>
           <div className="card" style={{ padding: "24px" }}>
@@ -2009,24 +1998,8 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {/* Lucro principal */}
-              <div style={{ padding: "16px 18px", background: totals.resultado >= 0 ? "rgba(22,163,74,0.08)" : "rgba(239,68,68,0.08)", borderRadius: 12, border: `1.5px solid ${totals.resultado >= 0 ? "rgba(22,163,74,0.2)" : "rgba(239,68,68,0.2)"}` }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, color: "var(--text-dim)", textTransform: "uppercase" }}>{totals.resultado >= 0 ? "💚 Lucro do Período" : "🔴 Prejuízo do Período"}</div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)" }}>{totals.resultado >= 0 ? "Receita > Despesas ✓" : "Despesas > Receita ✗"}</div>
-                </div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: totals.resultado >= 0 ? "#16a34a" : "#ef4444", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(totals.resultado)}</div>
-                <div style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 6, fontWeight: 600 }}>Receita líquida menos todas as despesas da empresa</div>
-              </div>
-
-              {/* 3 mini-cards */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-                <div style={{ padding: "12px", border: "1px solid var(--divider)", borderRadius: 10, textAlign: "center" }}>
-                  <div style={{ fontSize: 16, marginBottom: 4 }}>💵</div>
-                  <div style={{ fontSize: 9, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Faturamento Bruto</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap" }}>{fmt(totals.totalBruto)}</div>
-                  <div style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Antes das taxas</div>
-                </div>
+              {/* 2 mini-cards */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <div style={{ padding: "12px", border: "1px solid var(--divider)", borderRadius: 10, textAlign: "center" }}>
                   <div style={{ fontSize: 16, marginBottom: 4 }}>📉</div>
                   <div style={{ fontSize: 9, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Custos Operacionais</div>
@@ -2593,6 +2566,7 @@ export default function App() {
   const openEditReserva = (r) => { setFormReserva({ ...r, valor: toDigits(r.valor) }); setModal({ type: "reserva", mode: "edit", record: r }); };
 
   const [context, setContext] = useState("pj"); // "pj" | "pf"
+  const isPJ = context === "pj";
   const [toast, setToast] = useState(null);
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
   const [page, setPage] = useState("main");     // "main" | "config"
@@ -2824,7 +2798,6 @@ export default function App() {
   };
 
   const closeModal = () => setModal(null);
-  const isPJ = context === "pj";
 
   // ── Totals ──
   const totals = useMemo(() => {
@@ -3289,8 +3262,8 @@ export default function App() {
 
   // ── Summary cards config ──
   const summaryCards = isPJ ? [
-    { label: "Lucro Real", value: fmt(totals.resultado), sub: `Margem: ${fmtPct(pjStats.margemLucro)}`, accent: "#16a34a" },
-    { label: "Pró-labore Sugerido", value: fmt(pjStats.prolaboreSugerido), sub: `Meta: ${fmt(unmaskCurrency(maskCurrency(perfil.prolabore)))}`, accent: "#6366f1" },
+    { label: "Faturamento Total", value: fmt(totals.totalBruto), sub: "Antes das taxas", accent: "#16a34a" },
+    { label: "Lucro Real", value: fmt(totals.resultado), sub: `Margem: ${fmtPct(pjStats.margemLucro)}`, accent: "#6366f1" },
     { label: "Custo Fixo PJ", value: fmt(totals.totalDesp), sub: "despesas recorrentes", accent: "#ef4444" },
     { label: "Ticket Médio", value: fmt(pjStats.ticketMedio), sub: "valor por venda", accent: "#f59e0b" },
   ] : (() => {
@@ -3548,7 +3521,12 @@ export default function App() {
             <div className="sidebar-section-label">Navegação</div>
             {[
               { key: "dashboard", icon: <IconDashboard size={18} />, label: "Dashboard" },
-              { key: "lista", icon: <IconList size={18} />, label: isPJ ? "Vendas & Despesas" : "Gastos" },
+              ...(isPJ ? [
+                { key: "vendas", icon: <IconBusiness size={18} />, label: "Vendas" },
+                { key: "despesas", icon: <IconList size={18} />, label: "Despesas" }
+              ] : [
+                { key: "lista", icon: <IconList size={18} />, label: "Gastos" }
+              ]),
               { key: "categorias", icon: <IconPie size={18} />, label: "Categorias de Gastos" },
               { key: "relatorios", icon: <IconReport size={18} />, label: "Relatórios" },
             ].map(item => (
@@ -3597,7 +3575,7 @@ export default function App() {
               perfil={perfil} 
               records={isPJ ? despesas : gastos} 
               isPJ={isPJ} 
-              onLaunch={onLaunchSuggested} 
+              onLaunch={launchSuggested} 
               catIcon={catIcon} 
               fatura={isPJ ? totals.faturaPJ : totals.faturaPF} 
             />
@@ -3724,24 +3702,26 @@ export default function App() {
                         </div>
 
                         {/* ── Search + status filter ── */}
-                        <div className={view === "dashboard" ? "hide-mobile mobile-search-row" : "mobile-search-row"} style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
-                          <input className="input" style={{ maxWidth: 240 }} placeholder={isPJ ? "Buscar descrição ou cliente..." : "Buscar descrição..."} value={search} onChange={e => setSearch(e.target.value)} />
-                          <div className="mobile-filter-scroll" style={{ display: "flex", gap: 6 }}>
-                            {(isPJ ? ["todos", "recebido", "pendente", "cancelado"] : ["todos", ...METODOS]).map(s => {
-                              const isFilterActive = isPJ ? filterStatus === s : filterMetodo === s;
-                              return (
-                                <button key={s} className="filter-btn" onClick={() => isPJ ? setFilterStatus(s) : setFilterMetodo(s)}
-                                  style={{
-                                    borderColor: isFilterActive ? "var(--text)" : "var(--filter-btn-border)",
-                                    background: isFilterActive ? "var(--text)" : "transparent",
-                                    color: isFilterActive ? "var(--text)" : "var(--text-muted)"
-                                  }}>
-                                  {s.charAt(0).toUpperCase() + s.slice(1)}
-                                </button>
-                              );
-                            })}
+                          <div className={view === "dashboard" ? "hide-mobile mobile-search-row" : "mobile-search-row"} style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
+                            <input className="input" style={{ maxWidth: 240 }} placeholder={isPJ ? "Buscar descrição ou cliente..." : "Buscar descrição..."} value={search} onChange={e => setSearch(e.target.value)} />
+                            <div className="mobile-filter-scroll" style={{ display: "flex", gap: 6 }}>
+                              {(isPJ ? ["recebido", "pendente", "cancelado"] : METODOS).map(s => {
+                                const isFilterActive = isPJ ? filterStatus === s : filterMetodo === s;
+                                return (
+                                  <button key={s} className={`filter-btn ${isFilterActive ? "active" : ""}`} 
+                                    onClick={() => {
+                                      if (isPJ) {
+                                        setFilterStatus(filterStatus === s ? "todos" : s);
+                                      } else {
+                                        setFilterMetodo(filterMetodo === s ? "todos" : s);
+                                      }
+                                    }}>
+                                    {s.charAt(0).toUpperCase() + s.slice(1)}
+                                  </button>
+                                );
+                              })}
+                            </div>
                           </div>
-                        </div>
                       </>
                     )}
 
@@ -3827,7 +3807,27 @@ export default function App() {
                       />
                     )}
 
-                    {/* ── List view ── */}
+                    {/* ── Vendas view ── */}
+                    {view === "vendas" && isPJ && (
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 10 }}>Vendas / Receitas</div>
+                        <RecordTable records={filteredVendas} columns={vendasCols}
+                          onView={openViewVenda} onEdit={openEditVenda} onDelete={id => setDeleteConfirm({ id, type: "venda" })}
+                          emptyMsg="Nenhuma venda no período" />
+                      </div>
+                    )}
+
+                    {/* ── Despesas view ── */}
+                    {view === "despesas" && isPJ && (
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 10 }}>Despesas da empresa</div>
+                        <RecordTable records={filteredDespesas} columns={despesasCols}
+                          onView={openViewDespesa} onEdit={openEditDespesa} onDelete={id => setDeleteConfirm({ id, type: "despesa" })}
+                          emptyMsg="Nenhuma despesa no período" />
+                      </div>
+                    )}
+
+                    {/* ── Legacy List view (PJ) ── */}
                     {view === "lista" && isPJ && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
                         {/* Vendas */}
@@ -4236,7 +4236,7 @@ export default function App() {
             <button onClick={() => { setPage("main"); setView("dashboard"); }} style={{ background: "none", border: "none", color: (page === "main" && view === "dashboard") ? "var(--text)" : "var(--text-dim)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
               <IconDashboard size={20} /> <span style={{ fontSize: 10, fontWeight: 700 }}>Resumo</span>
             </button>
-            <button onClick={() => { setPage("main"); setView("lista"); }} style={{ background: "none", border: "none", color: (page === "main" && view === "lista") ? "var(--text)" : "var(--text-dim)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+            <button onClick={() => { setPage("main"); setView(isPJ ? "vendas" : "lista"); }} style={{ background: "none", border: "none", color: (page === "main" && (view === "lista" || view === "vendas" || view === "despesas")) ? "var(--text)" : "var(--text-dim)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
               <IconList size={20} /> <span style={{ fontSize: 10, fontWeight: 700 }}>Lista</span>
             </button>
             {/* Floating Add Button in Nav */}
