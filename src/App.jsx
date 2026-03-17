@@ -139,6 +139,10 @@ const IconExport = ({ size = 20 }) => <svg width={size} height={size} viewBox="0
 const IconLogout = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>;
 const IconBank = ({ size = 20 }) => <svg width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 10V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3M7 10v11M11 10v11M15 10v11M19 10v11" /></svg>;
 const IconSafe = ({ size = 20 }) => <svg width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="12" cy="12" r="3" /><path d="M12 9v6M9 12h6" /></svg>;
+const IconCash = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><line x1="12" y1="18" x2="12" y2="6" /></svg>;
+const IconExpenses = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" ry="1" /><path d="M12 11h4" /><path d="M12 16h4" /><path d="M8 11h.01" /><path d="M8 16h.01" /></svg>;
+const IconWallet = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2" /><path d="M16 12h5" /><circle cx="18" cy="12" r="1.5" /></svg>;
+const IconSparkles = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>;
 const IconSun = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>;
 const IconMoon = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>;
 
@@ -1229,6 +1233,18 @@ function ConfigPage({ activeSection = "perfil", categoriasVendas, setCategoriasV
             Sair da conta
           </button>
         </div>
+        
+        <div style={{ padding: "16px", marginTop: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ fontSize: 10, fontWeight: 800, color: "var(--text-dim)", textTransform: "uppercase", padding: "0 4px" }}>Exportar Dados</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={exportToCSV} className="btn-outline" style={{ flex: 1, padding: "8px", fontSize: 11, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+              📊 CSV
+            </button>
+            <button onClick={exportToPDF} className="btn-outline" style={{ flex: 1, padding: "8px", fontSize: 11, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+              📄 PDF
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* ── Content ── */}
@@ -1722,7 +1738,7 @@ function CostDistributionCard({ data, isPJ, catIcon }) {
   );
 }
 
-function SuggestedEntriesWidget({ perfil, records, isPJ, onLaunch, catIcon, fatura }) {
+function LancamentosView({ perfil, records, isPJ, onLaunch, catIcon, fatura }) {
   const [editingDates, setEditingDates] = useState({});
 
   const suggested = useMemo(() => {
@@ -1740,10 +1756,12 @@ function SuggestedEntriesWidget({ perfil, records, isPJ, onLaunch, catIcon, fatu
     });
 
     const list = pending.map(f => {
-      const key = `fixed-${f.descricao}-${f.categoria}`;
-      const day = editingDates[key] || f.vencimento || 1;
+      const key = `fixed-${f.id || f.descricao}`;
+      const day = editingDates[key] || f.vencimento || 5;
       return {
-        ...f,
+        descricao: f.descricao,
+        valor: f.valor,
+        categoria: f.categoria,
         idSug: key,
         vencimento: day,
         dateSuggestion: `${currentMonthKey}-${String(day).padStart(2, '0')}`,
@@ -1768,7 +1786,7 @@ function SuggestedEntriesWidget({ perfil, records, isPJ, onLaunch, catIcon, fatu
     // DAS Alert Suggestion
     if (isPJ && perfil.isMei !== false) {
       const vencimentoDia = parseInt(perfil.diaFechamento) || 20;
-      const valorDas = unmaskCurrency(maskCurrency(perfil.valorDAS)) || 72; // Valor médio MEI 2024
+      const valorDas = unmaskCurrency(maskCurrency(perfil.valorDAS)) || 72;
       const key = `das-${currentMonthKey}`;
       
       const alreadyPaid = records.some(r => 
@@ -1793,59 +1811,59 @@ function SuggestedEntriesWidget({ perfil, records, isPJ, onLaunch, catIcon, fatu
     return list;
   }, [perfil, records, isPJ, fatura, editingDates]);
 
-  if (suggested.length === 0) return null;
+  if (suggested.length === 0) {
+    return (
+      <div style={{ textAlign: 'center', padding: '60px 20px', background: 'var(--card)', borderRadius: 20, border: '1px solid var(--border)' }}>
+        <div style={{ fontSize: 48, marginBottom: 20 }}>✨</div>
+        <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text)', marginBottom: 8 }}>Tudo em dia!</div>
+        <div style={{ fontSize: 14, color: 'var(--text-dim)', fontWeight: 600 }}>Não há novos lançamentos para este mês.</div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ marginBottom: 20 }}>
-      <div className="sidebar-section-label" style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-        <span style={{ fontSize: 14 }}>💡</span> Sugestões do Mês
+    <div style={{ animation: "fadeIn 0.3s ease-out" }}>
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.6px" }}>Lançamentos</div>
+        <div style={{ fontSize: 13, color: "var(--text-dim)", marginTop: 6, fontWeight: 600 }}>Adicione rapidamente seus custos fixos e faturas ao controle do mês.</div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "0 4px" }}>
+      
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 20 }}>
         {suggested.map((s, i) => (
-          <div key={i} className="card" style={{ padding: "10px 12px", background: "var(--card)", border: "1px solid var(--border)", position: "relative" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <div style={{ fontSize: 14 }}>{s.type === 'cc' ? '💳' : catIcon(s.categoria)}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "var(--text)" }}>{s.descricao}</div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-accent)", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(s.valor)}</div>
-              </div>
-            </div>
-            
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 4 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <span style={{ fontSize: 9, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase" }}>Dia</span>
-                <input 
-                  type="number" 
-                  min="1" 
-                  max="31"
-                  value={s.vencimento}
-                  onChange={(e) => {
-                    const val = Math.max(1, Math.min(31, parseInt(e.target.value) || 1));
-                    setEditingDates(prev => ({ ...prev, [s.idSug]: val }));
-                  }}
-                  style={{ 
-                    width: 32, 
-                    height: 20, 
-                    padding: "0 2px", 
-                    fontSize: 10, 
-                    fontWeight: 800, 
-                    background: "var(--input-bg)", 
-                    border: "1px solid var(--border)", 
-                    borderRadius: 4, 
-                    color: "var(--text)",
-                    textAlign: "center",
-                    fontFamily: "'JetBrains Mono', monospace"
-                  }}
-                />
-              </div>
-              <button 
-                onClick={() => onLaunch(s)}
-                className="btn-dark"
-                style={{ padding: "4px 8px", fontSize: 9, fontWeight: 800, borderRadius: 6, cursor: "pointer", border: "none" }}
-              >
-                {s.type === 'cc' ? 'QUITAR' : 'LANÇAR'}
-              </button>
-            </div>
+          <div key={i} className="card row-hover" style={{ padding: "24px", display: "flex", flexDirection: "column", gap: 20, borderTop: "4px solid var(--text-accent)" }}>
+             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--divider)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
+                   {s.type === 'cc' ? '💳' : (s.type === 'das' ? '🧾' : catIcon(s.categoria))}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.descricao}</div>
+                  <div style={{ fontSize: 11, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>{s.categoria}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "var(--text-accent)", fontFamily: "'JetBrains Mono', monospace" }}>{fmt(s.valor)}</div>
+                </div>
+             </div>
+             
+             <div className="divider" style={{ opacity: 0.5 }} />
+             
+             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                   <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase" }}>Vencimento: Dia</span>
+                   <input 
+                      type="number" min="1" max="31"
+                      value={s.vencimento}
+                      onChange={(e) => {
+                        const val = Math.max(1, Math.min(31, parseInt(e.target.value) || 1));
+                        setEditingDates(prev => ({ ...prev, [s.idSug]: val }));
+                      }}
+                      className="input"
+                      style={{ width: 44, height: 32, padding: 0, textAlign: 'center', fontSize: 12, fontWeight: 800 }}
+                   />
+                </div>
+                <button onClick={() => onLaunch(s)} className="btn btn-dark" style={{ padding: "8px 16px", borderRadius: 10 }}>
+                   {s.type === 'cc' ? 'Confirmar Pagamento' : 'Lançar Agora'}
+                </button>
+             </div>
           </div>
         ))}
       </div>
@@ -1886,6 +1904,74 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
   if (isPJ) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        
+        {/* DAS Alert Widget */}
+        {perfil.dasDashAlerts !== false && (() => {
+          const now = new Date();
+          const day = now.getDate();
+          const vencimentoDia = parseInt(perfil.diaFechamento) || 20;
+          const valorDas = unmaskCurrency(maskCurrency(perfil.valorDAS)) || 72;
+          
+          // Check if already paid this month
+          const currentMonthKey = now.toISOString().substring(0, 7);
+          const alreadyPaid = despesas.some(r => 
+            r.status === "pago" && 
+            (r.descricao?.toLowerCase().includes("das") || r.categoria === "Impostos / DAS") &&
+            r.data?.startsWith(currentMonthKey)
+          );
+
+          if (alreadyPaid) return null;
+
+          let alertType = "info"; // info, warning, danger
+          let title = "DAS Pendente";
+          let desc = `Vencimento dia ${vencimentoDia}. Valor: ${fmt(valorDas)}`;
+          let icon = "🧾";
+          
+          if (day === vencimentoDia) {
+            alertType = "warning";
+            title = "Vencimento do DAS Hoje!";
+            desc = `Hoje é o prazo final. Valor: ${fmt(valorDas)}. Evite multas!`;
+            icon = "⚠️";
+          } else if (day > vencimentoDia) {
+            alertType = "danger";
+            title = "DAS em Atraso!";
+            desc = `O vencimento foi dia ${vencimentoDia}. Regularize o quanto antes.`;
+            icon = "🚩";
+          } else if (day >= vencimentoDia - 5) {
+            alertType = "warning";
+            title = "DAS Vence em Breve";
+            desc = `Faltam ${vencimentoDia - day} dias para o vencimento (${vencimentoDia}/${now.getMonth() + 1}).`;
+          }
+
+          const colors = {
+            info: { bg: "rgba(99,102,241,0.1)", border: "rgba(99,102,241,0.2)", text: "#6366f1" },
+            warning: { bg: "#fffbeb", border: "#fef3c7", text: "#d97706" },
+            danger: { bg: "#fef2f2", border: "#fee2e2", text: "#ef4444" }
+          }[alertType];
+
+          return (
+            <div className="card" style={{ padding: "16px 20px", background: colors.bg, borderColor: colors.border, display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{ fontSize: 24 }}>{icon}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: colors.text }}>{title}</div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginTop: 2 }}>{desc}</div>
+              </div>
+              <button 
+                className="btn btn-dark" 
+                style={{ fontSize: 11, padding: "6px 12px" }}
+                onClick={() => onLaunchSuggested({
+                  descricao: `DAS MEI - ${currentMonthKey}`,
+                  valor: valorDas,
+                  categoria: "Impostos / DAS",
+                  dateSuggestion: today(),
+                  type: 'das'
+                })}
+              >
+                Pagar agora
+              </button>
+            </div>
+          );
+        })()}
 
 
         <div className="mobile-chart-grid" style={{ display: "grid", gridTemplateColumns: "2.2fr 1fr", gap: 14 }}>
@@ -1934,6 +2020,27 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: "var(--text-muted)" }}>
                 <span>{fmt(totals.totalLiq)}</span>
                 <span>META: {fmt(meta)}</span>
+              </div>
+            </div>
+
+            <div className="card" style={{ padding: "24px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "4px solid #10b981" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>Pró-labore Recomendado</div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
+                <div style={{ fontSize: 24, fontWeight: 800, color: "#10b981", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(pjStats.prolaboreSugerido)}</div>
+              </div>
+              <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 600, lineHeight: 1.4 }}>
+                {totals.resultado > 0 
+                  ? "Valor seguro para retirada baseado no seu lucro atual." 
+                  : "Sem lucro real no período para sugerir retirada."}
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <button 
+                  className="btn btn-outline" 
+                  style={{ width: "100%", fontSize: 11, padding: "6px" }}
+                  onClick={() => safeNavigate("main", "lancamentos")}
+                >
+                  Ver lançamentos
+                </button>
               </div>
             </div>
             <div className="card" style={{ padding: "20px" }}>
@@ -2797,6 +2904,107 @@ export default function App() {
     showToast("CSV exportado com sucesso!");
   };
 
+  const exportToPDF = () => {
+    const context = isPJ ? "PJ" : "PF";
+    const dataSet = isPJ ? despesas : gastos;
+    const filtered = dataSet.filter(r => inDateRange(r.data, dateRange));
+    const salesFiltered = isPJ ? vendas.filter(v => inDateRange(v.data, dateRange)) : [];
+
+    const printWindow = window.open('', '_blank');
+    const html = `
+      <html>
+        <head>
+          <title>Relatório Financeiro - ${context}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; }
+            h1 { color: #1a1a1a; margin-bottom: 8px; }
+            h2 { color: #666; font-size: 16px; margin-top: 0; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+            th { text-align: left; background: #f9fafb; padding: 12px 15px; border-bottom: 2px solid #ddd; font-size: 13px; text-transform: uppercase; color: #6b7280; }
+            td { padding: 12px 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+            .total-row { background: #f3f4f6; font-weight: bold; }
+            .money { font-family: 'Courier New', Courier, monospace; text-align: right; }
+            .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+            .pago { background: #dcfce7; color: #166534; }
+            .pendente { background: #fef9c3; color: #854d0e; }
+            .footer { margin-top: 50px; font-size: 12px; color: #999; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <h1>Relatório Financeiro</h1>
+          <h2>Contexto: ${context} | Período: ${dateRange.label}</h2>
+          
+          ${isPJ ? `
+            <h3>Vendas / Receitas</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Descrição</th>
+                  <th>Bruto</th>
+                  <th>Líquido</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${salesFiltered.map(v => `
+                  <tr>
+                    <td>${v.data ? new Date(v.data).toLocaleDateString('pt-BR') : '—'}</td>
+                    <td>${v.descricao || '—'}</td>
+                    <td class="money">${fmt(v.faturamento)}</td>
+                    <td class="money">${fmt(calcLiquido(v.faturamento, v.taxas).liquido)}</td>
+                    <td><span class="badge ${v.status}">${v.status.toUpperCase()}</span></td>
+                  </tr>
+                `).join('')}
+                <tr class="total-row">
+                  <td colspan="2">TOTAL</td>
+                  <td class="money">${fmt(totals.totalBruto)}</td>
+                  <td class="money">${fmt(totals.totalLiq)}</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          ` : ''}
+
+          <h3>${isPJ ? 'Despesas' : 'Gastos'}</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Categoria</th>
+                <th>Valor</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.map(r => `
+                <tr>
+                  <td>${r.data ? new Date(r.data).toLocaleDateString('pt-BR') : '—'}</td>
+                  <td>${r.descricao || '—'}</td>
+                  <td>${r.categoria || '—'}</td>
+                  <td class="money">${fmt(r.valor)}</td>
+                  <td><span class="badge ${r.status}">${r.status.toUpperCase()}</span></td>
+                </tr>
+              `).join('')}
+              <tr class="total-row">
+                <td colspan="3">TOTAL</td>
+                <td class="money">${fmt(isPJ ? totals.totalDesp : totals.totalGastos)}</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')} por Mei Finanças</div>
+          <script>window.onload = () => { window.print(); window.close(); }</script>
+        </body>
+      </html>
+    `;
+    printWindow.document.write(html);
+    printWindow.document.close();
+    showToast("PDF gerado com sucesso!");
+  };
+
   const closeModal = () => setModal(null);
 
   // ── Totals ──
@@ -3270,11 +3478,12 @@ export default function App() {
     const pfOrcTotal = (categoriasPF || []).reduce((acc, c) => acc + (orcamentos?.[c.label] || 0), 0);
     const totalCustoFixoPF = (perfil.custosFixosPF || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
     const pl = parseFloat(perfil.prolabore) || 0;
-    const custoBase = totalCustoFixoPF > 0 ? totalCustoFixoPF : (pl > 0 ? pl : (pfOrcTotal > 0 ? pfOrcTotal : (parseFloat(perfil.mediaGastoManual) || 0)));
+    const pjProfit = totals.resultado || 0;
+    const custoBase = totalCustoFixoPF > 0 ? totalCustoFixoPF : (pl > 0 ? pl : (pfOrcTotal > 0 ? pfOrcTotal : (pjProfit > 0 ? pjProfit : (parseFloat(perfil.mediaGastoManual) || 0))));
 
     return [
       { label: "Total Gasto", value: fmt(totals.totalGastos), sub: `Fixo: ${fmt(totals.totalGastosFixo)} · Var: ${fmt(totals.totalGastosVariavel)}`, accent: "#6366f1" },
-      { label: "Disponível", value: fmt(Math.max(0, custoBase - totals.totalGastos)), sub: "até o fim do mês", accent: "#4ade80" },
+      { label: "Disponível", value: fmt(Math.max(0, custoBase - totals.totalGastos)), sub: custoBase === pjProfit ? "baseado no lucro PJ" : "até o fim do mês", accent: "#4ade80" },
       { label: "Total Reservado", value: fmt(totals.totalReservado), sub: "guardado no período", accent: "#10b981" },
       { label: "Pendentes", value: fmt(totals.pendentesGasto), sub: "a pagar", accent: "#f59e0b" },
     ];
@@ -3522,11 +3731,12 @@ export default function App() {
             {[
               { key: "dashboard", icon: <IconDashboard size={18} />, label: "Dashboard" },
               ...(isPJ ? [
-                { key: "vendas", icon: <IconBusiness size={18} />, label: "Vendas" },
-                { key: "despesas", icon: <IconList size={18} />, label: "Despesas" }
+                { key: "vendas", icon: <IconCash size={18} />, label: "Vendas" },
+                { key: "despesas", icon: <IconExpenses size={18} />, label: "Despesas" }
               ] : [
-                { key: "lista", icon: <IconList size={18} />, label: "Gastos" }
+                { key: "lista", icon: <IconWallet size={18} />, label: "Gastos" }
               ]),
+              { key: "lancamentos", icon: <IconSparkles size={18} />, label: "Lançamentos" },
               { key: "categorias", icon: <IconPie size={18} />, label: "Categorias de Gastos" },
               { key: "relatorios", icon: <IconReport size={18} />, label: "Relatórios" },
             ].map(item => (
@@ -3568,17 +3778,6 @@ export default function App() {
                 </button>
               </>
             )}
-
-            <div className="divider" style={{ margin: "14px 0" }} />
-
-            <SuggestedEntriesWidget 
-              perfil={perfil} 
-              records={isPJ ? despesas : gastos} 
-              isPJ={isPJ} 
-              onLaunch={launchSuggested} 
-              catIcon={catIcon} 
-              fatura={isPJ ? totals.faturaPJ : totals.faturaPF} 
-            />
 
             <div style={{ marginTop: 12 }}>
               <div className="sidebar-section-label">Ações</div>
@@ -3793,6 +3992,18 @@ export default function App() {
 
                     {/* ── Dashboard view ── */}
                     {view === "dashboard" && <Dashboard vendas={vendas} despesas={despesas} gastos={gastos} perfil={perfil} totals={totals} dateRange={dateRange} isPJ={isPJ} catIcon={catIcon} reservas={reservas} pfStats={pfStats} orcamentos={orcamentos} pjStats={pjStats} onLaunchSuggested={launchSuggested} />}
+
+                    {/* ── Lancamentos view ── */}
+                    {view === "lancamentos" && (
+                      <LancamentosView 
+                        perfil={perfil} 
+                        records={isPJ ? despesas : gastos} 
+                        isPJ={isPJ} 
+                        onLaunch={launchSuggested} 
+                        catIcon={catIcon} 
+                        fatura={isPJ ? totals.faturaPJ : totals.faturaPF} 
+                      />
+                    )}
 
                     {/* ── Category view ── */}
                     {view === "categorias" && (
@@ -4238,6 +4449,9 @@ export default function App() {
             </button>
             <button onClick={() => { setPage("main"); setView(isPJ ? "vendas" : "lista"); }} style={{ background: "none", border: "none", color: (page === "main" && (view === "lista" || view === "vendas" || view === "despesas")) ? "var(--text)" : "var(--text-dim)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
               <IconList size={20} /> <span style={{ fontSize: 10, fontWeight: 700 }}>Lista</span>
+            </button>
+            <button onClick={() => { setPage("main"); setView("lancamentos"); }} style={{ background: "none", border: "none", color: (page === "main" && view === "lancamentos") ? "var(--text)" : "var(--text-dim)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+              <IconSparkles size={20} /> <span style={{ fontSize: 10, fontWeight: 700 }}>Lançar</span>
             </button>
             {/* Floating Add Button in Nav */}
             <button className="btn-fab" onClick={() => setModal({ type: "mobile-add-menu" })}
