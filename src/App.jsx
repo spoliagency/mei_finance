@@ -165,8 +165,8 @@ const CSS = `
     --border: #e8e5e0;
     --input-bg: #ffffff;
     --sidebar-bg: #faf9f7;
-    --sidebar-active: #1a1a1a;
-    --sidebar-active-text: #f5f2ed;
+    --sidebar-active: #4BE277;
+    --sidebar-active-text: #0a0a0a;
     --row-hover: #faf9f7;
     --modal-bg: #ffffff;
     --divider: #e8e5e0;
@@ -196,12 +196,12 @@ const CSS = `
   body { background: var(--bg); color: var(--text); transition: background 0.2s, color 0.2s; }
   
   .input { background: var(--input-bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 13px; outline: none; width: 100%; transition: border 0.15s; }
-  .input:focus { border-color: var(--text); }
+  .input:focus { border-color: #4BE277; }
   select.input option { background: var(--input-bg); color: var(--text); }
   
   .btn { border: none; border-radius: 10px; padding: 10px 18px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-  .btn-dark { background: var(--text); color: var(--bg); }
-  .btn-dark:hover { opacity: 0.8; }
+  .btn-dark { background: #4BE277; color: #0a0a0a; font-style: italic; }
+  .btn-dark:hover { opacity: 0.85; }
   
   .btn-outline { background: transparent; border: 1.5px solid var(--filter-btn-border); color: var(--text-muted); }
   .btn-outline:hover { border-color: var(--text); color: var(--text); }
@@ -209,7 +209,8 @@ const CSS = `
   .btn-danger { background: #fff0f0; color: #c0392b; border: 1.5px solid #fcc; }
   .dark .btn-danger { background: #2d1a1a; border-color: #552222; }
   
-  .btn-green { background: #0d1f14; color: #4BE277; border: 1px solid #166534; }
+  .btn-green { background: rgba(75,226,119,0.12); color: #166534; border: 1px solid rgba(75,226,119,0.35); }
+  .dark .btn-green { background: #0d1f14; color: #4BE277; border-color: #166534; }
   
   .btn-icon { background: none; border: none; cursor: pointer; padding: 6px; border-radius: 8px; transition: background 0.15s; display: flex; align-items: center; justify-content: center; color: var(--text-dim); }
   .btn-icon:hover { background: var(--row-hover); color: var(--text); }
@@ -336,9 +337,9 @@ const CSS = `
     }
 
     .filter-btn.active {
-      background: var(--text) !important;
-      color: var(--bg) !important;
-      border-color: var(--text) !important;
+      background: #4BE277 !important;
+      color: #0a0a0a !important;
+      border-color: #4BE277 !important;
     }
 
     .mobile-record-card:last-child { border-bottom: none; }
