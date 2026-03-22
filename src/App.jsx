@@ -1977,7 +1977,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
         })()}
 
 
-        <div className="mobile-chart-grid" style={{ display: "grid", gridTemplateColumns: "2.2fr 1fr", gap: 14 }}>
+        <div className="mobile-chart-grid" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 14 }}>
           <div className="card" style={{ padding: "24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <div>
@@ -1995,7 +1995,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                 </div>
               </div>
             </div>
-            <div style={{ height: 260, width: "100%" }}>
+            <div style={{ height: 220, width: "100%" }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--divider)" />
