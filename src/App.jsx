@@ -2010,14 +2010,14 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           </div>
           <div className="hide-mobile" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <CostDistributionCard data={pjStats.costDist} isPJ={true} catIcon={catIcon} />
-            
-            <div className="card" style={{ padding: "24px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 16 }}>Meta de Receita</div>
-              <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 12 }}>
-                <div style={{ fontSize: 32, fontWeight: 800, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace", lineHeight: 1 }}>{Math.round(pctMeta)}%</div>
-                <div style={{ fontSize: 11, color: "var(--text-dim)", fontWeight: 600, paddingBottom: 4 }}>atingido</div>
+
+            <div className="card" style={{ padding: "20px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>Meta de Receita</div>
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 10 }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace", lineHeight: 1 }}>{Math.round(pctMeta)}%</div>
+                <div style={{ fontSize: 11, color: "var(--text-dim)", fontWeight: 600, paddingBottom: 2 }}>atingido</div>
               </div>
-              <div style={{ height: 10, background: "var(--divider)", borderRadius: 99, overflow: "hidden", marginBottom: 10 }}>
+              <div style={{ height: 8, background: "var(--divider)", borderRadius: 99, overflow: "hidden", marginBottom: 8 }}>
                 <div style={{ height: "100%", width: `${Math.min(pctMeta, 100)}%`, background: pctMeta >= 100 ? "#4BE277" : "#38bdf8", borderRadius: 99, transition: "width 1s ease" }} />
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: "var(--text-muted)" }}>
@@ -2025,49 +2025,59 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                 <span>META: {fmt(meta)}</span>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div className="card" style={{ padding: "24px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "4px solid #4BE277" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>Pró-labore Recomendado</div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
-                <div style={{ fontSize: 24, fontWeight: 800, color: "#4BE277", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(pjStats.prolaboreSugerido)}</div>
+        <div className="hide-mobile" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+          {/* Pró-labore */}
+          <div className="card" style={{ padding: "20px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "4px solid #4BE277" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>Pró-labore Recomendado</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#4BE277", fontFamily: "'JetBrains Mono',monospace", marginBottom: 4 }}>{fmt(pjStats.prolaboreSugerido)}</div>
+            <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 600, lineHeight: 1.4 }}>
+              {totals.resultado > 0 ? "Valor seguro para retirada baseado no seu lucro atual." : "Sem lucro real no período para sugerir retirada."}
+            </div>
+            <div style={{ marginTop: 12 }}>
+              <button className="btn btn-outline" style={{ width: "100%", fontSize: 11, padding: "6px" }} onClick={() => safeNavigate("main", "lancamentos")}>Ver lançamentos</button>
+            </div>
+          </div>
+          {/* Faturamento MEI */}
+          <div className="card" style={{ padding: "20px" }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 14 }}>Faturamento MEI — Anual</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+              <div style={{ padding: "10px 12px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--divider)" }}>
+                <div style={{ fontSize: 9, fontWeight: 800, color: "var(--text-dim)", textTransform: "uppercase", marginBottom: 4 }}>📄 Com NF</div>
+                <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: pjStats.pctLimiteMEI > 80 ? "#ef4444" : "var(--text)" }}>{fmt(pjStats.anualComNF)}</div>
               </div>
-              <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 600, lineHeight: 1.4 }}>
-                {totals.resultado > 0 
-                  ? "Valor seguro para retirada baseado no seu lucro atual." 
-                  : "Sem lucro real no período para sugerir retirada."}
-              </div>
-              <div style={{ marginTop: 12 }}>
-                <button 
-                  className="btn btn-outline" 
-                  style={{ width: "100%", fontSize: 11, padding: "6px" }}
-                  onClick={() => safeNavigate("main", "lancamentos")}
-                >
-                  Ver lançamentos
-                </button>
+              <div style={{ padding: "10px 12px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--divider)" }}>
+                <div style={{ fontSize: 9, fontWeight: 800, color: "var(--text-dim)", textTransform: "uppercase", marginBottom: 4 }}>💰 Total</div>
+                <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>{fmt(pjStats.anualTotal)}</div>
               </div>
             </div>
-            <div className="card" style={{ padding: "20px" }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 14 }}>Faturamento MEI — Anual</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
-                <div style={{ padding: "10px 12px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--divider)" }}>
-                  <div style={{ fontSize: 9, fontWeight: 800, color: "var(--text-dim)", textTransform: "uppercase", marginBottom: 4 }}>📄 Com NF (Limite MEI)</div>
-                  <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: pjStats.pctLimiteMEI > 80 ? "#ef4444" : "var(--text)" }}>{fmt(pjStats.anualComNF)}</div>
-                </div>
-                <div style={{ padding: "10px 12px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--divider)" }}>
-                  <div style={{ fontSize: 9, fontWeight: 800, color: "var(--text-dim)", textTransform: "uppercase", marginBottom: 4 }}>💰 Faturamento Total</div>
-                  <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>{fmt(pjStats.anualTotal)}</div>
-                </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)" }}>Limite MEI</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: pjStats.pctLimiteMEI > 80 ? "#ef4444" : "var(--text-muted)" }}>{Math.round(pjStats.pctLimiteMEI)}%</div>
+            </div>
+            <div style={{ height: 6, background: "var(--divider)", borderRadius: 99, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${Math.min(pjStats.pctLimiteMEI, 100)}%`, background: pjStats.pctLimiteMEI > 85 ? "#ef4444" : pjStats.pctLimiteMEI > 50 ? "#f59e0b" : "#4BE277", borderRadius: 99, transition: "width 0.4s ease" }} />
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "var(--text-dim)", marginTop: 6, fontWeight: 600 }}>
+              <span>{fmt(pjStats.anualComNF)} com NF</span>
+              <span>Teto: R$ 81.000,00</span>
+            </div>
+          </div>
+          {/* Saúde do Negócio */}
+          <div className="card" style={{ padding: "20px" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 16 }}>Saúde do Negócio</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div style={{ padding: "16px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--divider)" }}>
+                <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", marginBottom: 8 }}>Custos Operacionais</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "#ef4444", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(totals.totalDesp + totals.totalDeducao)}</div>
+                <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 6, fontWeight: 600 }}>Fixos: {fmt(totals.totalDespFixo)} · Var: {fmt(totals.totalDespVariavel)}</div>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)" }}>Limite MEI</div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: pjStats.pctLimiteMEI > 80 ? "#ef4444" : "var(--text-muted)" }}>{Math.round(pjStats.pctLimiteMEI)}%</div>
-              </div>
-              <div style={{ height: 6, background: "var(--divider)", borderRadius: 99, overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${Math.min(pjStats.pctLimiteMEI, 100)}%`, background: pjStats.pctLimiteMEI > 85 ? "#ef4444" : pjStats.pctLimiteMEI > 50 ? "#f59e0b" : "#4BE277", borderRadius: 99, transition: "width 0.4s ease" }} />
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "var(--text-dim)", marginTop: 6, fontWeight: 600 }}>
-                <span>{fmt(pjStats.anualComNF)} faturado com NF</span>
-                <span>Teto: R$ 81.000,00</span>
+              <div style={{ padding: "16px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--divider)" }}>
+                <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", marginBottom: 8 }}>Impacto das Taxas</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace" }}>{totals.totalBruto > 0 ? ((totals.totalDeducao / totals.totalBruto) * 100).toFixed(1) + "%" : "0.0%"}</div>
+                <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 6, fontWeight: 600 }}>% comido pelas taxas</div>
               </div>
             </div>
           </div>
@@ -2096,23 +2106,6 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                     <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text)", marginLeft: "auto" }}>{totals.totalLiq > 0 ? Math.round((c.value / totals.totalLiq) * 100) : 0}%</div>
                   </div>
                 ))}
-              </div>
-            </div>
-          </div>
-          <div className="card" style={{ padding: "20px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Saúde do Negócio</div>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div style={{ padding: "16px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--divider)" }}>
-                <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", marginBottom: 8 }}>Custos Operacionais</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: "#ef4444", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(totals.totalDesp + totals.totalDeducao)}</div>
-                <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 6, fontWeight: 600 }}>Fixos: {fmt(totals.totalDespFixo)} · Var: {fmt(totals.totalDespVariavel)}</div>
-              </div>
-              <div style={{ padding: "16px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--divider)" }}>
-                <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", marginBottom: 8 }}>Impacto das Taxas</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace" }}>{totals.totalBruto > 0 ? ((totals.totalDeducao / totals.totalBruto) * 100).toFixed(1) + "%" : "0.0%"}</div>
-                <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 6, fontWeight: 600 }}>% comido pelas taxas</div>
               </div>
             </div>
           </div>
