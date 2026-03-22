@@ -152,8 +152,10 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
   ];
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'Syne',sans-serif" }}>
+    <div style={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden", fontFamily: "'Syne',sans-serif", position: "fixed", top: 0, left: 0 }}>
       <style>{`
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { margin: 0; padding: 0; overflow: hidden; height: 100%; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes authPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.7; } }
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -164,7 +166,8 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
         .abh:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(75,226,119,0.35) !important; }
         .agh:hover { background: #f5f5f5 !important; border-color: #ccc !important; }
         .alh:hover { color: #2ea855 !important; }
-        .glass-card { background: #ffffff; border-radius: 20px; padding: 36px; }
+        .glass-card { background: #ffffff; padding: 36px; width: 100%; max-width: 400px; }
+        .auth-form-side { overflow-y: auto; }
         @media (max-width: 768px) { .auth-brand-panel { display: none !important; } .auth-form-side { padding: 24px 16px !important; background: #fff !important; } .glass-card { padding: 28px 20px !important; } }
         .auth-toast-anim { animation: fadeSlideIn 0.3s ease-out; }
       `}</style>
@@ -172,20 +175,20 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
       {/* ── Brand Panel (Desktop) ── */}
       <div className="auth-brand-panel" style={{
         flex: 1, background: "linear-gradient(145deg, #050505 0%, #0a0a0a 50%, #0d1a0d 100%)",
-        display: "flex", flexDirection: "column", justifyContent: "center", padding: "60px 56px",
-        position: "relative", overflow: "hidden", minWidth: 0
+        display: "flex", flexDirection: "column", justifyContent: "center", padding: "40px 48px",
+        position: "relative", overflow: "hidden", minWidth: 0, height: "100%"
       }}>
         <div style={{ position: "absolute", top: "-20%", right: "-10%", width: "70%", height: "80%", background: "radial-gradient(circle, rgba(75,226,119,0.15) 0%, transparent 65%)", pointerEvents: "none", animation: "greenGlow 8s ease-in-out infinite" }} />
         <div style={{ position: "absolute", bottom: "-25%", left: "-10%", width: "55%", height: "70%", background: "radial-gradient(circle, rgba(75,226,119,0.08) 0%, transparent 55%)", pointerEvents: "none", animation: "greenGlow 12s ease-in-out infinite 3s" }} />
         <div style={{ position: "relative", zIndex: 1 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(75,226,119,0.6)", textTransform: "uppercase", letterSpacing: "3px", marginBottom: 12 }}>Gestão Financeira MEI</div>
-          <div style={{ fontSize: 44, fontWeight: 800, fontStyle: "italic", color: "#f5f2ed", letterSpacing: "-2px", lineHeight: 1.05, marginBottom: 12 }}>Finanças<br /><span style={{ color: "#4BE277" }}>Mei</span></div>
-          <div style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", fontWeight: 500, lineHeight: 1.6, marginBottom: 48, maxWidth: 360 }}>
+          <div style={{ fontSize: 40, fontWeight: 800, fontStyle: "italic", color: "#f5f2ed", letterSpacing: "-2px", lineHeight: 1.05, marginBottom: 10 }}>Finanças<br /><span style={{ color: "#4BE277" }}>Mei</span></div>
+          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", fontWeight: 500, lineHeight: 1.5, marginBottom: 28, maxWidth: 360 }}>
             O único app com separação PJ/PF + DAS + controle real simples. Feito para os 17M+ de MEIs no Brasil.
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {FEATURES.map(([Icon, title, desc]) => (
-              <div key={title} style={{ display: "flex", alignItems: "center", gap: 16, padding: "12px 0" }}>
+              <div key={title} style={{ display: "flex", alignItems: "center", gap: 14, padding: "9px 0" }}>
                 <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(75,226,119,0.08)", border: "1px solid rgba(75,226,119,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Icon /></div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#f5f2ed" }}>{title}</div>
@@ -198,8 +201,8 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
       </div>
 
       {/* ── Form Panel ── */}
-      <div className="auth-form-side" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 48px", background: "#ffffff", position: "relative", overflow: "hidden" }}>
-        <div className="auth-fade glass-card" key={view} style={{ width: "100%", maxWidth: 400 }}>
+      <div className="auth-form-side" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 48px", background: "#ffffff", height: "100%", overflowY: "auto" }}>
+        <div className="auth-fade glass-card" key={view}>
 
           {/* ════════ LOGIN ════════ */}
           {view === "login" && <>
