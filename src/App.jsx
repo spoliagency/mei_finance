@@ -3485,7 +3485,7 @@ export default function App() {
     const custoBase = totalCustoFixoPF > 0 ? totalCustoFixoPF : (pl > 0 ? pl : (pfOrcTotal > 0 ? pfOrcTotal : (pjProfit > 0 ? pjProfit : (parseFloat(perfil.mediaGastoManual) || 0))));
 
     return [
-      { label: "Total Gasto", value: fmt(totals.totalGastos), sub: `Fixo: ${fmt(totals.totalGastosFixo)} · Var: ${fmt(totals.totalGastosVariavel)}`, accent: "#ef4444" },
+      { label: "Total Gasto", value: fmt(totals.totalGastos), sub: "no período", accent: "#ef4444" },
       { label: "Disponível", value: fmt(Math.max(0, custoBase - totals.totalGastos)), sub: custoBase === pjProfit ? "baseado no lucro PJ" : "até o fim do mês", accent: "#4BE277" },
       { label: "Total Reservado", value: fmt(totals.totalReservado), sub: "guardado no período", accent: "#38bdf8" },
       { label: "Pendentes", value: fmt(totals.pendentesGasto), sub: "a pagar", accent: "#aaa" },
