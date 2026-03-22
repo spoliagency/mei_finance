@@ -3175,8 +3175,11 @@ export default function App() {
       atingido: mediaFinal > 0 && reservaAtualVal >= (mediaFinal * m)
     }));
 
-    // Pró-labore vs Gastos
-    const taxaEconomia = pl > 0 ? ((pl - totalGasto) / pl) * 100 : 0;
+    // Taxa de economia: (renda período - gastos período) / renda período
+    // Usa pró-labore proporcional ao nº de meses do período
+    const periodMonths = new Set(currentGastos.map(g => g.data?.substring(0, 7)).filter(Boolean)).size || 1;
+    const rendaPeriodo = pl > 0 ? pl * periodMonths : 0;
+    const taxaEconomia = rendaPeriodo > 0 ? ((rendaPeriodo - totalGasto) / rendaPeriodo) * 100 : 0;
 
     // Ralos (Categories)
     const catMap = {};
