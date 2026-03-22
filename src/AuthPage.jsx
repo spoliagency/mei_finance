@@ -111,12 +111,12 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
   const Spinner = () => <div style={{ width: 18, height: 18, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.6s linear infinite" }} />;
 
   // ── Shared Styles ──
-  const inp = { width: "100%", padding: "14px 16px", border: "1.5px solid #e8e5e0", borderRadius: 12, fontFamily: "'Syne',sans-serif", fontSize: 14, background: "#fff", color: "#1a1a1a", outline: "none", transition: "border 0.2s, box-shadow 0.2s", boxSizing: "border-box" };
+  const inp = { width: "100%", padding: "14px 16px", border: "1.5px solid #e0ddd8", borderRadius: 12, fontFamily: "'Syne',sans-serif", fontSize: 14, background: "#fff", color: "#1a1a1a", outline: "none", transition: "border 0.2s, box-shadow 0.2s", boxSizing: "border-box" };
   const lbl = { fontSize: 11, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "0.6px", display: "block", marginBottom: 6 };
-  const btnP = { width: "100%", height: 50, border: "none", borderRadius: 12, fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: "#1a1a1a", color: "#f5f2ed", opacity: loading ? 0.6 : 1 };
-  const btnG = { width: "100%", height: 50, border: "1.5px solid #e8e5e0", borderRadius: 12, fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: "#fff", color: "#1a1a1a" };
-  const lnk = { color: "#6366f1", fontWeight: 700, cursor: "pointer", background: "none", border: "none", fontFamily: "'Syne',sans-serif", fontSize: 13, padding: 0 };
-  const divider = <div style={{ display: "flex", alignItems: "center", gap: 16, margin: "24px 0", color: "#ccc", fontSize: 12, fontWeight: 600 }}><div style={{ flex: 1, height: 1, background: "#e0ddd8" }} /><span>ou</span><div style={{ flex: 1, height: 1, background: "#e0ddd8" }} /></div>;
+  const btnP = { width: "100%", height: 50, border: "none", borderRadius: 12, fontFamily: "'Syne',sans-serif", fontSize: 15, fontWeight: 800, fontStyle: "italic", cursor: loading ? "not-allowed" : "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: "#4BE277", color: "#0a0a0a", opacity: loading ? 0.6 : 1, letterSpacing: "-0.3px" };
+  const btnG = { width: "100%", height: 50, border: "1.5px solid #e0ddd8", borderRadius: 12, fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: "#fff", color: "#1a1a1a" };
+  const lnk = { color: "#4BE277", fontWeight: 700, cursor: "pointer", background: "none", border: "none", fontFamily: "'Syne',sans-serif", fontSize: 13, padding: 0 };
+  const divider = <div style={{ display: "flex", alignItems: "center", gap: 16, margin: "24px 0", color: "#ccc", fontSize: 12, fontWeight: 600 }}><div style={{ flex: 1, height: 1, background: "#e8e5e0" }} /><span>ou</span><div style={{ flex: 1, height: 1, background: "#e8e5e0" }} /></div>;
 
   const pwdInput = (placeholder = "••••••••", autoC = "current-password") => (
     <div style={{ position: "relative" }}>
@@ -136,70 +136,76 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
     </div>
   ) : null;
 
+  const FeatureIcons = {
+    pj: () => <svg width="20" height="20" fill="none" stroke="#4BE277" strokeWidth="1.8" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>,
+    das: () => <svg width="20" height="20" fill="none" stroke="#4BE277" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>,
+    prolabore: () => <svg width="20" height="20" fill="none" stroke="#4BE277" strokeWidth="1.8" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+    relatorio: () => <svg width="20" height="20" fill="none" stroke="#4BE277" strokeWidth="1.8" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+    seguro: () => <svg width="20" height="20" fill="none" stroke="#4BE277" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+  };
   const FEATURES = [
-    ["📊", "Separação PJ / PF", "Controle inteligente empresa vs pessoal"],
-    ["🧾", "DAS Automático", "Acompanhe e nunca esqueça o imposto"],
-    ["💰", "Pró-labore e Metas", "Saiba quanto se pagar e onde investir"],
-    ["📈", "Relatórios e DRE", "Visão completa da saúde do negócio"],
-    ["🔒", "Dados Seguros", "Criptografia e backup na nuvem"],
+    [FeatureIcons.pj, "Separação PJ / PF", "Controle inteligente empresa vs pessoal"],
+    [FeatureIcons.das, "DAS Automático", "Acompanhe e nunca esqueça o imposto"],
+    [FeatureIcons.prolabore, "Pró-labore e Metas", "Saiba quanto se pagar e onde investir"],
+    [FeatureIcons.relatorio, "Relatórios e DRE", "Visão completa da saúde do negócio"],
+    [FeatureIcons.seguro, "Dados Seguros", "Criptografia e backup na nuvem"],
   ];
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'Syne',sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#0a0a0a", padding: "12px", fontFamily: "'Syne',sans-serif", boxSizing: "border-box" }}>
+    <div style={{ display: "flex", minHeight: "calc(100vh - 24px)", border: "1.5px solid rgba(255,255,255,0.15)", borderRadius: 16, overflow: "hidden" }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes authPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.7; } }
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes greenGlow { 0%, 100% { opacity: 0.12; transform: scale(1); } 50% { opacity: 0.22; transform: scale(1.05); } }
         .auth-fade { animation: fadeSlideIn 0.35s ease-out; }
-        .af:focus { border-color: #1a1a1a !important; box-shadow: 0 0 0 3px rgba(26,26,26,0.06) !important; }
-        .abh:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
-        .agh:hover { background: #faf9f7 !important; border-color: #ccc !important; }
-        .alh:hover { color: #4f46e5 !important; }
-        @media (max-width: 768px) { .auth-brand-panel { display: none !important; } .auth-form-side { padding: 24px 20px !important; } }
+        .af:focus { border-color: #4BE277 !important; box-shadow: 0 0 0 3px rgba(75,226,119,0.15) !important; }
+        .af::placeholder { color: #bbb !important; }
+        .abh:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(75,226,119,0.35) !important; }
+        .agh:hover { background: #f5f5f5 !important; border-color: #ccc !important; }
+        .alh:hover { color: #2ea855 !important; }
+        .glass-card { background: #ffffff; border-radius: 20px; padding: 36px; }
+        @media (max-width: 768px) { .auth-brand-panel { display: none !important; } .auth-form-side { padding: 24px 16px !important; background: #fff !important; } .glass-card { padding: 28px 20px !important; } }
         .auth-toast-anim { animation: fadeSlideIn 0.3s ease-out; }
       `}</style>
 
       {/* ── Brand Panel (Desktop) ── */}
       <div className="auth-brand-panel" style={{
-        flex: 1, background: "linear-gradient(145deg, #0f0f0f 0%, #1a1a1a 40%, #252525 100%)",
+        flex: 1, background: "linear-gradient(145deg, #050505 0%, #0a0a0a 50%, #0d1a0d 100%)",
         display: "flex", flexDirection: "column", justifyContent: "center", padding: "60px 56px",
         position: "relative", overflow: "hidden", minWidth: 0
       }}>
-        <div style={{ position: "absolute", top: "-30%", right: "-20%", width: "70%", height: "100%", background: "radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 65%)", pointerEvents: "none", animation: "authPulse 8s ease-in-out infinite" }} />
-        <div style={{ position: "absolute", bottom: "-20%", left: "-15%", width: "50%", height: "70%", background: "radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 55%)", pointerEvents: "none", animation: "authPulse 10s ease-in-out infinite 2s" }} />
+        <div style={{ position: "absolute", top: "-20%", right: "-10%", width: "70%", height: "80%", background: "radial-gradient(circle, rgba(75,226,119,0.15) 0%, transparent 65%)", pointerEvents: "none", animation: "greenGlow 8s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", bottom: "-25%", left: "-10%", width: "55%", height: "70%", background: "radial-gradient(circle, rgba(75,226,119,0.08) 0%, transparent 55%)", pointerEvents: "none", animation: "greenGlow 12s ease-in-out infinite 3s" }} />
         <div style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: "3px", marginBottom: 12 }}>Gestão Financeira MEI</div>
-          <div style={{ fontSize: 42, fontWeight: 800, color: "#f5f2ed", letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 12 }}>Finanças<br /><span style={{ color: "#6366f1" }}>Mei</span></div>
-          <div style={{ fontSize: 15, color: "#888", fontWeight: 500, lineHeight: 1.6, marginBottom: 48, maxWidth: 360 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(75,226,119,0.6)", textTransform: "uppercase", letterSpacing: "3px", marginBottom: 12 }}>Gestão Financeira MEI</div>
+          <div style={{ fontSize: 44, fontWeight: 800, fontStyle: "italic", color: "#f5f2ed", letterSpacing: "-2px", lineHeight: 1.05, marginBottom: 12 }}>Finanças<br /><span style={{ color: "#4BE277" }}>Mei</span></div>
+          <div style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", fontWeight: 500, lineHeight: 1.6, marginBottom: 48, maxWidth: 360 }}>
             O único app com separação PJ/PF + DAS + controle real simples. Feito para os 17M+ de MEIs no Brasil.
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {FEATURES.map(([icon, title, desc]) => (
+            {FEATURES.map(([Icon, title, desc]) => (
               <div key={title} style={{ display: "flex", alignItems: "center", gap: 16, padding: "12px 0" }}>
-                <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{icon}</div>
+                <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(75,226,119,0.08)", border: "1px solid rgba(75,226,119,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Icon /></div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#f5f2ed" }}>{title}</div>
-                  <div style={{ fontSize: 11, color: "#666", fontWeight: 500 }}>{desc}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontWeight: 500 }}>{desc}</div>
                 </div>
               </div>
             ))}
-          </div>
-          {/* Future subscription badge */}
-          <div style={{ marginTop: 48, padding: "12px 18px", background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.15)", borderRadius: 10, display: "inline-flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 14 }}>✨</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#818cf8" }}>Grátis para começar · Pro em breve</span>
           </div>
         </div>
       </div>
 
       {/* ── Form Panel ── */}
-      <div className="auth-form-side" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 48px", background: "#f5f2ed" }}>
-        <div className="auth-fade" key={view} style={{ width: "100%", maxWidth: 400 }}>
+      <div className="auth-form-side" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 48px", background: "#ffffff", position: "relative", overflow: "hidden" }}>
+        <div className="auth-fade glass-card" key={view} style={{ width: "100%", maxWidth: 400 }}>
 
           {/* ════════ LOGIN ════════ */}
           {view === "login" && <>
             <div style={{ marginBottom: 32 }}>
-              <div style={{ fontSize: 26, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.8px", marginBottom: 6 }}>Bem-vindo de volta</div>
+              <div style={{ fontSize: 26, fontWeight: 800, fontStyle: "italic", color: "#1a1a1a", letterSpacing: "-0.8px", marginBottom: 6 }}>Bem-vindo de volta</div>
               <div style={{ fontSize: 14, color: "#888", fontWeight: 500 }}>Entre na sua conta para continuar</div>
             </div>
             <form onSubmit={doLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -223,7 +229,7 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
           {/* ════════ REGISTER ════════ */}
           {view === "register" && <>
             <div style={{ marginBottom: 28 }}>
-              <div style={{ fontSize: 26, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.8px", marginBottom: 6 }}>Criar conta</div>
+              <div style={{ fontSize: 26, fontWeight: 800, fontStyle: "italic", color: "#1a1a1a", letterSpacing: "-0.8px", marginBottom: 6 }}>Criar conta</div>
               <div style={{ fontSize: 14, color: "#888", fontWeight: 500 }}>Comece a organizar suas finanças agora</div>
             </div>
             <form onSubmit={doRegister} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -251,7 +257,7 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
           {/* ════════ FORGOT PASSWORD ════════ */}
           {view === "forgot" && <>
             <div style={{ marginBottom: 32 }}>
-              <div style={{ fontSize: 26, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.8px", marginBottom: 6 }}>Recuperar senha</div>
+              <div style={{ fontSize: 26, fontWeight: 800, fontStyle: "italic", color: "#1a1a1a", letterSpacing: "-0.8px", marginBottom: 6 }}>Recuperar senha</div>
               <div style={{ fontSize: 14, color: "#888", fontWeight: 500, lineHeight: 1.5 }}>
                 Digite o e-mail cadastrado e enviaremos um link para redefinir sua senha.
               </div>
@@ -269,14 +275,14 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
           {view === "forgot-sent" && <>
             <div style={{ textAlign: "center", padding: "20px 0" }}>
               <div style={{ fontSize: 56, marginBottom: 20 }}>📧</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.5px", marginBottom: 10 }}>Verifique seu e-mail</div>
+              <div style={{ fontSize: 22, fontWeight: 800, fontStyle: "italic", color: "#1a1a1a", letterSpacing: "-0.5px", marginBottom: 10 }}>Verifique seu e-mail</div>
               <div style={{ fontSize: 14, color: "#888", fontWeight: 500, lineHeight: 1.6, marginBottom: 8 }}>
                 Enviamos um link de recuperação para <strong style={{ color: "#1a1a1a" }}>{email}</strong>.
               </div>
               <div style={{ fontSize: 12, color: "#aaa", lineHeight: 1.5, marginBottom: 32 }}>
                 Clique no link do e-mail para redefinir sua senha. Verifique também a pasta de spam.
               </div>
-              <button onClick={() => go("login")} className="abh" style={{ ...btnP, background: "transparent", color: "#1a1a1a", border: "1.5px solid #e8e5e0" }}>Voltar ao login</button>
+              <button onClick={() => go("login")} className="abh" style={{ ...btnP, background: "transparent", color: "#1a1a1a", border: "1.5px solid #e0ddd8", fontStyle: "normal" }}>Voltar ao login</button>
               <div style={{ marginTop: 16 }}>
                 <button onClick={() => go("forgot")} className="alh" style={{ ...lnk, fontSize: 12 }}>Reenviar e-mail</button>
               </div>
@@ -286,7 +292,7 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
           {/* ════════ RESET PASSWORD ════════ */}
           {view === "reset" && <>
             <div style={{ marginBottom: 32 }}>
-              <div style={{ fontSize: 26, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.8px", marginBottom: 6 }}>Nova senha</div>
+              <div style={{ fontSize: 26, fontWeight: 800, fontStyle: "italic", color: "#1a1a1a", letterSpacing: "-0.8px", marginBottom: 6 }}>Nova senha</div>
               <div style={{ fontSize: 14, color: "#888", fontWeight: 500, lineHeight: 1.5 }}>
                 Crie uma nova senha segura para sua conta.
               </div>
@@ -310,15 +316,15 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
           {view === "confirm" && <>
             <div style={{ textAlign: "center", padding: "20px 0" }}>
               <div style={{ fontSize: 56, marginBottom: 20 }}>✉️</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.5px", marginBottom: 10 }}>Confirme seu e-mail</div>
+              <div style={{ fontSize: 22, fontWeight: 800, fontStyle: "italic", color: "#1a1a1a", letterSpacing: "-0.5px", marginBottom: 10 }}>Confirme seu e-mail</div>
               <div style={{ fontSize: 14, color: "#888", fontWeight: 500, lineHeight: 1.6, marginBottom: 8 }}>
                 Enviamos um link de confirmação para <strong style={{ color: "#1a1a1a" }}>{email}</strong>.
               </div>
               <div style={{ fontSize: 12, color: "#aaa", lineHeight: 1.5, marginBottom: 16 }}>
                 Clique no link do e-mail para ativar sua conta. Verifique também a caixa de spam.
               </div>
-              <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 12, padding: "14px 18px", marginBottom: 28 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#16a34a", display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+              <div style={{ background: "rgba(75,226,119,0.08)", border: "1px solid rgba(75,226,119,0.2)", borderRadius: 12, padding: "14px 18px", marginBottom: 28 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#4BE277", display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
                   <span>✓</span> Conta criada com sucesso!
                 </div>
               </div>
@@ -358,24 +364,25 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
           display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10000, padding: 20
         }}>
           <div onClick={e => e.stopPropagation()} className="auth-fade" style={{
-            background: "#f5f2ed", borderRadius: 16, width: "100%", maxWidth: 640, maxHeight: "85vh",
-            display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.3)"
+            background: "rgba(12,12,12,0.97)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
+            border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, width: "100%", maxWidth: 640, maxHeight: "85vh",
+            display: "flex", flexDirection: "column", boxShadow: "0 24px 80px rgba(0,0,0,0.6)"
           }}>
             {/* Header */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 28px", borderBottom: "1px solid #e8e5e0", flexShrink: 0 }}>
-              <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.5px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 28px", borderBottom: "1px solid rgba(255,255,255,0.08)", flexShrink: 0 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, fontStyle: "italic", color: "#f5f2ed", letterSpacing: "-0.5px" }}>
                 {legalModal === "terms" ? "Termos de Uso" : "Política de Privacidade"}
               </div>
-              <button onClick={() => setLegalModal(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 22, color: "#888", padding: 4, lineHeight: 1 }}>✕</button>
+              <button onClick={() => setLegalModal(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 22, color: "rgba(255,255,255,0.35)", padding: 4, lineHeight: 1 }}>✕</button>
             </div>
             {/* Content */}
-            <div style={{ padding: "24px 28px", overflowY: "auto", fontSize: 13, color: "#555", lineHeight: 1.8, fontFamily: "'Syne',sans-serif" }}>
+            <div style={{ padding: "24px 28px", overflowY: "auto", fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.8, fontFamily: "'Syne',sans-serif" }}>
               {legalModal === "terms" ? (
                 <div>
                   <p style={{ fontSize: 11, color: "#aaa", marginBottom: 16 }}>Última atualização: {new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 0 }}>1. Aceitação dos Termos</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 0 }}>1. Aceitação dos Termos</h3>
                   <p>Ao acessar e utilizar o <strong>Mei Finanças</strong> ("Plataforma"), disponível em meifinancas.app, você declara que leu, compreendeu e concorda com estes Termos de Uso. Caso não concorde, não utilize a Plataforma.</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>2. Descrição do Serviço</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>2. Descrição do Serviço</h3>
                   <p>O Mei Finanças é uma plataforma de gestão financeira voltada para Microempreendedores Individuais (MEI), oferecendo funcionalidades como:</p>
                   <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
                     <li>Separação de contas PJ (Pessoa Jurídica) e PF (Pessoa Física)</li>
@@ -384,9 +391,9 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
                     <li>Acompanhamento do DAS (Documento de Arrecadação do Simples Nacional)</li>
                     <li>Relatórios financeiros e dashboards</li>
                   </ul>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>3. Cadastro e Conta</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>3. Cadastro e Conta</h3>
                   <p>Para utilizar a Plataforma, você deve criar uma conta fornecendo informações verdadeiras e atualizadas. Você é responsável por manter a confidencialidade de sua senha e por todas as atividades realizadas em sua conta.</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>4. Uso Adequado</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>4. Uso Adequado</h3>
                   <p>Você se compromete a utilizar a Plataforma apenas para fins legais e de acordo com estes Termos. É proibido:</p>
                   <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
                     <li>Utilizar a Plataforma para qualquer atividade ilícita</li>
@@ -394,25 +401,25 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
                     <li>Introduzir vírus, malware ou código malicioso</li>
                     <li>Realizar engenharia reversa ou descompilar o software</li>
                   </ul>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>5. Planos e Pagamentos</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>5. Planos e Pagamentos</h3>
                   <p>A Plataforma pode oferecer planos gratuitos e pagos. Os valores, funcionalidades e condições de cada plano serão informados na página de preços. Pagamentos recorrentes podem ser cancelados a qualquer momento, com efeito ao final do período vigente.</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>6. Propriedade Intelectual</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>6. Propriedade Intelectual</h3>
                   <p>Todo o conteúdo da Plataforma, incluindo marca, design, código-fonte, textos e funcionalidades, é de propriedade exclusiva do Mei Finanças e protegido pelas leis de propriedade intelectual brasileiras.</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>7. Limitação de Responsabilidade</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>7. Limitação de Responsabilidade</h3>
                   <p>O Mei Finanças não substitui consultoria contábil ou fiscal profissional. Os dados e cálculos fornecidos são meramente informativos. Recomendamos a consulta a um contador para decisões financeiras relevantes. Não nos responsabilizamos por perdas decorrentes do uso inadequado das informações.</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>8. Disponibilidade</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>8. Disponibilidade</h3>
                   <p>Nos esforçamos para manter a Plataforma disponível 24/7, mas não garantimos disponibilidade ininterrupta. Manutenções programadas e imprevistos podem causar períodos de indisponibilidade.</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>9. Modificações</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>9. Modificações</h3>
                   <p>Reservamo-nos o direito de modificar estes Termos a qualquer momento. Alterações significativas serão comunicadas por e-mail ou notificação na Plataforma.</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>10. Contato</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>10. Contato</h3>
                   <p>Em caso de dúvidas, entre em contato pelo e-mail <strong>contato@meifinancas.app</strong>.</p>
                 </div>
               ) : (
                 <div>
                   <p style={{ fontSize: 11, color: "#aaa", marginBottom: 16 }}>Última atualização: {new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 0 }}>1. Introdução</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 0 }}>1. Introdução</h3>
                   <p>A sua privacidade é importante para nós. Esta Política de Privacidade descreve como o <strong>Mei Finanças</strong> coleta, utiliza, armazena e protege as informações pessoais dos usuários, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>2. Dados Coletados</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>2. Dados Coletados</h3>
                   <p>Coletamos os seguintes dados pessoais:</p>
                   <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
                     <li><strong>Dados de cadastro:</strong> nome completo, e-mail, CNPJ (opcional), CPF (opcional)</li>
@@ -420,7 +427,7 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
                     <li><strong>Dados de uso:</strong> informações sobre como você interage com a Plataforma (páginas visitadas, funcionalidades utilizadas)</li>
                     <li><strong>Dados técnicos:</strong> endereço IP, tipo de navegador, sistema operacional</li>
                   </ul>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>3. Finalidade do Uso dos Dados</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>3. Finalidade do Uso dos Dados</h3>
                   <p>Utilizamos seus dados para:</p>
                   <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
                     <li>Fornecer e aprimorar os serviços da Plataforma</li>
@@ -429,13 +436,13 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
                     <li>Garantir a segurança da sua conta</li>
                     <li>Cumprir obrigações legais e regulatórias</li>
                   </ul>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>4. Compartilhamento de Dados</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>4. Compartilhamento de Dados</h3>
                   <p><strong>Não vendemos</strong> seus dados pessoais. Podemos compartilhar informações apenas com:</p>
                   <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
                     <li><strong>Provedores de serviço:</strong> empresas que nos auxiliam na operação (hospedagem, e-mail, analytics), sob contratos de confidencialidade</li>
                     <li><strong>Obrigações legais:</strong> quando exigido por lei ou ordem judicial</li>
                   </ul>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>5. Armazenamento e Segurança</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>5. Armazenamento e Segurança</h3>
                   <p>Seus dados são armazenados em servidores seguros com criptografia. Utilizamos medidas técnicas e organizacionais para proteger suas informações contra acesso não autorizado, perda ou destruição, incluindo:</p>
                   <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
                     <li>Criptografia de dados em trânsito (HTTPS/TLS)</li>
@@ -443,7 +450,7 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
                     <li>Backups periódicos</li>
                     <li>Controle de acesso restrito</li>
                   </ul>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>6. Seus Direitos (LGPD)</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>6. Seus Direitos (LGPD)</h3>
                   <p>Conforme a LGPD, você tem direito a:</p>
                   <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
                     <li>Confirmar a existência de tratamento de seus dados</li>
@@ -454,24 +461,25 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
                     <li>Solicitar a portabilidade dos dados</li>
                   </ul>
                   <p>Para exercer seus direitos, entre em contato pelo e-mail <strong>contato@meifinancas.app</strong>.</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>7. Cookies</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>7. Cookies</h3>
                   <p>Utilizamos cookies essenciais para o funcionamento da Plataforma (autenticação e sessão). Não utilizamos cookies de rastreamento para fins publicitários.</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>8. Retenção de Dados</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>8. Retenção de Dados</h3>
                   <p>Seus dados são mantidos enquanto sua conta estiver ativa. Ao solicitar o encerramento da conta, seus dados serão excluídos em até 30 dias, exceto quando a retenção for necessária para cumprimento de obrigações legais.</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>9. Alterações nesta Política</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>9. Alterações nesta Política</h3>
                   <p>Esta Política pode ser atualizada periodicamente. Alterações significativas serão comunicadas por e-mail ou notificação na Plataforma.</p>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 8, marginTop: 20 }}>10. Contato</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f5f2ed", marginBottom: 8, marginTop: 20 }}>10. Contato</h3>
                   <p>Para dúvidas sobre privacidade e proteção de dados, entre em contato: <strong>contato@meifinancas.app</strong>.</p>
                 </div>
               )}
             </div>
             {/* Footer */}
-            <div style={{ padding: "16px 28px", borderTop: "1px solid #e8e5e0", flexShrink: 0, display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ padding: "16px 28px", borderTop: "1px solid rgba(255,255,255,0.08)", flexShrink: 0, display: "flex", justifyContent: "flex-end" }}>
               <button onClick={() => setLegalModal(null)} className="abh" style={{ ...btnP, width: "auto", padding: "0 32px", height: 42, fontSize: 13 }}>Entendido</button>
             </div>
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }
