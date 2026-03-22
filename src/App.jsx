@@ -157,21 +157,21 @@ const safeNavigate = (p, v) => {
 // ─── Shared CSS ───────────────────────────────────────────────────────────────
 const CSS = `
   :root {
-    --bg: #f5f2ed;
+    --bg: #ffffff;
     --card: #ffffff;
     --text: #1a1a1a;
     --text-muted: #666;
     --text-dim: #aaa;
-    --border: #e8e5e0;
-    --input-bg: #ffffff;
-    --sidebar-bg: #faf9f7;
+    --border: #e8e8e8;
+    --input-bg: #f8f8f8;
+    --sidebar-bg: #f4f4f4;
     --sidebar-active: #4BE277;
     --sidebar-active-text: #0a0a0a;
-    --row-hover: #faf9f7;
+    --row-hover: #f8f8f8;
     --modal-bg: #ffffff;
-    --divider: #e8e5e0;
-    --filter-btn-border: #d0cdc8;
-    --tag-bg: #faf9f7;
+    --divider: #ebebeb;
+    --filter-btn-border: #d4d4d4;
+    --tag-bg: #f4f4f4;
   }
 
   .dark {
