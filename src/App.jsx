@@ -2029,15 +2029,30 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
         </div>
 
         <div className="hide-mobile" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
-          {/* Pró-labore */}
-          <div className="card" style={{ padding: "20px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "4px solid #4BE277" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>Pró-labore Recomendado</div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: "#4BE277", fontFamily: "'JetBrains Mono',monospace", marginBottom: 4 }}>{fmt(pjStats.prolaboreSugerido)}</div>
-            <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 600, lineHeight: 1.4 }}>
-              {totals.resultado > 0 ? "Valor seguro para retirada baseado no seu lucro atual." : "Sem lucro real no período para sugerir retirada."}
+          {/* Conversão por Categoria */}
+          <div className="card" style={{ padding: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+              <div style={{ color: "#4BE277" }}><IconPie size={18} /></div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", textTransform: "uppercase" }}>Conversão por Categoria</div>
             </div>
-            <div style={{ marginTop: 12 }}>
-              <button className="btn btn-outline" style={{ width: "100%", fontSize: 11, padding: "6px" }} onClick={() => safeNavigate("main", "lancamentos")}>Ver lançamentos</button>
+            <div style={{ height: 180, width: "100%", display: "flex", alignItems: "center" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={pjStats.catChartData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value">
+                    {pjStats.catChartData.map((entry, index) => <Cell key={`cell-${index}`} fill={CAT_COLORS[entry.name] || "#ccc"} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ background: "var(--text)", border: "none", borderRadius: 10, color: "var(--bg)", fontSize: 12, fontWeight: 600 }} formatter={(val) => fmt(val)} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {pjStats.catChartData.slice(0, 4).map((c, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: 2, background: CAT_COLORS[c.name] || "#ccc" }} />
+                    <div style={{ fontSize: 10, fontWeight: 600, color: "var(--text-muted)", whiteSpace: "nowrap" }}>{c.name}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text)", marginLeft: "auto" }}>{totals.totalLiq > 0 ? Math.round((c.value / totals.totalLiq) * 100) : 0}%</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           {/* Faturamento MEI */}
@@ -2083,33 +2098,6 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           </div>
         </div>
 
-        <div className="hide-mobile" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <div className="card" style={{ padding: "24px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-              <div style={{ color: "#4BE277" }}><IconPie size={18} /></div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", textTransform: "uppercase" }}>Conversão por Categoria</div>
-            </div>
-            <div style={{ height: 200, width: "100%", display: "flex", alignItems: "center" }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={pjStats.catChartData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                    {pjStats.catChartData.map((entry, index) => <Cell key={`cell-${index}`} fill={CAT_COLORS[entry.name] || "#ccc"} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ background: "var(--text)", border: "none", borderRadius: 10, color: "var(--bg)", fontSize: 12, fontWeight: 600 }} formatter={(val) => fmt(val)} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingLeft: 20 }}>
-                {pjStats.catChartData.slice(0, 4).map((c, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: 2, background: CAT_COLORS[c.name] || "#ccc" }} />
-                    <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)" }}>{c.name}</div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text)", marginLeft: "auto" }}>{totals.totalLiq > 0 ? Math.round((c.value / totals.totalLiq) * 100) : 0}%</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     );
   } else {
