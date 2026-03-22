@@ -1662,8 +1662,7 @@ function CategoryBudgetView({ catBreakdown, orcamentos, catIcon, isPJ, totals, o
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, fontWeight: 600 }}>
                     <div style={{ color: "var(--text-dim)", display: "flex", gap: 8 }}>
                       <span>{total ? `${((val / total) * 100).toFixed(1)}% do total` : ""}</span>
-                      {info.fixo > 0 && <span style={{ color: "#4BE277" }}>Fixo: {fmt(info.fixo)}</span>}
-                      {info.variavel > 0 && <span style={{ color: "#f59e0b" }}>Var: {fmt(info.variavel)}</span>}
+
                     </div>
                     {hasOrc && (
                       <div style={{ color: overBudget ? "#ef4444" : "#4BE277" }}>
