@@ -575,16 +575,16 @@ const EMOJI_OPTIONS = [
   "🍱", "🍕", "🥤", "🛒", "🛍️", "⛽", "🎟️", "🎭", "🏥", "💊", "🏋️", "✈️", "🏠", "⚡", "💧", "📞", "📡", "🧹", "🧺", "🐈", "🐶", "👶", "🎁", "💖",
   "📈", "📉", "🏦", "💳", "💱", "💎", "🛡️", "⚖️", "📅", "📝", "✅", "⚠️", "🆘", "🔒", "🔓"
 ];
-const COLOR_OPTIONS = ["#6366f1", "#8b5cf6", "#a855f7", "#d946ef", "#06b6d4", "#f97316", "#ef4444", "#10b981", "#3b82f6", "#64748b", "#f59e0b", "#ec4899", "#14b8a6", "#84cc16", "#f43f5e"];
+const COLOR_OPTIONS = ["#4BE277", "#8b5cf6", "#a855f7", "#d946ef", "#06b6d4", "#f97316", "#ef4444", "#4BE277", "#3b82f6", "#64748b", "#f59e0b", "#ec4899", "#14b8a6", "#84cc16", "#f43f5e"];
 
 function CatGridEditable({ cats, value, onChange, onCatsChange }) {
   const [editMode, setEditMode] = useState(false);
   const [editingIdx, setEditingIdx] = useState(null); // null = adding new
-  const [form, setForm] = useState({ label: "", icon: "💼", color: "#6366f1" });
+  const [form, setForm] = useState({ label: "", icon: "💼", color: "#4BE277" });
   const [showForm, setShowForm] = useState(false);
 
-  const openAdd = () => { setForm({ label: "", icon: "💼", color: "#6366f1" }); setEditingIdx(null); setShowForm(true); };
-  const openEdit = (idx) => { setForm({ label: cats[idx].label, icon: cats[idx].icon, color: CAT_COLORS[cats[idx].label] || "#6366f1" }); setEditingIdx(idx); setShowForm(true); };
+  const openAdd = () => { setForm({ label: "", icon: "💼", color: "#4BE277" }); setEditingIdx(null); setShowForm(true); };
+  const openEdit = (idx) => { setForm({ label: cats[idx].label, icon: cats[idx].icon, color: CAT_COLORS[cats[idx].label] || "#4BE277" }); setEditingIdx(idx); setShowForm(true); };
   const saveForm = () => {
     if (!form.label.trim()) return;
     const newCat = { label: form.label.trim(), icon: form.icon };
@@ -624,7 +624,7 @@ function CatGridEditable({ cats, value, onChange, onCatsChange }) {
             </button>
             {editMode && (
               <div style={{ position: "absolute", top: -6, right: -6, display: "flex", gap: 2 }}>
-                <button onClick={() => openEdit(i)} style={{ width: 18, height: 18, borderRadius: 4, background: "#6366f1", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <button onClick={() => openEdit(i)} style={{ width: 18, height: 18, borderRadius: 4, background: "#4BE277", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <svg width="9" height="9" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                 </button>
                 <button onClick={() => deleteCat(i)} style={{ width: 18, height: 18, borderRadius: 4, background: "#ef4444", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -646,7 +646,7 @@ function CatGridEditable({ cats, value, onChange, onCatsChange }) {
 
       {/* Edit mode toggle */}
       <button onClick={() => setEditMode(m => !m)}
-        style={{ fontSize: 11, fontWeight: 700, color: editMode ? "#6366f1" : "#aaa", background: editMode ? "#ede9fe" : "transparent", border: editMode ? "1px solid #c4b5fd" : "1px solid transparent", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "'Syne',sans-serif", transition: "all 0.15s" }}>
+        style={{ fontSize: 11, fontWeight: 700, color: editMode ? "#4BE277" : "#aaa", background: editMode ? "rgba(75,226,119,0.1)" : "transparent", border: editMode ? "1px solid rgba(75,226,119,0.3)" : "1px solid transparent", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "'Syne',sans-serif", transition: "all 0.15s" }}>
         {editMode ? "✓ Concluir edição" : "✎ Editar categorias"}
       </button>
 
@@ -751,12 +751,12 @@ function RecordTable({ records, columns, onView, onEdit, onDelete, emptyMsg }) {
 function CatManager({ cats, setCats, orcamentos = {}, setOrcamento }) {
   const [editingIdx, setEditingIdx] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ label: "", icon: "💼", color: "#6366f1" });
+  const [form, setForm] = useState({ label: "", icon: "💼", color: "#4BE277" });
   const [editingOrc, setEditingOrc] = useState(null);
   const [orcInput, setOrcInput] = useState("");
 
-  const openAdd = () => { setForm({ label: "", icon: "💼", color: "#6366f1" }); setEditingIdx(null); setShowForm(true); };
-  const openEdit = (i) => { const c = cats[i]; setForm({ label: c.label, icon: c.icon, color: CAT_COLORS[c.label] || "#6366f1" }); setEditingIdx(i); setShowForm(true); };
+  const openAdd = () => { setForm({ label: "", icon: "💼", color: "#4BE277" }); setEditingIdx(null); setShowForm(true); };
+  const openEdit = (i) => { const c = cats[i]; setForm({ label: c.label, icon: c.icon, color: CAT_COLORS[c.label] || "#4BE277" }); setEditingIdx(i); setShowForm(true); };
 
   const saveForm = () => {
     if (!form.label.trim()) return;
@@ -854,7 +854,7 @@ function CatManager({ cats, setCats, orcamentos = {}, setOrcamento }) {
                 )}
 
                 <div style={{ display: "flex", gap: 3 }}>
-                  <button className="btn-icon" onClick={() => openEdit(i)} style={{ color: editingIdx === i ? "var(--text)" : "#6366f1" }}><IconEdit size={14} /></button>
+                  <button className="btn-icon" onClick={() => openEdit(i)} style={{ color: editingIdx === i ? "var(--text)" : "#4BE277" }}><IconEdit size={14} /></button>
                   <button className="btn-icon" onClick={() => deleteCat(i)}><IconTrash size={14} /></button>
                 </div>
               </div>
@@ -994,10 +994,10 @@ function BudgetManager({ cats, orcamentos, setOrcamento }) {
 function BankManager({ bancos, setBancos, session, showToast }) {
   const [editingIdx, setEditingIdx] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ nome: "", icon: "🏦", color: "#6366f1" });
+  const [form, setForm] = useState({ nome: "", icon: "🏦", color: "#4BE277" });
 
-  const openAdd = () => { setForm({ nome: "", icon: "🏦", color: "#6366f1" }); setEditingIdx(null); setShowForm(true); };
-  const openEdit = (i) => { const b = bancos[i]; setForm({ nome: b.nome, icon: b.icon, color: b.color || "#6366f1" }); setEditingIdx(i); setShowForm(true); };
+  const openAdd = () => { setForm({ nome: "", icon: "🏦", color: "#4BE277" }); setEditingIdx(null); setShowForm(true); };
+  const openEdit = (i) => { const b = bancos[i]; setForm({ nome: b.nome, icon: b.icon, color: b.color || "#4BE277" }); setEditingIdx(i); setShowForm(true); };
 
   const saveForm = async () => {
     if (!form.nome.trim()) return;
@@ -1585,7 +1585,7 @@ function CategoryBudgetView({ catBreakdown, orcamentos, catIcon, isPJ, totals, o
 
       {/* ── Dashboard Stats Overlay ── */}
       {withBudget.length > 0 && (
-        <div className="card" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 16, borderLeft: "4px solid #6366f1" }}>
+        <div className="card" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 16, borderLeft: "4px solid #4BE277" }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 9, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 4 }}>Eficiência do Orçamento</div>
             <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>
@@ -1596,7 +1596,7 @@ function CategoryBudgetView({ catBreakdown, orcamentos, catIcon, isPJ, totals, o
             {withBudget.map(([cat, val]) => {
               const orc = orcamentos[cat];
               const pct = orc ? val / orc : 0;
-              const color = pct > 1 ? "#ef4444" : pct > 0.85 ? "#f59e0b" : "#10b981";
+              const color = pct > 1 ? "#ef4444" : pct > 0.85 ? "#f59e0b" : "#4BE277";
               return (
                 <div key={cat} title={`${cat}: ${Math.round(pct * 100)}%`}
                   style={{ width: 5, height: 26, borderRadius: 2, background: "rgba(0,0,0,0.05)", overflow: "hidden", position: "relative" }}>
@@ -1662,11 +1662,11 @@ function CategoryBudgetView({ catBreakdown, orcamentos, catIcon, isPJ, totals, o
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, fontWeight: 600 }}>
                     <div style={{ color: "var(--text-dim)", display: "flex", gap: 8 }}>
                       <span>{total ? `${((val / total) * 100).toFixed(1)}% do total` : ""}</span>
-                      {info.fixo > 0 && <span style={{ color: "#6366f1" }}>Fixo: {fmt(info.fixo)}</span>}
+                      {info.fixo > 0 && <span style={{ color: "#4BE277" }}>Fixo: {fmt(info.fixo)}</span>}
                       {info.variavel > 0 && <span style={{ color: "#f59e0b" }}>Var: {fmt(info.variavel)}</span>}
                     </div>
                     {hasOrc && (
-                      <div style={{ color: overBudget ? "#ef4444" : "#10b981" }}>
+                      <div style={{ color: overBudget ? "#ef4444" : "#4BE277" }}>
                         {overBudget ? `+${fmt(val - orc)}` : `${fmt(orc - val)} de limite`}
                       </div>
                     )}
@@ -1694,27 +1694,27 @@ function CostDistributionCard({ data, isPJ, catIcon }) {
         <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
           Distribuição: Fixo vs Variável
         </div>
-        <div className="tag" style={{ fontSize: 10, background: "rgba(99,102,241,0.1)", color: "#6366f1", borderColor: "rgba(99,102,241,0.2)" }}>
+        <div className="tag" style={{ fontSize: 10, background: "rgba(75,226,119,0.1)", color: "#4BE277", borderColor: "rgba(75,226,119,0.2)" }}>
           {isPJ ? "Empresa" : "Pessoal"}
         </div>
       </div>
 
       <div style={{ marginBottom: 20 }}>
         <div style={{ height: 24, background: "var(--divider)", borderRadius: 8, overflow: "hidden", display: "flex", marginBottom: 8 }}>
-          <div style={{ width: `${fixoPct}%`, background: "#6366f1", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>
+          <div style={{ width: `${fixoPct}%`, background: "#4BE277", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#0a0a0a", fontSize: 10, fontWeight: 800 }}>
             {fixoPct > 15 && `${fixoPct.toFixed(0)}% FIXO`}
           </div>
-          <div style={{ width: `${variavelPct}%`, background: "#f59e0b", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>
+          <div style={{ width: `${variavelPct}%`, background: "#38bdf8", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#0a0a0a", fontSize: 10, fontWeight: 800 }}>
             {variavelPct > 15 && `${variavelPct.toFixed(0)}% VARIÁVEL`}
           </div>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 2, background: "#6366f1" }} />
+            <div style={{ width: 8, height: 8, borderRadius: 2, background: "#4BE277" }} />
             <span style={{ color: "var(--text-dim)" }}>Fixo:</span> {fmt(data.fixo)}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 2, background: "#f59e0b" }} />
+            <div style={{ width: 8, height: 8, borderRadius: 2, background: "#38bdf8" }} />
             <span style={{ color: "var(--text-dim)" }}>Variável:</span> {fmt(data.variavel)}
           </div>
         </div>
@@ -1947,7 +1947,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           }
 
           const colors = {
-            info: { bg: "rgba(99,102,241,0.1)", border: "rgba(99,102,241,0.2)", text: "#6366f1" },
+            info: { bg: "rgba(75,226,119,0.1)", border: "rgba(75,226,119,0.2)", text: "#4BE277" },
             warning: { bg: "#fffbeb", border: "#fef3c7", text: "#d97706" },
             danger: { bg: "#fef2f2", border: "#fee2e2", text: "#ef4444" }
           }[alertType];
@@ -2018,7 +2018,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                 <div style={{ fontSize: 11, color: "var(--text-dim)", fontWeight: 600, paddingBottom: 4 }}>atingido</div>
               </div>
               <div style={{ height: 10, background: "var(--divider)", borderRadius: 99, overflow: "hidden", marginBottom: 10 }}>
-                <div style={{ height: "100%", width: `${Math.min(pctMeta, 100)}%`, background: pctMeta >= 100 ? "#4BE277" : "#6366f1", borderRadius: 99, transition: "width 1s ease" }} />
+                <div style={{ height: "100%", width: `${Math.min(pctMeta, 100)}%`, background: pctMeta >= 100 ? "#4BE277" : "#38bdf8", borderRadius: 99, transition: "width 1s ease" }} />
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: "var(--text-muted)" }}>
                 <span>{fmt(totals.totalLiq)}</span>
@@ -2026,10 +2026,10 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               </div>
             </div>
 
-            <div className="card" style={{ padding: "24px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "4px solid #10b981" }}>
+            <div className="card" style={{ padding: "24px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "4px solid #4BE277" }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>Pró-labore Recomendado</div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
-                <div style={{ fontSize: 24, fontWeight: 800, color: "#10b981", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(pjStats.prolaboreSugerido)}</div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: "#4BE277", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(pjStats.prolaboreSugerido)}</div>
               </div>
               <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 600, lineHeight: 1.4 }}>
                 {totals.resultado > 0 
@@ -2076,7 +2076,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
         <div className="hide-mobile" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <div className="card" style={{ padding: "24px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-              <div style={{ color: "#a855f7" }}><IconPie size={18} /></div>
+              <div style={{ color: "#4BE277" }}><IconPie size={18} /></div>
               <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", textTransform: "uppercase" }}>Conversão por Categoria</div>
             </div>
             <div style={{ height: 200, width: "100%", display: "flex", alignItems: "center" }}>
@@ -2149,7 +2149,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <div style={{ color: "#6366f1" }}>⚖️</div>
+              <div style={{ color: "#4BE277" }}>⚖️</div>
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase" }}>Custo Base</div>
             </div>
             <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)" }}>
@@ -2159,7 +2159,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           </div>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <div style={{ color: "#6366f1" }}>💰</div>
+              <div style={{ color: "#4BE277" }}>💰</div>
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase" }}>Taxa Economia</div>
             </div>
             <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: pfStats.taxaEconomia > 15 ? "#4BE277" : "var(--text)" }}>
@@ -2180,7 +2180,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
           {/* Donut 50/30/20 */}
           <div className="card" style={{ padding: "24px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-              <div style={{ color: "#a855f7" }}><IconPie size={18} /></div>
+              <div style={{ color: "#4BE277" }}><IconPie size={18} /></div>
               <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", textTransform: "uppercase" }}>Regra 50 / 30 / 20</div>
             </div>
             <div style={{ height: 260, width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -2222,7 +2222,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "var(--text-dim)", fontWeight: 600 }} />
                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "var(--text-dim)", fontFamily: "'JetBrains Mono',monospace" }} />
                     <Tooltip contentStyle={{ background: "var(--text)", border: "none", borderRadius: 10, color: "var(--bg)", fontSize: 12, fontWeight: 600 }} formatter={(val) => fmt(val)} />
-                    <Line type="monotone" dataKey="gasto" stroke="#6366f1" strokeWidth={3} dot={{ fill: "#6366f1", r: 4 }} />
+                    <Line type="monotone" dataKey="gasto" stroke="#38bdf8" strokeWidth={3} dot={{ fill: "#38bdf8", r: 4 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -2241,7 +2241,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                         <div style={{ fontSize: 12, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace" }}>{fmt(val)} <span style={{ color: "var(--text-dim)", fontSize: 10, marginLeft: 4 }}>({pct.toFixed(1)}%)</span></div>
                       </div>
                       <div style={{ height: 6, background: "var(--divider)", borderRadius: 99, overflow: "hidden" }}>
-                        <div style={{ height: "100%", width: `${Math.min(pct, 100)}%`, background: "#6366f1", borderRadius: 99 }} />
+                        <div style={{ height: "100%", width: `${Math.min(pct, 100)}%`, background: "#4BE277", borderRadius: 99 }} />
                       </div>
                     </div>
                   );
@@ -2407,7 +2407,7 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
                 <span style={{ fontSize: 11, fontWeight: 800 }}>{fmtPct(progressoReserva)}</span>
               </div>
               <div style={{ height: 6, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>
-                <div style={{ width: `${progressoReserva}%`, height: "100%", background: progressoReserva >= 100 ? "#10b981" : "#6366f1", transition: "width 0.8s ease" }} />
+                <div style={{ width: `${progressoReserva}%`, height: "100%", background: progressoReserva >= 100 ? "#4BE277" : "#4BE277", transition: "width 0.8s ease" }} />
               </div>
             </div>
           </div>
@@ -2450,13 +2450,13 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
             <div style={{ width: "100%", height: 300 }}>
               <ResponsiveContainer>
                 <AreaChart data={hist}>
-                  <defs><linearGradient id="colorGastos" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/><stop offset="95%" stopColor="#6366f1" stopOpacity={0}/></linearGradient></defs>
+                  <defs><linearGradient id="colorGastos" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#4BE277" stopOpacity={0.3}/><stop offset="95%" stopColor="#4BE277" stopOpacity={0}/></linearGradient></defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--divider)" />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "var(--text-muted)" }} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "var(--text-muted)" }} tickFormatter={v => `R$ ${v}`} />
                   <Tooltip contentStyle={{ background: "var(--card)", borderRadius: 12, border: "1px solid var(--border)" }} />
-                  <Area type="monotone" dataKey="Gastos" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorGastos)" />
-                  <Area type="monotone" dataKey="Investimento" stroke="#10b981" strokeWidth={2} fillOpacity={0} />
+                  <Area type="monotone" dataKey="Gastos" stroke="#4BE277" strokeWidth={3} fillOpacity={1} fill="url(#colorGastos)" />
+                  <Area type="monotone" dataKey="Investimento" stroke="#4BE277" strokeWidth={2} fillOpacity={0} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -2530,7 +2530,7 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
           </div>
           <div style={{ background: "var(--bg)", borderRadius: 12, padding: "12px", border: "1px solid var(--border)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span style={{ fontSize: 11, fontWeight: 700 }}>Meta: {fmt(totalCustoFixo)}</span><span style={{ fontSize: 11, fontWeight: 800 }}>{fmtPct(progressoCobertura)}</span></div>
-            <div style={{ height: 6, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}><div style={{ width: `${progressoCobertura}%`, height: "100%", background: "#10b981", transition: "width 0.8s ease" }} /></div>
+            <div style={{ height: 6, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}><div style={{ width: `${progressoCobertura}%`, height: "100%", background: "#4BE277", transition: "width 0.8s ease" }} /></div>
           </div>
         </div>
         <div className="card" style={{ padding: "24px 28px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
@@ -2542,7 +2542,7 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
             </div>
             <div style={{ marginTop: 16 }}>
               <div style={{ fontSize: 11, color: "var(--text-muted)" }}>Margem Operacional</div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: margemOp > 30 ? "#10b981" : "#6366f1" }}>{fmtPct(margemOp)}</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: margemOp > 30 ? "#4BE277" : "#4BE277" }}>{fmtPct(margemOp)}</div>
             </div>
           </div>
           <div>
@@ -2568,7 +2568,7 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "var(--text-muted)" }} tickFormatter={v => `R$ ${v}`} />
               <Tooltip cursor={{ fill: 'var(--row-hover)' }} contentStyle={{ background: "var(--card)", borderRadius: 12, border: "1px solid var(--border)" }} />
               <Legend verticalAlign="top" height={36}/>
-              <Bar dataKey="Receita" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Receita" fill="#4BE277" radius={[4, 4, 0, 0]} />
               <Bar dataKey="Despesas" fill="#f87171" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -2589,7 +2589,7 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
               <span>2. Deduções (Serviços/Taxas)</span><strong style={{ color: "#ef4444" }}>−{fmt(dreDeducoes)}</strong>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 700, padding: "8px 0", borderTop: "1px dashed var(--divider)", borderBottom: "1px dashed var(--divider)" }}>
-              <span>(=) 3. Receita Líquida</span><strong style={{ color: "#10b981" }}>{fmt(dreRecLiq)}</strong>
+              <span>(=) 3. Receita Líquida</span><strong style={{ color: "#4BE277" }}>{fmt(dreRecLiq)}</strong>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
               <span>4. Custos e Despesas PJ</span><strong style={{ color: "#ef4444" }}>−{fmt(dreDesp)}</strong>
@@ -2602,7 +2602,7 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800, paddingTop: 12, borderTop: "1px solid var(--text)" }}>
               <span>(=) Resultado Final</span>
-              <strong style={{ color: dreLucroLiq >= 0 ? "#10b981" : "#ef4444" }}>{fmt(dreLucroLiq)}</strong>
+              <strong style={{ color: dreLucroLiq >= 0 ? "#4BE277" : "#ef4444" }}>{fmt(dreLucroLiq)}</strong>
             </div>
           </div>
         </div>
@@ -2618,7 +2618,7 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
               <span style={{ fontSize: 12, fontWeight: 800, color: "var(--text)" }}>{fmtPct(pctTeto)}</span>
             </div>
             <div style={{ height: 8, background: "var(--border)", borderRadius: 4, overflow: "hidden", marginBottom: 16 }}>
-              <div style={{ width: `${Math.min(pctTeto, 100)}%`, height: "100%", background: pctTeto > 90 ? "#ef4444" : pctTeto > 75 ? "#f59e0b" : "#6366f1", borderRadius: 4, transition: "width 0.5s ease" }} />
+              <div style={{ width: `${Math.min(pctTeto, 100)}%`, height: "100%", background: pctTeto > 90 ? "#ef4444" : pctTeto > 75 ? "#f59e0b" : "#4BE277", borderRadius: 4, transition: "width 0.5s ease" }} />
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -2633,8 +2633,8 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
             </div>
           </div>
 
-          <div style={{ background: "rgba(99,102,241,0.08)", border: "1px dashed rgba(99,102,241,0.3)", borderRadius: 12, padding: "16px" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#6366f1", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 }}>Recomendação</div>
+          <div style={{ background: "rgba(75,226,119,0.08)", border: "1px dashed rgba(75,226,119,0.3)", borderRadius: 12, padding: "16px" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#4BE277", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 }}>Recomendação</div>
             <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.4 }}>
               Para não exceder o limite até o final do ano ({remMonthsAno} meses restantes), seu faturamento não deve ultrapassar a média de <strong style={{ color: "var(--text)", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(medParaNaoEstourar)}/mês</strong>.
             </div>
@@ -2777,7 +2777,7 @@ export default function App() {
     if (!session) return;
     const { error: dErr } = await supabase.from('categorias_config').delete().eq('user_id', session.user.id).eq('tipo', 'venda');
     if (dErr) { showToast("Erro ao sincronizar categorias: " + dErr.message); return; }
-    const { error: iErr } = await supabase.from('categorias_config').insert(newCats.map(c => ({ label: c.label, icon: c.icon, color: CAT_COLORS[c.label] || "#6366f1", tipo: 'venda', user_id: session.user.id })));
+    const { error: iErr } = await supabase.from('categorias_config').insert(newCats.map(c => ({ label: c.label, icon: c.icon, color: CAT_COLORS[c.label] || "#4BE277", tipo: 'venda', user_id: session.user.id })));
     if (iErr) showToast("Erro ao salvar categorias: " + iErr.message);
   };
 
@@ -2786,7 +2786,7 @@ export default function App() {
     if (!session) return;
     const { error: dErr } = await supabase.from('categorias_config').delete().eq('user_id', session.user.id).eq('tipo', 'pj');
     if (dErr) { showToast("Erro ao sincronizar categorias PJ: " + dErr.message); return; }
-    const { error: iErr } = await supabase.from('categorias_config').insert(newCats.map(c => ({ label: c.label, icon: c.icon, color: CAT_COLORS[c.label] || "#6366f1", tipo: 'pj', user_id: session.user.id })));
+    const { error: iErr } = await supabase.from('categorias_config').insert(newCats.map(c => ({ label: c.label, icon: c.icon, color: CAT_COLORS[c.label] || "#4BE277", tipo: 'pj', user_id: session.user.id })));
     if (iErr) showToast("Erro ao salvar categorias PJ: " + iErr.message);
   };
 
@@ -2795,7 +2795,7 @@ export default function App() {
     if (!session) return;
     const { error: dErr } = await supabase.from('categorias_config').delete().eq('user_id', session.user.id).eq('tipo', 'pf');
     if (dErr) { showToast("Erro ao sincronizar categorias PF: " + dErr.message); return; }
-    const { error: iErr } = await supabase.from('categorias_config').insert(newCats.map(c => ({ label: c.label, icon: c.icon, color: CAT_COLORS[c.label] || "#6366f1", tipo: 'pf', user_id: session.user.id })));
+    const { error: iErr } = await supabase.from('categorias_config').insert(newCats.map(c => ({ label: c.label, icon: c.icon, color: CAT_COLORS[c.label] || "#4BE277", tipo: 'pf', user_id: session.user.id })));
     if (iErr) showToast("Erro ao salvar categorias PF: " + iErr.message);
   };
   // Budgets: {[categoria]: number }
@@ -3142,9 +3142,9 @@ export default function App() {
     const sVal = currentGastos.filter(g => savingsArr.includes(g.categoria)).reduce((s, g) => s + g.valor, 0);
 
     const rule503020 = [
-      { name: "Essenciais", value: nVal, color: "#6366f1", target: 50 },
-      { name: "Estilo Vida", value: wVal, color: "#f59e0b", target: 30 },
-      { name: "Investimento", value: sVal, color: "#10b981", target: 20 },
+      { name: "Essenciais", value: nVal, color: "#4BE277", target: 50 },
+      { name: "Estilo Vida", value: wVal, color: "#38bdf8", target: 30 },
+      { name: "Investimento", value: sVal, color: "#2dd4bf", target: 20 },
     ];
 
     // ── Reserva de Emergência Inteligente ──
@@ -3510,7 +3510,7 @@ export default function App() {
         return <div style={{ fontSize: 13, fontWeight: 700, color: "#4BE277", fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap" }}>{fmt(c.liquido)}</div>;
       }
     },
-    { label: "Status", w: "1.2fr", render: r => { const s = STATUS_STYLE[r.status]; return <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span className="tag" style={{ background: s.bg, borderColor: s.border, color: s.color }}>{s.label}</span>{r.nf && <span style={{ fontSize: 9, fontWeight: 800, background: "rgba(99,102,241,0.15)", color: "#6366f1", padding: "2px 6px", borderRadius: 4, border: "1px solid rgba(99,102,241,0.3)" }}>NF</span>}</div>; } },
+    { label: "Status", w: "1.2fr", render: r => { const s = STATUS_STYLE[r.status]; return <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span className="tag" style={{ background: s.bg, borderColor: s.border, color: s.color }}>{s.label}</span>{r.nf && <span style={{ fontSize: 9, fontWeight: 800, background: "rgba(75,226,119,0.15)", color: "#4BE277", padding: "2px 6px", borderRadius: 4, border: "1px solid rgba(75,226,119,0.3)" }}>NF</span>}</div>; } },
   ];
 
   const despesasCols = [
@@ -4307,7 +4307,7 @@ export default function App() {
                     </div>
                     <div style={{ fontSize: 12, color: "var(--text-dim)", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                       <span>Método: <strong style={{ color: "var(--text)" }}>{r.metodo}</strong></span>
-                      {r.nf && <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(99,102,241,0.15)", color: "#6366f1", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(99,102,241,0.3)" }}>📄 NF Emitida</span>}
+                      {r.nf && <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(75,226,119,0.15)", color: "#4BE277", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(75,226,119,0.3)" }}>📄 NF Emitida</span>}
                       {r.obs && <span>· {r.obs}</span>}
                     </div>
                   </div>
