@@ -49,12 +49,12 @@ const BANCOS_DEFAULT = [
   { nome: "BTG Pactual", color: "#001e62", icon: "🔵" }
 ];
 const CAT_COLORS = {
-  "Serviço prestado": "#6366f1", "Produto vendido": "#8b5cf6", "Consultoria": "#a855f7", "Comissão": "#d946ef",
-  "Ferramentas / SaaS": "#06b6d4", "Marketing": "#f97316", "Impostos / DAS": "#ef4444", "Educação": "#10b981",
-  "Equipamento": "#3b82f6", "Outro PJ": "#64748b",
-  "Alimentação": "#f59e0b", "Moradia": "#6366f1", "Transporte": "#3b82f6", "Lazer": "#10b981",
-  "Saúde": "#ec4899", "Compras": "#f97316", "Streaming": "#a855f7",
-  "Investimentos": "#14b8a6", "Outros": "#94a3b8",
+  "Serviço prestado": "#4BE277", "Produto vendido": "#38bdf8", "Consultoria": "#2dd4bf", "Comissão": "#a78bfa",
+  "Ferramentas / SaaS": "#06b6d4", "Marketing": "#fb923c", "Impostos / DAS": "#ef4444", "Educação": "#34d399",
+  "Equipamento": "#38bdf8", "Outro PJ": "#94a3b8",
+  "Alimentação": "#fbbf24", "Moradia": "#38bdf8", "Transporte": "#06b6d4", "Lazer": "#34d399",
+  "Saúde": "#f472b6", "Compras": "#fb923c", "Streaming": "#a78bfa",
+  "Investimentos": "#2dd4bf", "Outros": "#94a3b8",
 };
 const STATUS_STYLE = {
   recebido: { bg: "#0d1f14", border: "#166534", color: "#4BE277", label: "Recebido" },
@@ -3474,7 +3474,7 @@ export default function App() {
   // ── Summary cards config ──
   const summaryCards = isPJ ? [
     { label: "Faturamento Total", value: fmt(totals.totalBruto), sub: "Antes das taxas", accent: "#4BE277" },
-    { label: "Lucro Real", value: fmt(totals.resultado), sub: `Margem: ${fmtPct(pjStats.margemLucro)}`, accent: "#4BE277" },
+    { label: "Lucro Real", value: fmt(totals.resultado), sub: `Margem: ${fmtPct(pjStats.margemLucro)}`, accent: "#38bdf8" },
     { label: "Custo Fixo PJ", value: fmt(totals.totalDesp), sub: "despesas recorrentes", accent: "#ef4444" },
     { label: "Ticket Médio", value: fmt(pjStats.ticketMedio), sub: "valor por venda", accent: "#aaa" },
   ] : (() => {
@@ -3607,7 +3607,7 @@ export default function App() {
       <header className="top-bar">
         <div style={{ display: "flex", alignItems: "center", gap: 24, flex: 1 }}>
           <div style={{ cursor: "pointer" }} onClick={handleGoHome}>
-            <div style={{ fontSize: 18, fontWeight: 800, color: "#f5f2ed", letterSpacing: "-0.5px" }}>Finanças Mei</div>
+            <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.5px" }}><span style={{ color: "#f5f2ed" }}>Finanças </span><span style={{ color: "#4BE277", fontStyle: "italic" }}>Mei</span></div>
             <div className="hide-mobile" style={{ fontSize: 9, color: "#666", fontWeight: 700, marginTop: -2, letterSpacing: "0.2px" }}>Controle financeiro MEI</div>
           </div>
         </div>
