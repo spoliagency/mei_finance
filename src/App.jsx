@@ -57,8 +57,8 @@ const CAT_COLORS = {
   "Investimentos": "#14b8a6", "Outros": "#94a3b8",
 };
 const STATUS_STYLE = {
-  recebido: { bg: "#052e16", border: "#166534", color: "#4ade80", label: "Recebido" },
-  pago: { bg: "#052e16", border: "#166534", color: "#4ade80", label: "Pago" },
+  recebido: { bg: "#0d1f14", border: "#166534", color: "#4BE277", label: "Recebido" },
+  pago: { bg: "#0d1f14", border: "#166534", color: "#4BE277", label: "Pago" },
   pendente: { bg: "#1c1400", border: "#713f12", color: "#facc15", label: "Pendente" },
   cancelado: { bg: "#1f0a0a", border: "#7f1d1d", color: "#f87171", label: "Cancelado" },
 };
@@ -175,21 +175,21 @@ const CSS = `
   }
 
   .dark {
-    --bg: #111111;
-    --card: #1a1a1a;
+    --bg: #0a0a0a;
+    --card: #111111;
     --text: #f5f2ed;
     --text-muted: #aaa;
     --text-dim: #666;
-    --border: #2a2a2a;
-    --input-bg: #222222;
-    --sidebar-bg: #141414;
-    --sidebar-active: #f5f2ed;
-    --sidebar-active-text: #1a1a1a;
-    --row-hover: #222222;
-    --modal-bg: #1a1a1a;
-    --divider: #2a2a2a;
-    --filter-btn-border: #333333;
-    --tag-bg: #222222;
+    --border: #1a1a1a;
+    --input-bg: #111111;
+    --sidebar-bg: #0a0a0a;
+    --sidebar-active: #4BE277;
+    --sidebar-active-text: #0a0a0a;
+    --row-hover: #141414;
+    --modal-bg: #111111;
+    --divider: #1a1a1a;
+    --filter-btn-border: #222222;
+    --tag-bg: #141414;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -209,7 +209,7 @@ const CSS = `
   .btn-danger { background: #fff0f0; color: #c0392b; border: 1.5px solid #fcc; }
   .dark .btn-danger { background: #2d1a1a; border-color: #552222; }
   
-  .btn-green { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+  .btn-green { background: #0d1f14; color: #4BE277; border: 1px solid #166534; }
   
   .btn-icon { background: none; border: none; cursor: pointer; padding: 6px; border-radius: 8px; transition: background 0.15s; display: flex; align-items: center; justify-content: center; color: var(--text-dim); }
   .btn-icon:hover { background: var(--row-hover); color: var(--text); }
@@ -473,6 +473,9 @@ const CSS = `
     text-transform: uppercase;
     letter-spacing: 1.5px;
     padding: 16px 16px 6px;
+  }
+  .dark .sidebar-section-label {
+    color: #4BE277;
   }
   .app-content {
     flex: 1;
@@ -1341,7 +1344,7 @@ function ConfigPage({ activeSection = "perfil", categoriasVendas, setCategoriasV
                 <input className="input" placeholder="Ex: João Silva Consultoria" value={draftPerfil.empresa || ""} onChange={e => setDraftPerfil(p => ({ ...p, empresa: e.target.value }))} />
               </div>
               <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 4, gap: 10, alignItems: "center" }}>
-                {savedFeedback && <div style={{ fontSize: 11, color: "#16a34a", fontWeight: 700 }}>✓ Dados salvos com sucesso!</div>}
+                {savedFeedback && <div style={{ fontSize: 11, color: "#4BE277", fontWeight: 700 }}>✓ Dados salvos com sucesso!</div>}
                 <button className="btn btn-dark" onClick={savePerfil} style={{ padding: "8px 24px" }}>Salvar alterações</button>
               </div>
             </div>
@@ -1413,7 +1416,7 @@ function ConfigPage({ activeSection = "perfil", categoriasVendas, setCategoriasV
                 <div
                   onClick={() => setDraftPerfil(p => ({ ...p, isMei: p.isMei === undefined ? false : !p.isMei }))}
                   style={{
-                    width: 44, height: 24, borderRadius: 20, background: (draftPerfil.isMei === undefined || draftPerfil.isMei) ? "#16a34a" : "#ccc", padding: 3, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center",
+                    width: 44, height: 24, borderRadius: 20, background: (draftPerfil.isMei === undefined || draftPerfil.isMei) ? "#4BE277" : "#ccc", padding: 3, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center",
                     justifyContent: (draftPerfil.isMei === undefined || draftPerfil.isMei) ? "flex-end" : "flex-start"
                   }}>
                   <div style={{ width: 18, height: 18, borderRadius: 99, background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
@@ -1448,7 +1451,7 @@ function ConfigPage({ activeSection = "perfil", categoriasVendas, setCategoriasV
                 <div
                   onClick={() => setDraftPerfil(p => ({ ...p, dasDashAlerts: p.dasDashAlerts === undefined ? false : !p.dasDashAlerts }))}
                   style={{
-                    width: 44, height: 24, borderRadius: 20, background: (draftPerfil.dasDashAlerts === undefined || draftPerfil.dasDashAlerts) ? "#16a34a" : "#ccc", padding: 3, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center",
+                    width: 44, height: 24, borderRadius: 20, background: (draftPerfil.dasDashAlerts === undefined || draftPerfil.dasDashAlerts) ? "#4BE277" : "#ccc", padding: 3, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center",
                     justifyContent: (draftPerfil.dasDashAlerts === undefined || draftPerfil.dasDashAlerts) ? "flex-end" : "flex-start"
                   }}>
                   <div style={{ width: 18, height: 18, borderRadius: 99, background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
@@ -1463,7 +1466,7 @@ function ConfigPage({ activeSection = "perfil", categoriasVendas, setCategoriasV
                 <div
                   onClick={() => setDraftPerfil(p => ({ ...p, dasEmailAlerts: p.dasEmailAlerts === undefined ? false : !p.dasEmailAlerts }))}
                   style={{
-                    width: 44, height: 24, borderRadius: 20, background: (draftPerfil.dasEmailAlerts === undefined || draftPerfil.dasEmailAlerts) ? "#16a34a" : "#ccc", padding: 3, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center",
+                    width: 44, height: 24, borderRadius: 20, background: (draftPerfil.dasEmailAlerts === undefined || draftPerfil.dasEmailAlerts) ? "#4BE277" : "#ccc", padding: 3, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center",
                     justifyContent: (draftPerfil.dasEmailAlerts === undefined || draftPerfil.dasEmailAlerts) ? "flex-end" : "flex-start"
                   }}>
                   <div style={{ width: 18, height: 18, borderRadius: 99, background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
@@ -1478,7 +1481,7 @@ function ConfigPage({ activeSection = "perfil", categoriasVendas, setCategoriasV
                 <div
                   onClick={() => setDraftPerfil(p => ({ ...p, darkMode: !p.darkMode }))}
                   style={{
-                    width: 44, height: 24, borderRadius: 20, background: draftPerfil.darkMode ? "#16a34a" : "#ccc", padding: 3, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center",
+                    width: 44, height: 24, borderRadius: 20, background: draftPerfil.darkMode ? "#4BE277" : "#ccc", padding: 3, cursor: "pointer", transition: "all 0.2s", display: "flex", alignItems: "center",
                     justifyContent: draftPerfil.darkMode ? "flex-end" : "flex-start"
                   }}>
                   <div style={{ width: 18, height: 18, borderRadius: 99, background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
@@ -1486,7 +1489,7 @@ function ConfigPage({ activeSection = "perfil", categoriasVendas, setCategoriasV
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 4, gap: 10, alignItems: "center" }}>
-                {savedFeedback && <div style={{ fontSize: 11, color: "#16a34a", fontWeight: 700 }}>✓ Preferências salvas!</div>}
+                {savedFeedback && <div style={{ fontSize: 11, color: "#4BE277", fontWeight: 700 }}>✓ Preferências salvas!</div>}
                 <button className="btn btn-dark" onClick={savePerfil} style={{ padding: "8px 24px" }}>Salvar alterações</button>
               </div>
             </div>
@@ -1586,7 +1589,7 @@ function CategoryBudgetView({ catBreakdown, orcamentos, catIcon, isPJ, totals, o
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 9, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 4 }}>Eficiência do Orçamento</div>
             <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>
-              <span style={{ color: withinBudget === withBudget.length ? "#16a34a" : "#f59e0b" }}>{withinBudget} de {withBudget.length}</span> categorias no limite
+              <span style={{ color: withinBudget === withBudget.length ? "#4BE277" : "#f59e0b" }}>{withinBudget} de {withBudget.length}</span> categorias no limite
             </div>
           </div>
           <div style={{ display: "flex", gap: 4, background: "var(--divider)", padding: "6px", borderRadius: 10 }}>
@@ -1983,7 +1986,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               </div>
               <div style={{ display: "flex", gap: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: 3, background: "#16a34a" }} />
+                  <div style={{ width: 10, height: 10, borderRadius: 3, background: "#4BE277" }} />
                   <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>Receita</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -1999,7 +2002,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "var(--text-dim)", fontWeight: 600 }} dy={10} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "var(--text-dim)", fontFamily: "'JetBrains Mono',monospace" }} />
                   <Tooltip cursor={{ fill: "var(--bg)" }} contentStyle={{ background: "var(--text)", border: "none", borderRadius: 10, color: "var(--bg)", fontSize: 12, fontWeight: 600, fontFamily: "'Syne',sans-serif" }} formatter={(val) => fmt(val)} />
-                  <Bar dataKey="receita" fill="#16a34a" radius={[4, 4, 0, 0]} barSize={24} />
+                  <Bar dataKey="receita" fill="#4BE277" radius={[4, 4, 0, 0]} barSize={24} />
                   <Bar dataKey="despesa" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={24} />
                 </BarChart>
               </ResponsiveContainer>
@@ -2015,7 +2018,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                 <div style={{ fontSize: 11, color: "var(--text-dim)", fontWeight: 600, paddingBottom: 4 }}>atingido</div>
               </div>
               <div style={{ height: 10, background: "var(--divider)", borderRadius: 99, overflow: "hidden", marginBottom: 10 }}>
-                <div style={{ height: "100%", width: `${Math.min(pctMeta, 100)}%`, background: pctMeta >= 100 ? "#16a34a" : "#6366f1", borderRadius: 99, transition: "width 1s ease" }} />
+                <div style={{ height: "100%", width: `${Math.min(pctMeta, 100)}%`, background: pctMeta >= 100 ? "#4BE277" : "#6366f1", borderRadius: 99, transition: "width 1s ease" }} />
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: "var(--text-muted)" }}>
                 <span>{fmt(totals.totalLiq)}</span>
@@ -2060,7 +2063,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                 <div style={{ fontSize: 11, fontWeight: 700, color: pjStats.pctLimiteMEI > 80 ? "#ef4444" : "var(--text-muted)" }}>{Math.round(pjStats.pctLimiteMEI)}%</div>
               </div>
               <div style={{ height: 6, background: "var(--divider)", borderRadius: 99, overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${Math.min(pjStats.pctLimiteMEI, 100)}%`, background: pjStats.pctLimiteMEI > 85 ? "#ef4444" : pjStats.pctLimiteMEI > 50 ? "#f59e0b" : "#16a34a", borderRadius: 99, transition: "width 0.4s ease" }} />
+                <div style={{ height: "100%", width: `${Math.min(pjStats.pctLimiteMEI, 100)}%`, background: pjStats.pctLimiteMEI > 85 ? "#ef4444" : pjStats.pctLimiteMEI > 50 ? "#f59e0b" : "#4BE277", borderRadius: 99, transition: "width 0.4s ease" }} />
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "var(--text-dim)", marginTop: 6, fontWeight: 600 }}>
                 <span>{fmt(pjStats.anualComNF)} faturado com NF</span>
@@ -2133,11 +2136,11 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
         <div className="mobile-summary-grid hide-mobile" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
           <div className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <div style={{ color: "#16a34a" }}>🛡️</div>
+              <div style={{ color: "#4BE277" }}>🛡️</div>
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase" }}>Meses Seguros</div>
             </div>
             {pfStats.hasMediaData ? (
-              <div style={{ fontSize: 18, fontWeight: 800, color: pfStats.reservaMeses >= pfStats.metaReservaMeses ? "#16a34a" : "#f59e0b", fontFamily: "'JetBrains Mono',monospace" }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: pfStats.reservaMeses >= pfStats.metaReservaMeses ? "#4BE277" : "#f59e0b", fontFamily: "'JetBrains Mono',monospace" }}>
                 {pfStats.reservaMeses.toFixed(1)} meses
               </div>
             ) : (
@@ -2159,7 +2162,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               <div style={{ color: "#6366f1" }}>💰</div>
               <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase" }}>Taxa Economia</div>
             </div>
-            <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: pfStats.taxaEconomia > 15 ? "#16a34a" : "var(--text)" }}>
+            <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: pfStats.taxaEconomia > 15 ? "#4BE277" : "var(--text)" }}>
               {fmtPct(pfStats.taxaEconomia)}
             </div>
           </div>
@@ -2256,15 +2259,15 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 10 }}>
                   <div>
                     <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 700 }}>MESES PROTEGIDOS</div>
-                    <div style={{ fontSize: 22, fontWeight: 800, color: pfStats.reservaMeses >= pfStats.metaReservaMeses ? "#16a34a" : "#f59e0b", fontFamily: "'JetBrains Mono',monospace" }}>{pfStats.reservaMeses.toFixed(1)} / {pfStats.metaReservaMeses}</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: pfStats.reservaMeses >= pfStats.metaReservaMeses ? "#4BE277" : "#f59e0b", fontFamily: "'JetBrains Mono',monospace" }}>{pfStats.reservaMeses.toFixed(1)} / {pfStats.metaReservaMeses}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 700 }}>GUARDADO</div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "#16a34a", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(pfStats.reservaAtualVal)}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "#4BE277", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(pfStats.reservaAtualVal)}</div>
                   </div>
                 </div>
                 <div style={{ height: 8, background: "var(--divider)", borderRadius: 99, overflow: "hidden", marginBottom: 10 }}>
-                  <div style={{ height: "100%", width: `${Math.min((pfStats.reservaMeses / pfStats.metaReservaMeses) * 100, 100)}%`, background: pfStats.reservaMeses >= pfStats.metaReservaMeses ? "#16a34a" : "#f59e0b", borderRadius: 99, transition: "width 0.4s ease" }} />
+                  <div style={{ height: "100%", width: `${Math.min((pfStats.reservaMeses / pfStats.metaReservaMeses) * 100, 100)}%`, background: pfStats.reservaMeses >= pfStats.metaReservaMeses ? "#4BE277" : "#f59e0b", borderRadius: 99, transition: "width 0.4s ease" }} />
                 </div>
                 <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 600, marginBottom: 12 }}>
                   Média mensal: {fmt(pfStats.mediaFinal)} · {
@@ -2276,11 +2279,11 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                   {pfStats.metas.map(m => (
-                    <div key={m.meses} style={{ padding: "10px", background: "var(--bg)", borderRadius: 10, textAlign: "center", border: m.atingido ? "1.5px solid #16a34a" : "1px solid var(--divider)" }}>
-                      <div style={{ fontSize: 9, fontWeight: 800, color: m.atingido ? "#16a34a" : "var(--text-dim)", textTransform: "uppercase", marginBottom: 4 }}>{m.meses} meses</div>
+                    <div key={m.meses} style={{ padding: "10px", background: "var(--bg)", borderRadius: 10, textAlign: "center", border: m.atingido ? "1.5px solid #4BE277" : "1px solid var(--divider)" }}>
+                      <div style={{ fontSize: 9, fontWeight: 800, color: m.atingido ? "#4BE277" : "var(--text-dim)", textTransform: "uppercase", marginBottom: 4 }}>{m.meses} meses</div>
                       <div style={{ fontSize: 12, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: "var(--text)", marginBottom: 2 }}>{fmt(m.necessario)}</div>
                       {m.atingido
-                        ? <div style={{ fontSize: 9, fontWeight: 700, color: "#16a34a" }}>✓ Atingido</div>
+                        ? <div style={{ fontSize: 9, fontWeight: 700, color: "#4BE277" }}>✓ Atingido</div>
                         : <div style={{ fontSize: 9, fontWeight: 700, color: "#ef4444" }}>Falta {fmt(m.falta)}</div>
                       }
                     </div>
@@ -2294,7 +2297,7 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                     Registre gastos pessoais ou defina sua<br />média mensal em <strong>⚙ Preferências</strong>
                   </div>
                   {pfStats.reservaAtualVal > 0 && (
-                    <div style={{ marginTop: 12, fontSize: 12, fontWeight: 700, color: "#16a34a" }}>Guardado: {fmt(pfStats.reservaAtualVal)}</div>
+                    <div style={{ marginTop: 12, fontSize: 12, fontWeight: 700, color: "#4BE277" }}>Guardado: {fmt(pfStats.reservaAtualVal)}</div>
                   )}
                 </div>
               )}
@@ -2418,7 +2421,7 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
               <div style={{ fontSize: 11, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Ref: Pro-labore {fmt(prolabore)}</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ flex: 1, padding: "1px 8px", borderRadius: 6, background: "rgba(22,163,74,0.1)", color: "#16a34a", fontSize: 10, fontWeight: 800, textAlign: "center" }}>
+              <div style={{ flex: 1, padding: "1px 8px", borderRadius: 6, background: "rgba(22,163,74,0.1)", color: "#4BE277", fontSize: 10, fontWeight: 800, textAlign: "center" }}>
                 {progressoCustoVida >= 100 ? "LUCRO PF" : "DÉFICIT PF"}
               </div>
               <div style={{ fontSize: 11, fontWeight: 800, color: "var(--text-muted)" }}>{fmtPct(progressoCustoVida)}</div>
@@ -2432,7 +2435,7 @@ function ReportsView({ vendas, despesas, gastos, orcamentos, dateRange, isPJ, pe
               <div style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", width: 100, height: 100, marginBottom: 12 }}>
                 <svg width="100" height="100" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="44" stroke="var(--divider)" strokeWidth="6" fill="none" />
-                  <circle cx="50" cy="50" r="44" stroke="#16a34a" strokeWidth="8" fill="none" strokeDasharray="276" strokeDashoffset={276 - (276 * eficienciaOrc / 100)} strokeLinecap="round" transform="rotate(-90 50 50)" style={{ transition: "stroke-dashoffset 1s ease" }} />
+                  <circle cx="50" cy="50" r="44" stroke="#4BE277" strokeWidth="8" fill="none" strokeDasharray="276" strokeDashoffset={276 - (276 * eficienciaOrc / 100)} strokeLinecap="round" transform="rotate(-90 50 50)" style={{ transition: "stroke-dashoffset 1s ease" }} />
                 </svg>
                 <div style={{ position: "absolute", fontSize: 18, fontWeight: 800, color: "var(--text)" }}>{Math.round(eficienciaOrc)}%</div>
               </div>
@@ -3470,10 +3473,10 @@ export default function App() {
 
   // ── Summary cards config ──
   const summaryCards = isPJ ? [
-    { label: "Faturamento Total", value: fmt(totals.totalBruto), sub: "Antes das taxas", accent: "#16a34a" },
-    { label: "Lucro Real", value: fmt(totals.resultado), sub: `Margem: ${fmtPct(pjStats.margemLucro)}`, accent: "#6366f1" },
+    { label: "Faturamento Total", value: fmt(totals.totalBruto), sub: "Antes das taxas", accent: "#4BE277" },
+    { label: "Lucro Real", value: fmt(totals.resultado), sub: `Margem: ${fmtPct(pjStats.margemLucro)}`, accent: "#4BE277" },
     { label: "Custo Fixo PJ", value: fmt(totals.totalDesp), sub: "despesas recorrentes", accent: "#ef4444" },
-    { label: "Ticket Médio", value: fmt(pjStats.ticketMedio), sub: "valor por venda", accent: "#f59e0b" },
+    { label: "Ticket Médio", value: fmt(pjStats.ticketMedio), sub: "valor por venda", accent: "#aaa" },
   ] : (() => {
     const pfOrcTotal = (categoriasPF || []).reduce((acc, c) => acc + (orcamentos?.[c.label] || 0), 0);
     const totalCustoFixoPF = (perfil.custosFixosPF || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
@@ -3482,10 +3485,10 @@ export default function App() {
     const custoBase = totalCustoFixoPF > 0 ? totalCustoFixoPF : (pl > 0 ? pl : (pfOrcTotal > 0 ? pfOrcTotal : (pjProfit > 0 ? pjProfit : (parseFloat(perfil.mediaGastoManual) || 0))));
 
     return [
-      { label: "Total Gasto", value: fmt(totals.totalGastos), sub: `Fixo: ${fmt(totals.totalGastosFixo)} · Var: ${fmt(totals.totalGastosVariavel)}`, accent: "#6366f1" },
-      { label: "Disponível", value: fmt(Math.max(0, custoBase - totals.totalGastos)), sub: custoBase === pjProfit ? "baseado no lucro PJ" : "até o fim do mês", accent: "#4ade80" },
-      { label: "Total Reservado", value: fmt(totals.totalReservado), sub: "guardado no período", accent: "#10b981" },
-      { label: "Pendentes", value: fmt(totals.pendentesGasto), sub: "a pagar", accent: "#f59e0b" },
+      { label: "Total Gasto", value: fmt(totals.totalGastos), sub: `Fixo: ${fmt(totals.totalGastosFixo)} · Var: ${fmt(totals.totalGastosVariavel)}`, accent: "#4BE277" },
+      { label: "Disponível", value: fmt(Math.max(0, custoBase - totals.totalGastos)), sub: custoBase === pjProfit ? "baseado no lucro PJ" : "até o fim do mês", accent: "#4BE277" },
+      { label: "Total Reservado", value: fmt(totals.totalReservado), sub: "guardado no período", accent: "#4BE277" },
+      { label: "Pendentes", value: fmt(totals.pendentesGasto), sub: "a pagar", accent: "#aaa" },
     ];
   })();
 
@@ -3504,7 +3507,7 @@ export default function App() {
     {
       label: "Líquido", w: "1.2fr", render: r => {
         const c = calcLiquido(r.faturamento, r.taxas);
-        return <div style={{ fontSize: 13, fontWeight: 700, color: "#16a34a", fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap" }}>{fmt(c.liquido)}</div>;
+        return <div style={{ fontSize: 13, fontWeight: 700, color: "#4BE277", fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap" }}>{fmt(c.liquido)}</div>;
       }
     },
     { label: "Status", w: "1.2fr", render: r => { const s = STATUS_STYLE[r.status]; return <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span className="tag" style={{ background: s.bg, borderColor: s.border, color: s.color }}>{s.label}</span>{r.nf && <span style={{ fontSize: 9, fontWeight: 800, background: "rgba(99,102,241,0.15)", color: "#6366f1", padding: "2px 6px", borderRadius: 4, border: "1px solid rgba(99,102,241,0.3)" }}>NF</span>}</div>; } },
@@ -3628,8 +3631,8 @@ export default function App() {
             onClick={isPJ ? openAddVenda : openAddReserva}
             style={{
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: 140, height: 38, fontSize: 13, fontWeight: 700, fontFamily: "'Syne',sans-serif", borderRadius: 10, border: "none", cursor: "pointer", transition: "all 0.15s", flexShrink: 0,
-              background: page === "main" ? "#16a34a" : "transparent",
-              color: page === "main" ? "#fff" : "transparent",
+              background: page === "main" ? "#4BE277" : "transparent",
+              color: page === "main" ? "#0a0a0a" : "transparent",
               pointerEvents: page === "main" ? "auto" : "none"
             }}>
             {isPJ ? (
@@ -4168,7 +4171,7 @@ export default function App() {
                   </div>
                   {formVenda.faturamento && (
                     <div style={{ background: "#f5f2ed", borderRadius: 12, padding: "14px 16px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-                      {[["Bruto", fmt(previewVenda.fat), "#1a1a1a"], ["Deduções", `−${fmt(previewVenda.totalDeducao)}`, "#c0392b"], ["Líquido", fmt(previewVenda.liquido), "#16a34a"]].map(([label, val, color]) => (
+                      {[["Bruto", fmt(previewVenda.fat), "#1a1a1a"], ["Deduções", `−${fmt(previewVenda.totalDeducao)}`, "#c0392b"], ["Líquido", fmt(previewVenda.liquido), "#4BE277"]].map(([label, val, color]) => (
                         <div key={label}><div style={{ fontSize: 10, color, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4, opacity: 0.7 }}>{label}</div>
                           <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color }}>{val}</div></div>
                       ))}
@@ -4284,7 +4287,7 @@ export default function App() {
                       <span className="tag" style={{ background: s.bg, borderColor: s.border, color: s.color }}>{s.label}</span>
                     </div>
                     <div style={{ background: "var(--divider)", borderRadius: 14, padding: "16px 20px", marginBottom: 16, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-                      {[["Faturamento", fmt(r.faturamento), "var(--text)"], [`Deduções (${fmtPct(c.totalPct)})`, `−${fmt(c.totalDeducao)}`, "#ef4444"], ["Líquido", fmt(c.liquido), "#16a34a"]].map(([label, val, color]) => (
+                      {[["Faturamento", fmt(r.faturamento), "var(--text)"], [`Deduções (${fmtPct(c.totalPct)})`, `−${fmt(c.totalDeducao)}`, "#ef4444"], ["Líquido", fmt(c.liquido), "#4BE277"]].map(([label, val, color]) => (
                         <div key={label}><div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 6 }}>{label}</div>
                           <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color }}>{val}</div></div>
                       ))}
