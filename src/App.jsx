@@ -2243,11 +2243,13 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
                 </div>
                 <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 600, marginBottom: 12 }}>
                   Média mensal: {fmt(pfStats.mediaFinal)} · {
+                    pfStats.mediaSource === "auto" ? `Média real de ${pfStats.numMonths} meses de gastos` :
+                    pfStats.mediaSource === "manual" ? "Custo médio definido nas Preferências" :
+                    pfStats.mediaSource === "custos_fixos" ? "Baseada nos Custos Fixos PF" :
+                    pfStats.mediaSource === "orcamentos" ? "Baseada nos Orçamentos" :
                     pfStats.mediaSource === "prolabore" ? "Baseada no Pró-labore" :
-                    pfStats.mediaSource === "auto" ? `Calculada de ${pfStats.numMonths} meses de dados` : 
                     "Definida nas Preferências"
                   }
-                  {pfStats.mediaSource === "manual" && pfStats.numMonths > 0 && pfStats.numMonths < 3 ? ` · ${pfStats.numMonths}/3 meses p/ média automática` : ""}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                   {pfStats.metas.map(m => (
@@ -3120,7 +3122,7 @@ export default function App() {
     ];
 
     // ── Reserva de Emergência Inteligente ──
-    // Prioridade de Custo Base: Custos Fixos PF > Orçamentos > Média Mensal
+    // Prioridade: Média real dos gastos (≥1 mês) > Preferências configuradas > default
     const totalCustoFixoPF = (perfil.custosFixosPF || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
     const somaOrcamentos = Object.values(orcamentos).reduce((s, v) => s + (parseFloat(v) || 0), 0);
     const mediaManual = unmaskCurrency(maskCurrency(perfil.mediaGastoManual)) || 0;
@@ -3131,28 +3133,31 @@ export default function App() {
     });
     const numMonths = monthsWithSpending.size;
     const totalAllGastos = gastos.filter(g => g.status === "pago").reduce((s, g) => s + g.valor, 0);
-    const mediaAutoGastos = numMonths >= 3 ? totalAllGastos / numMonths : 0;
+    const mediaAutoGastos = numMonths >= 1 ? totalAllGastos / numMonths : 0;
 
     const pl = unmaskCurrency(maskCurrency(perfil.prolabore)) || 0;
+
+    // Valor base de preferências (fallback para usuário novo)
+    const prefBase = mediaManual > 0 ? mediaManual
+      : totalCustoFixoPF > 0 ? totalCustoFixoPF
+      : somaOrcamentos > 0 ? somaOrcamentos
+      : pl > 0 ? pl
+      : 0;
 
     let mediaFinal = 0;
     let mediaSource = "none";
 
-    if (totalCustoFixoPF > 0) {
-      mediaFinal = totalCustoFixoPF;
-      mediaSource = "custos_fixos";
-    } else if (pl > 0) {
-      mediaFinal = pl;
-      mediaSource = "prolabore";
-    } else if (somaOrcamentos > 0) {
-      mediaFinal = somaOrcamentos;
-      mediaSource = "orcamentos";
-    } else if (numMonths >= 3 && mediaAutoGastos > 0) {
+    if (numMonths >= 1 && mediaAutoGastos > 0) {
+      // Tem histórico real: usa média dos gastos
       mediaFinal = mediaAutoGastos;
       mediaSource = "auto";
+    } else if (prefBase > 0) {
+      // Usuário novo: usa valor de preferências
+      mediaFinal = prefBase;
+      mediaSource = mediaManual > 0 ? "manual" : totalCustoFixoPF > 0 ? "custos_fixos" : somaOrcamentos > 0 ? "orcamentos" : "prolabore";
     } else {
-      mediaFinal = mediaManual > 0 ? mediaManual : 1;
-      mediaSource = mediaManual > 0 ? "manual" : "default";
+      mediaFinal = 1;
+      mediaSource = "default";
     }
     const hasMediaData = mediaFinal > 1 || mediaSource !== "default";
 
