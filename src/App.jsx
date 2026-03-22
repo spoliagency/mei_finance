@@ -1086,7 +1086,7 @@ function BankManager({ bancos, setBancos, session, showToast }) {
   );
 }
 
-function ConfigPage({ activeSection = "perfil", categoriasVendas, setCategoriasVendas, categoriasPJ, setCategoriasPJ, categoriasPF, setCategoriasPF, orcamentos, setOrcamento, perfil, setPerfil, isPJ, session, showToast, bancos, setBancos }) {
+function ConfigPage({ activeSection = "perfil", categoriasVendas, setCategoriasVendas, categoriasPJ, setCategoriasPJ, categoriasPF, setCategoriasPF, orcamentos, setOrcamento, perfil, setPerfil, isPJ, session, showToast, bancos, setBancos, exportToCSV, exportToPDF }) {
   const [draftPerfil, setDraftPerfil] = useState(perfil);
   const [section, setSection] = useState(activeSection);
   const [savedFeedback, setSavedFeedback] = useState(false);
@@ -3846,6 +3846,7 @@ export default function App() {
                 perfil={perfil} setPerfil={setPerfil}
                 isPJ={isPJ} session={session} showToast={showToast}
                 bancos={bancos} setBancos={setBancos}
+                exportToCSV={exportToCSV} exportToPDF={exportToPDF}
               />
             )}
 
