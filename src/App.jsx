@@ -3864,14 +3864,14 @@ export default function App() {
                           {isPJ ? (
                             <>
                               <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Bem-vindo(a),</div>
-                              <div className="mobile-welcome-title" style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.empresa || "Sua Empresa"} ✨</div>
+                              <div className="mobile-welcome-title" style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.empresa || "Sua Empresa"}</div>
                             </>
                           ) : (
                             <>
                               <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                                 {(() => { const h = new Date().getHours(); return h >= 5 && h < 12 ? "Bom dia," : h >= 12 && h < 18 ? "Boa tarde," : "Boa noite,"; })()}
                               </div>
-                              <div className="mobile-welcome-title" style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.apelido || perfil.nome || "Visitante"} ✨</div>
+                              <div className="mobile-welcome-title" style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.5px" }}>{perfil.apelido || perfil.nome || "Visitante"}</div>
                             </>
                           )}
                         </div>
