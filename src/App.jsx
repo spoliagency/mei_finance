@@ -2099,29 +2099,20 @@ function Dashboard({ vendas, despesas, gastos, perfil, totals, dateRange, isPJ, 
               </div>
             </div>
           </div>
-          <div className="card" style={{ padding: "24px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-              <div style={{ fontSize: 18 }}>📊</div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", textTransform: "uppercase" }}>Saúde do Negócio</div>
-                <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 600 }}>Resumo financeiro do período selecionado</div>
-              </div>
+          <div className="card" style={{ padding: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Saúde do Negócio</div>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {/* 2 mini-cards */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                <div style={{ padding: "12px", border: "1px solid var(--divider)", borderRadius: 10, textAlign: "center" }}>
-                  <div style={{ fontSize: 16, marginBottom: 4 }}>📉</div>
-                  <div style={{ fontSize: 9, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Custos Operacionais</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "#ef4444", fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap" }}>{fmt(totals.totalDesp + totals.totalDeducao)}</div>
-                  <div style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>Fixos: {fmt(totals.totalDespFixo)} · Var: {fmt(totals.totalDespVariavel)}</div>
-                </div>
-                <div style={{ padding: "12px", border: "1px solid var(--divider)", borderRadius: 10, textAlign: "center" }}>
-                  <div style={{ fontSize: 16, marginBottom: 4 }}>💳</div>
-                  <div style={{ fontSize: 9, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Impacto das Taxas</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace" }}>{totals.totalBruto > 0 ? ((totals.totalDeducao / totals.totalBruto) * 100).toFixed(1) + "%" : "0.0%"}</div>
-                  <div style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 4, fontWeight: 600 }}>% comido pelas taxas</div>
-                </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div style={{ padding: "16px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--divider)" }}>
+                <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", marginBottom: 8 }}>Custos Operacionais</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "#ef4444", fontFamily: "'JetBrains Mono',monospace" }}>{fmt(totals.totalDesp + totals.totalDeducao)}</div>
+                <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 6, fontWeight: 600 }}>Fixos: {fmt(totals.totalDespFixo)} · Var: {fmt(totals.totalDespVariavel)}</div>
+              </div>
+              <div style={{ padding: "16px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--divider)" }}>
+                <div style={{ fontSize: 10, color: "var(--text-dim)", fontWeight: 700, textTransform: "uppercase", marginBottom: 8 }}>Impacto das Taxas</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace" }}>{totals.totalBruto > 0 ? ((totals.totalDeducao / totals.totalBruto) * 100).toFixed(1) + "%" : "0.0%"}</div>
+                <div style={{ fontSize: 10, color: "var(--text-dim)", marginTop: 6, fontWeight: 600 }}>% comido pelas taxas</div>
               </div>
             </div>
           </div>
@@ -3880,7 +3871,7 @@ export default function App() {
                         </div>
 
                         {/* ── Summary cards ── */}
-                        <div className="mobile-summary-grid grid-4" style={{ display: "grid", gridTemplateColumns: isPJ ? "repeat(4, 1fr)" : "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
+                        <div className="mobile-summary-grid grid-4" style={{ display: "grid", gridTemplateColumns: isPJ ? "repeat(4, 1fr)" : "repeat(4, 1fr)", gap: 14, marginBottom: 14 }}>
                           {summaryCards.map((c, i) => (
                             <div key={i} className={`card ${c.className || ""}`} style={{ padding: "18px 20px", borderTop: `3px solid ${c.accent}` }}>
                               <div style={{ fontSize: 10, color: "#999", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.label}</div>
@@ -3890,13 +3881,25 @@ export default function App() {
                           ))}
                         </div>
 
-                        {/* ── List actions & stats ── */}
-                        <div className="hide-mobile" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
-                          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                            <div style={{ fontSize: 12, color: "var(--text-dim)" }}>
-                              {isPJ ? `${filteredVendas.length} venda${filteredVendas.length !== 1 ? "s" : ""} · ${filteredDespesas.length} despesa${filteredDespesas.length !== 1 ? "s" : ""}` : `${filteredGastos.length} gasto${filteredGastos.length !== 1 ? "s" : ""}`}
+                        {/* ── Activity stats ── */}
+                        <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+                          {isPJ ? (
+                            <>
+                              <div className="card" style={{ flex: 1, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
+                                <div style={{ fontSize: 20, fontWeight: 800, color: "#4BE277", fontFamily: "'JetBrains Mono',monospace" }}>{filteredVendas.length}</div>
+                                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.3px" }}>venda{filteredVendas.length !== 1 ? "s" : ""}</div>
+                              </div>
+                              <div className="card" style={{ flex: 1, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
+                                <div style={{ fontSize: 20, fontWeight: 800, color: "#ef4444", fontFamily: "'JetBrains Mono',monospace" }}>{filteredDespesas.length}</div>
+                                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.3px" }}>despesa{filteredDespesas.length !== 1 ? "s" : ""}</div>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="card" style={{ flex: 1, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
+                              <div style={{ fontSize: 20, fontWeight: 800, color: "#4BE277", fontFamily: "'JetBrains Mono',monospace" }}>{filteredGastos.length}</div>
+                              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.3px" }}>gasto{filteredGastos.length !== 1 ? "s" : ""}</div>
                             </div>
-                          </div>
+                          )}
                         </div>
 
                         {/* ── Date filter ── */}
