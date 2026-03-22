@@ -152,8 +152,7 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0a", padding: "12px", fontFamily: "'Syne',sans-serif", boxSizing: "border-box" }}>
-    <div style={{ display: "flex", minHeight: "calc(100vh - 24px)", border: "1.5px solid rgba(255,255,255,0.15)", borderRadius: 16, overflow: "hidden" }}>
+    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'Syne',sans-serif" }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes authPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.7; } }
@@ -479,7 +478,6 @@ export default function AuthPage({ initialView = "login", onPasswordResetComplet
           </div>
         </div>
       )}
-    </div>
     </div>
   );
 }
